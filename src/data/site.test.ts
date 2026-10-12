@@ -51,6 +51,21 @@ describe("structure", () => {
     }
   });
 
+  it("gives every service a unique slug and sane seo lengths", () => {
+    const slugs = site.services.map((s) => s.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const s of site.services) {
+      expect(s.slug).toMatch(/^[a-z0-9-]+$/);
+      expect(s.seoTitle.length, s.seoTitle).toBeLessThanOrEqual(60);
+      expect(s.seoDescription.length, s.seoDescription).toBeGreaterThanOrEqual(100);
+      expect(s.seoDescription.length, s.seoDescription).toBeLessThanOrEqual(165);
+      expect(s.intro.length).toBeGreaterThanOrEqual(2);
+      expect(s.examples.length).toBeGreaterThanOrEqual(3);
+      expect(s.faq.length).toBeGreaterThanOrEqual(3);
+    }
+    expect(site.SITE.description.length).toBeLessThanOrEqual(160);
+  });
+
   it("gives every service and package at least three bullets", () => {
     site.services.forEach((s) => expect(s.includes.length).toBeGreaterThanOrEqual(3));
     site.packages.forEach((p) => expect(p.includes.length).toBeGreaterThanOrEqual(3));
@@ -68,12 +83,9 @@ describe("structure", () => {
 describe("contact links", () => {
   const byId = (id: site.ChannelId) => site.channels.find((c) => c.id === id)!;
 
-  it("builds wa.me from digits only", () => {
-    expect(byId("whatsapp").href).toMatch(/^https:\/\/wa\.me\/\d{10,15}$/);
-  });
-
-  it("encodes the plus sign in the viber link", () => {
-    expect(byId("viber").href).toMatch(/^viber:\/\/chat\?number=%2B\d{10,15}$/);
+  it("publishes no phone number anywhere", () => {
+    const hits = everyString.filter((s) => /(\+63|\b09|\b639)\s?\d{2,3}\s?\d{3}\s?\d{4}/.test(s));
+    expect(hits).toEqual([]);
   });
 
   it("uses a public calendly booking url", () => {
@@ -84,9 +96,5 @@ describe("contact links", () => {
     const m = byId("messenger");
     if (m.value) expect(m.href).toMatch(/^https:\/\/m\.me\/[\w.]+$/);
     else expect(m.href).toBe("");
-  });
-
-  it("matches the display number to the digits", () => {
-    expect(site.SITE.phoneDisplay.replace(/\D/g, "")).toBe(site.SITE.phoneDigits);
   });
 });

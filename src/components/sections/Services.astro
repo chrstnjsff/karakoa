@@ -23,7 +23,9 @@ const { items } = Astro.props;
             <span class="grid h-11 w-11 place-items-center rounded-xl bg-accent/12 text-accent-text">
               <Icon name={s.icon} class="h-5 w-5" />
             </span>
-            <h3 class="mt-4 text-headline font-semibold text-ink">{s.title}</h3>
+            <h3 class="mt-4 text-headline font-semibold text-ink">
+              <a href={`/services/${s.slug}/`} class="link-ul">{s.title}</a>
+            </h3>
             <p class="mt-2 text-footnote text-muted">{s.summary}</p>
             <p class="eyebrow mt-5 text-caption">What is included</p>
             <ul class="mt-2 space-y-1.5 text-footnote text-ink">
@@ -35,6 +37,10 @@ const { items } = Astro.props;
               ))}
             </ul>
             <p class="mt-auto pt-5 text-caption text-muted">{s.stack.join(" · ")}</p>
+            <a href={`/services/${s.slug}/`} class="mt-3 inline-flex min-h-10 items-center gap-1 text-footnote font-semibold text-accent-text">
+              More about this service
+              <Icon name="arrow" class="h-3.5 w-3.5" />
+            </a>
           </li>
         ))
       }

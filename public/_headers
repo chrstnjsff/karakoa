@@ -3,3 +3,10 @@
 # gets a new URL and these can be cached for a year.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Security headers on every response. HTTPS itself is forced by the
+# Cloudflare zone setting "Always Use HTTPS".
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NAV, channels } from "../src/data/site";
+import { NAV, channels, services } from "../src/data/site";
 
 // Reveal animations wait for IntersectionObserver callbacks that never fire
 // in a hidden automation tab; force the final state before asserting.
@@ -108,6 +108,21 @@ test.describe("utility pages", () => {
     const res = await page.goto("/this-does-not-exist");
     expect(res?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Page not found");
+  });
+
+  test("about page renders with the founder", async ({ page }) => {
+    await page.goto("/about/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("About Karakoa");
+    await expect(page.getByText("Christian Josef Aquino")).toBeVisible();
+  });
+
+  test("every service page renders its own title, h1, and faq", async ({ page }) => {
+    for (const s of services) {
+      await page.goto(`/services/${s.slug}/`);
+      await expect(page).toHaveTitle(s.seoTitle);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(s.heading);
+      await expect(page.locator("details")).toHaveCount(s.faq.length);
+    }
   });
 
   test("privacy page renders", async ({ page }) => {

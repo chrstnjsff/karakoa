@@ -1,0 +1,58 @@
+---
+// What a karakoa is, and how each trait of the ship maps to how the studio
+// works. Sits right under the hero so the name and mascot are explained
+// before the services.
+import { Image } from "astro:assets";
+import night from "../../assets/brand/karakoa-night.png";
+import SectionHeading from "../SectionHeading.astro";
+
+interface Props {
+  heritage: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    facts: { fact: string; lesson: string }[];
+    sources: string;
+  };
+}
+const { heritage } = Astro.props;
+---
+
+<section id="name" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="name-title">
+  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
+    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+      <div>
+        <SectionHeading eyebrow={heritage.eyebrow} title={heritage.title} />
+        <p class="reveal d1 -mt-4 text-body text-muted">{heritage.intro}</p>
+        <div class="reveal d2 mt-8 overflow-hidden rounded-2xl">
+          <Image
+            src={night}
+            alt="Karakoa wordmark with the boat mascot under a night sky: a crescent hull on teal waves, a coral sail with a sun, and a flag on the mast."
+            widths={[480, 768, 1024]}
+            sizes="(min-width: 1024px) 28rem, 90vw"
+            format="webp"
+            loading="lazy"
+            class="block h-auto w-full"
+          />
+        </div>
+      </div>
+      <ol class="grid gap-4 sm:grid-cols-2">
+        {
+          heritage.facts.map((f, i) => (
+            <li class={`reveal d${(i % 4) + 1} card flex flex-col p-5`}>
+              <span class="tnum font-display text-title3 font-semibold text-accent-text" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p class="mt-2 text-footnote text-ink">{f.fact}</p>
+              <p class="mt-auto border-t border-line/10 pt-3 text-footnote text-muted">
+                <span class="font-semibold text-teal-text">For us: </span>
+                {f.lesson}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <p class="reveal mt-8 text-caption text-muted">{heritage.sources}</p>
+  </div>
+</section>

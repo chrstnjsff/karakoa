@@ -16,7 +16,7 @@
     "test:e2e": "playwright test",
     "brand": "node scripts/brand/build.mjs",
     "lint:html": "html-validate \"dist/**/*.html\"",
-    "lint:links": "linkinator dist --recurse --skip \"web3forms|m.me|wa.me|viber:|calendly|linkedin|https://karakoa.dev\"",
+    "lint:links": "linkinator dist --recurse --skip \"web3forms|m.me|calendly|linkedin|https://karakoa.dev\"",
     "lint:dash": "node scripts/lint-dash.mjs",
     "verify": "npm run check && npm run lint:dash && npm test && npm run build && npm run lint:html && npm run lint:links"
   },

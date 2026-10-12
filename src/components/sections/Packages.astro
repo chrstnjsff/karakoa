@@ -39,7 +39,7 @@ const { items, note } = Astro.props;
             ))}
           </ul>
           <a
-            href={`#contact`}
+            href={p.id === "capstone" ? "/services/capstone-thesis-system/" : "#contact"}
             class={`btn press mt-auto w-full ${p.featured ? "btn-primary" : "btn-secondary"}`}
             style="margin-top: calc(var(--spacing) * 6)"
           >

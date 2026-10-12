@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Hero from "../components/sections/Hero.astro";
+import Heritage from "../components/sections/Heritage.astro";
 import About from "../components/sections/About.astro";
 import Services from "../components/sections/Services.astro";
 import Work from "../components/sections/Work.astro";
@@ -13,6 +14,7 @@ import {
   SITE,
   hero,
   stats,
+  heritage,
   about,
   services,
   work,
@@ -26,34 +28,69 @@ import {
   contact,
 } from "../data/site";
 
-const title = `${SITE.name} · Websites, mobile apps, and capstone systems`;
+const title = "Software Development Company in the Philippines | Karakoa";
 
 const organization = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
+  "@type": ["ProfessionalService", "Organization"],
+  "@id": `${SITE.url}/#organization`,
   name: SITE.name,
   url: `${SITE.url}/`,
-  logo: `${SITE.url}/apple-touch-icon.png`,
+  logo: { "@type": "ImageObject", url: `${SITE.url}/apple-touch-icon.png`, width: 180, height: 180 },
   image: `${SITE.url}/og.png`,
   description: SITE.description,
-  email: `mailto:${SITE.email}`,
-  telephone: SITE.phoneDisplay,
+  email: SITE.email,
+  priceRange: "PHP",
+  currenciesAccepted: "PHP, USD",
   foundingDate: String(SITE.founded),
-  founder: { "@type": "Person", name: founder.name, url: founder.links[0].href },
+  founder: {
+    "@type": "Person",
+    "@id": `${SITE.url}/#founder`,
+    name: founder.name,
+    jobTitle: founder.role,
+    url: founder.links[0].href,
+    sameAs: founder.links.slice(1).map((l) => l.href),
+  },
   address: {
     "@type": "PostalAddress",
     addressLocality: SITE.location.locality,
     addressRegion: SITE.location.region,
     addressCountry: SITE.location.country,
   },
-  areaServed: "Worldwide",
+  areaServed: [{ "@type": "Country", name: "Philippines" }, { "@type": "Place", name: "Worldwide (remote)" }],
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "14:00",
+      closes: "21:00",
+    },
+  ],
   knowsAbout: services.map((s) => s.title),
-  sameAs: [SITE.githubUrl],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Services",
+    itemListElement: services.map((s) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", name: s.title, url: `${SITE.url}/services/${s.slug}/` },
+    })),
+  },
+  sameAs: [SITE.githubUrl, ...founder.links.slice(1).map((l) => l.href)],
+};
+
+const website = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE.url}/#website`,
+  url: `${SITE.url}/`,
+  name: SITE.name,
+  publisher: { "@id": `${SITE.url}/#organization` },
 };
 
 const faqPage = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  isPartOf: { "@id": `${SITE.url}/#website` },
   mainEntity: faq.flatMap((g) =>
     g.items.map((i) => ({
       "@type": "Question",
@@ -64,8 +101,9 @@ const faqPage = {
 };
 ---
 
-<Base title={title} description={SITE.description} jsonLd={[organization, faqPage]}>
+<Base title={title} description={SITE.description} jsonLd={[organization, website, faqPage]}>
   <Hero hero={hero} stats={stats} />
+  <Heritage heritage={heritage} />
   <About about={about} />
   <Services items={services} />
   <Work items={work} />

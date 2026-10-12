@@ -105,7 +105,7 @@ export const SITE = {
 
 // Public by design: Web3Forms keys only let a page send mail to the inbox
 // they were created for. Replace with the key created for SITE.email.
-export const WEB3FORMS_ACCESS_KEY = "REPLACE_WITH_WEB3FORMS_KEY";
+export const WEB3FORMS_ACCESS_KEY = "41b60b5c-5b0f-4556-af6e-02cbb129f06a";
 
 export const NAV: NavItem[] = [
   { href: "#services", label: "Services" },

@@ -1,8 +1,7 @@
 ---
-import { Picture } from "astro:assets";
-import mascot from "../../assets/brand/karakoa-app-icon.png";
 import Icon from "../Icon.astro";
-import type { Stat } from "../../data/site";
+import HeroFilm from "../HeroFilm.astro";
+import type { Stat, heroFilm, techStack } from "../../data/site";
 
 interface Props {
   hero: {
@@ -14,10 +13,12 @@ interface Props {
     statsNote: string;
   };
   stats: Stat[];
+  film: typeof heroFilm;
+  tech: typeof techStack;
 }
-const { hero, stats } = Astro.props;
-// The hero is above the fold and holds the LCP image, so it renders
-// immediately; the scroll reveal only applies from the stats row down.
+const { hero, stats, film, tech } = Astro.props;
+// The hero is above the fold, so it renders immediately; the scroll
+// reveal only applies from the stats row down.
 ---
 
 <section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pt-20 lg:pb-24" aria-labelledby="hero-title">
@@ -37,19 +38,8 @@ const { hero, stats } = Astro.props;
       </div>
     </div>
 
-    <div class="mx-auto w-full max-w-sm lg:max-w-md">
-      <div class="card overflow-hidden rounded-[2rem] border-0">
-        <Picture
-          src={mascot}
-          alt="The Karakoa mascot: a smiling wooden boat with a coral sail and a sun on it, riding teal waves."
-          widths={[320, 480, 640, 960]}
-          sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 90vw"
-          formats={["avif", "webp"]}
-          loading="eager"
-          fetchpriority="high"
-          class="block h-auto w-full" pictureAttributes={{ class: "block" }}
-        />
-      </div>
+    <div class="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none">
+      <HeroFilm film={film} />
     </div>
   </div>
 
@@ -64,4 +54,118 @@ const { hero, stats } = Astro.props;
     }
   </dl>
   <p class="reveal mt-4 text-caption text-muted">{hero.statsNote}</p>
+
+  <div class="reveal mt-14 border-t border-line/10 pt-8" data-marquee>
+    <div class="flex items-center justify-between gap-4">
+      <p class="eyebrow">{tech.label}</p>
+      <button
+        type="button"
+        class="marquee-toggle press"
+        data-marquee-toggle
+        data-playing
+        aria-label="Pause the moving tools list"
+        hidden
+      >
+        <Icon name="pause" class="i-pause h-4 w-4" />
+        <Icon name="play" class="i-play h-4 w-4" />
+      </button>
+    </div>
+    <div class="marquee mt-4">
+      <ul class="marquee-track">
+        {tech.items.map((item) => <li class="chip">{item}</li>)}
+      </ul>
+      <ul class="marquee-track" aria-hidden="true">
+        {tech.items.map((item) => <li class="chip">{item}</li>)}
+      </ul>
+    </div>
+  </div>
 </section>
+
+<script>
+  // The tools strip moves on its own, so it gets a pause button (WCAG
+  // 2.2.2). Under reduced motion it is a static, wrapped list instead.
+  const strip = document.querySelector<HTMLElement>("[data-marquee]");
+  const button = strip?.querySelector<HTMLButtonElement>("[data-marquee-toggle]");
+  if (strip && button && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    button.hidden = false;
+    button.addEventListener("click", () => {
+      const paused = strip.toggleAttribute("data-paused");
+      button.toggleAttribute("data-playing", !paused);
+      button.setAttribute("aria-label", paused ? "Play the moving tools list" : "Pause the moving tools list");
+    });
+  }
+</script>
+
+<style>
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    flex: none;
+    gap: 0.75rem;
+    padding-right: 0.75rem;
+    animation: marquee 60s linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  [data-paused] .marquee-track {
+    animation-play-state: paused;
+  }
+
+  .marquee-track li {
+    padding: 0.375rem 0.875rem;
+    font-size: var(--text-footnote);
+    white-space: nowrap;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .marquee-toggle {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    place-items: center;
+    border: 1px solid rgb(var(--line) / 0.15);
+    border-radius: 999px;
+    color: rgb(var(--ink));
+    cursor: pointer;
+  }
+
+  .marquee-toggle[hidden] {
+    display: none;
+  }
+
+  .marquee-toggle:hover {
+    border-color: rgb(var(--line) / 0.35);
+  }
+
+  .marquee-toggle[data-playing] :global(.i-play),
+  .marquee-toggle:not([data-playing]) :global(.i-pause) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      flex-wrap: wrap;
+      mask-image: none;
+    }
+
+    .marquee-track {
+      flex-wrap: wrap;
+      animation: none !important;
+    }
+
+    .marquee-track[aria-hidden="true"] {
+      display: none;
+    }
+  }
+</style>

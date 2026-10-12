@@ -20,7 +20,15 @@ export type IconName =
   | "globe"
   | "arrow"
   | "external"
-  | "check";
+  | "check"
+  | "home"
+  | "health"
+  | "layers"
+  | "network"
+  | "play"
+  | "pause"
+  | "expand"
+  | "shrink";
 
 export interface NavItem {
   href: string;
@@ -434,7 +442,7 @@ export const services: Service[] = [
       "Typical work includes moving a system to the cloud, automating deployments with CI/CD, adding monitoring and alerting, hardening security, and cutting cloud bills by rightsizing and tagging.",
     ],
     includes: ["Cloud setup on AWS, GCP, or Azure", "CI/CD pipelines", "Monitoring and alerting", "Security hardening and cost control"],
-    stack: ["AWS", "Kubernetes", "Terraform", "OpenTofu", "GitLab CI", "GitHub Actions"],
+    stack: ["AWS", "Google Cloud", "Azure", "Kubernetes", "Terraform", "OpenTofu", "GitLab CI", "GitHub Actions"],
     examples: ["Infrastructure as code for whole environments", "Zero-downtime deployment pipelines", "Uptime and cost dashboards", "Kubernetes operations and upgrades"],
     faq: [
       {
@@ -630,7 +638,94 @@ export const founder = {
     { label: "LinkedIn", href: "https://www.linkedin.com/in/cjosefaquino/", icon: "linkedin" as IconName },
     { label: "GitHub", href: SITE.githubUrl, icon: "github" as IconName },
   ],
-  skills: ["AWS", "Kubernetes", "Terraform", "React", "Node.js", "Python", "Django", "TypeScript", "React Native", "Claude"],
+  skills: ["AWS", "Google Cloud", "Azure", "Kubernetes", "Terraform", "React", "Node.js", "Python", "Django", "TypeScript", "React Native", "Claude"],
+};
+
+// The hero film: short slides that play in the hero card. Every fact
+// comes from copy above; labels stay short enough for a 320px phone.
+export interface FilmSlide {
+  id: "brand" | "promise" | "build" | "cloud" | "proof" | "process" | "founder" | "close";
+  label: string;
+  /** How long the slide stays up, in milliseconds. */
+  ms: number;
+}
+
+export const heroFilm = {
+  label: "Karakoa in 35 seconds",
+  slides: [
+    { id: "brand", label: "Karakoa", ms: 3600 },
+    { id: "promise", label: "Idea to shipped", ms: 3600 },
+    { id: "build", label: "What we build", ms: 6600 },
+    { id: "cloud", label: "Cloud", ms: 4400 },
+    { id: "proof", label: "Proof", ms: 4800 },
+    { id: "process", label: "How we work", ms: 5400 },
+    { id: "founder", label: "Who you work with", ms: 4000 },
+    { id: "close", label: "Start a project", ms: 5000 },
+  ] satisfies FilmSlide[],
+  brand: { caption: "Founder-led software studio", place: "Metro Manila, PH" },
+  promise: { from: "Idea.", to: "Shipped.", line: "Websites, apps, and systems, delivered on time." },
+  build: [
+    { label: "AI and agentic solutions", icon: "sparkles" },
+    { label: "E-commerce mobile apps", icon: "cart" },
+    { label: "Real estate applications", icon: "home" },
+    { label: "Healthcare portals", icon: "health" },
+    { label: "Multi-tenant platforms", icon: "layers" },
+    { label: "Multi-tenant clusters", icon: "network" },
+    { label: "Cloud infrastructure from scratch", icon: "cloud" },
+    { label: "Websites and web apps", icon: "web" },
+    { label: "Capstone and thesis systems", icon: "capstone" },
+  ] satisfies { label: string; icon: IconName }[],
+  cloud: {
+    names: ["AWS.", "Google Cloud.", "Azure."],
+    line: "Hands-on in all three, from an empty account to production.",
+  },
+  proof: [
+    { value: stats[1].value, label: "uptime on platforms we operate" },
+    { value: stats[2].value, label: "users served" },
+    { value: stats[3].value, label: "agencies in 5 US states" },
+    { value: stats[0].value, label: "years in production" },
+  ],
+  process: [
+    { name: "Discover", gets: process[0].deliverable },
+    { name: "Design", gets: process[1].deliverable },
+    { name: "Build", gets: process[2].deliverable },
+    { name: "Test", gets: process[3].deliverable },
+    { name: "Launch", gets: process[4].deliverable },
+  ],
+  founder: { lines: ["One senior engineer.", "Start to finish."], name: founder.name, role: founder.role },
+  close: { lines: ["Your idea,", "shipped on time."], cta: { href: "#contact", label: "Start a project" } },
+};
+
+/** The moving tools strip under the hero. */
+export const techStack = {
+  label: "Tools we ship with",
+  items: [
+    "AWS",
+    "Google Cloud",
+    "Azure",
+    "Kubernetes",
+    "Terraform",
+    "Docker",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "React Native",
+    "Expo",
+    "Node.js",
+    "Python",
+    "Django",
+    "PostgreSQL",
+    "Supabase",
+    "Firebase",
+    "GraphQL",
+    "Redux",
+    "Tailwind CSS",
+    "Shopify API",
+    "Claude AI",
+    "Gemini AI",
+    "Vercel AI SDK",
+    "MCP",
+  ],
 };
 
 export const faq: FaqGroup[] = [

@@ -16,6 +16,8 @@ import {
   SITE,
   hero,
   stats,
+  heroFilm,
+  techStack,
   heritage,
   about,
   services,
@@ -106,7 +108,7 @@ const faqPage = {
 ---
 
 <Base title={title} ogImage="/og/home.png" description={SITE.description} jsonLd={[organization, website, faqPage]}>
-  <Hero hero={hero} stats={stats} />
+  <Hero hero={hero} stats={stats} film={heroFilm} tech={techStack} />
   <Heritage heritage={heritage} />
   <About about={about} />
   <Services items={services} />

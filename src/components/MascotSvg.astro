@@ -1,0 +1,138 @@
+---
+// The Karakoa boat as inline SVG, so it can move: the hull bobs, the sail
+// breathes, the sun turns, the flag ripples, and the waves roll. Shapes
+// follow the brand mascot (and the Remotion rig in ~/karakoa-video).
+// Motion is CSS only and stops under prefers-reduced-motion.
+interface Props {
+  /** Unique per page: prefixes the clip-path id. Size it with its parent. */
+  id: string;
+}
+const { id } = Astro.props;
+
+const wave = (y: number) => `M-60 ${y}` + " q15 -12 30 0 t30 0".repeat(10);
+const rays = Array.from({ length: 8 }, (_, i) => {
+  const a = (i * Math.PI) / 4;
+  const r = (n: number) => Math.round(n * 10) / 10;
+  return { x1: r(208 + Math.cos(a) * 29), y1: r(148 + Math.sin(a) * 29), x2: r(208 + Math.cos(a) * 40), y2: r(148 + Math.sin(a) * 40) };
+});
+---
+
+<svg class="mascot" viewBox="0 0 400 440" aria-hidden="true">
+  <defs>
+    <clipPath id={`${id}-sea`}>
+      <rect x="44" y="370" width="312" height="70"></rect>
+    </clipPath>
+  </defs>
+
+  <g clip-path={`url(#${id}-sea)`} fill="none" stroke="#3cc4bf" stroke-width="9" stroke-linecap="round">
+    <path class="m-wave" d={wave(392)}></path>
+    <path class="m-wave m-wave-2" d={wave(418)}></path>
+  </g>
+
+  <g class="m-boat" stroke="#0b1e2c" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="9" d="M150 320v32M250 320v32"></path>
+    <rect x="92" y="344" width="216" height="20" rx="10" fill="#f4d58d" stroke-width="8"></rect>
+    <path stroke-width="9" d="M200 252V36"></path>
+
+    <g class="m-flag">
+      <path d="M200 30C228 18 252 44 292 28L278 46L292 62C252 74 228 52 200 62Z" fill="#f0553a" stroke-width="7"></path>
+      <path d="M206 44C230 36 250 56 280 45" fill="none" stroke="#f4d58d" stroke-width="6"></path>
+    </g>
+
+    <g class="m-sail">
+      <path d="M128 92L288 76Q300 142 284 208L134 216Q146 152 128 92Z" fill="#f0553a" stroke-width="9"></path>
+      <path stroke-width="9" d="M122 88L294 72M128 218L290 208"></path>
+      <g class="m-sun" stroke="#ffffff" stroke-width="6">
+        {rays.map((r) => <line {...r} />)}
+      </g>
+      <circle cx="208" cy="148" r="19" fill="#ffffff" stroke="none"></circle>
+    </g>
+
+    <path d="M58 214Q74 336 200 338Q326 336 342 214Q272 252 200 252Q128 252 58 214Z" fill="#e3a75b" stroke-width="10"></path>
+    <g stroke="none" fill="#f28b82" opacity="0.85">
+      <ellipse cx="128" cy="300" rx="16" ry="9"></ellipse>
+      <ellipse cx="272" cy="300" rx="16" ry="9"></ellipse>
+    </g>
+    <path fill="none" stroke-width="8" d="M146 268L168 282L146 296M254 268L232 282L254 296"></path>
+    <path d="M182 300Q200 322 218 300Z" fill="#0b1e2c" stroke-width="6"></path>
+    <ellipse cx="200" cy="310" rx="7" ry="4" fill="#f06b6b" stroke="none"></ellipse>
+  </g>
+</svg>
+
+<style>
+  .mascot {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .mascot :is(.m-boat, .m-flag, .m-sail, .m-sun, .m-wave) {
+    transform-box: view-box;
+  }
+
+  .m-boat {
+    transform-origin: 200px 360px;
+    animation: m-bob 2.6s ease-in-out infinite alternate;
+  }
+
+  .m-flag {
+    transform-origin: 200px 46px;
+    animation: m-flag 0.9s ease-in-out infinite alternate;
+  }
+
+  .m-sail {
+    transform-origin: 130px 150px;
+    animation: m-billow 1.8s ease-in-out infinite alternate;
+  }
+
+  .m-sun {
+    transform-origin: 208px 148px;
+    animation: m-turn 9s linear infinite;
+  }
+
+  .m-wave {
+    animation: m-roll 1.6s linear infinite;
+  }
+
+  .m-wave-2 {
+    animation-duration: 2.2s;
+    animation-direction: reverse;
+  }
+
+  @keyframes m-bob {
+    from {
+      transform: translateY(-7px) rotate(-2deg);
+    }
+    to {
+      transform: translateY(5px) rotate(2deg);
+    }
+  }
+
+  @keyframes m-flag {
+    from {
+      transform: skewY(-5deg);
+    }
+    to {
+      transform: skewY(4deg) scaleX(0.96);
+    }
+  }
+
+  @keyframes m-billow {
+    to {
+      transform: scaleX(1.04);
+    }
+  }
+
+  @keyframes m-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes m-roll {
+    to {
+      transform: translateX(-60px);
+    }
+  }
+</style>

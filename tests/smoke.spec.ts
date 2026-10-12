@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NAV, channels, services } from "../src/data/site";
+import { NAV, channels, heroFilm, services, techStack } from "../src/data/site";
 
 // Reveal animations wait for IntersectionObserver callbacks that never fire
 // in a hidden automation tab; force the final state before asserting.
@@ -81,6 +81,59 @@ test.describe("landing page", () => {
     await first.locator("summary").click();
     await expect(first).toHaveAttribute("open", "");
     await expect(first.locator("p")).toBeVisible();
+  });
+});
+
+test.describe("hero film", () => {
+  test("shows one slide at a time, pauses, and jumps between slides", async ({ page }) => {
+    await page.goto("/");
+    const film = page.getByRole("region", { name: heroFilm.label });
+    await expect(film).toBeVisible();
+    await expect(film.locator("[data-slide][data-active]")).toHaveCount(1);
+    await expect(film.locator("[data-slide]")).toHaveCount(heroFilm.slides.length);
+
+    await film.getByRole("button", { name: "Pause slides" }).click();
+    await expect(film).toHaveAttribute("data-paused", "");
+    const clock = await film.evaluate((el) => el.querySelector("[data-seg][data-state='now'] .fill")?.getAnimations()[0]?.playState);
+    expect(clock, "the slide clock stops").toBe("paused");
+
+    const build = heroFilm.slides.findIndex((s) => s.id === "build");
+    await film.locator("[data-seg]").nth(build).click();
+    await expect(film.locator("[data-slide='build']")).toHaveAttribute("data-active", "");
+    await expect(film.locator("[data-seg]").nth(build)).toHaveAttribute("aria-current", "step");
+    expect(await film.locator("[data-slide]:not([data-active])").evaluateAll((els) => els.every((el) => (el as HTMLElement).inert))).toBe(true);
+
+    await page.keyboard.press("ArrowRight");
+    await expect(film.locator(`[data-slide='${heroFilm.slides[build + 1].id}']`)).toHaveAttribute("data-active", "");
+
+    await film.getByRole("button", { name: "Play slides" }).click();
+    await expect(film).not.toHaveAttribute("data-paused", "");
+  });
+
+  test("moves on to the next slide by itself", async ({ page }) => {
+    await page.goto("/");
+    // Below the fold (phones) the film holds still until it is seen.
+    await page.locator("[data-film]").scrollIntoViewIfNeeded();
+    const second = page.locator(`[data-slide='${heroFilm.slides[1].id}']`);
+    await expect(second).toHaveAttribute("data-active", "", { timeout: heroFilm.slides[0].ms + 3000 });
+  });
+
+  test("starts paused when the reader asks for reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const film = page.getByRole("region", { name: heroFilm.label });
+    await expect(film.getByRole("button", { name: "Play slides" })).toBeVisible();
+    await expect(film).toHaveAttribute("data-paused", "");
+  });
+
+  test("tools strip lists every tool once for readers and can be paused", async ({ page }) => {
+    await page.goto("/");
+    await settle(page);
+    const strip = page.locator("[data-marquee]");
+    await expect(strip.locator("ul:not([aria-hidden]) li")).toHaveCount(techStack.items.length);
+    await strip.getByRole("button", { name: "Pause the moving tools list" }).click();
+    await expect(strip).toHaveAttribute("data-paused", "");
+    await expect(strip.getByRole("button", { name: "Play the moving tools list" })).toBeVisible();
   });
 });
 

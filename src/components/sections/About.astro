@@ -17,7 +17,7 @@ const { about } = Astro.props;
   <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
     <div>
       <SectionHeading eyebrow={about.eyebrow} title={about.title} />
-      <p class="reveal d1 -mt-4 text-body text-muted">{about.body}</p>
+      <p class="reveal d1 -mt-4 text-callout text-muted">{about.body}</p>
     </div>
     <ul class="grid gap-4 sm:grid-cols-2">
       {
@@ -27,7 +27,7 @@ const { about } = Astro.props;
               <Icon name="check" class="h-4 w-4" />
             </span>
             <h3 class="mt-4 text-headline font-semibold text-ink">{p.title}</h3>
-            <p class="mt-2 text-footnote text-muted">{p.body}</p>
+            <p class="mt-2 text-body text-muted">{p.body}</p>
           </li>
         ))
       }

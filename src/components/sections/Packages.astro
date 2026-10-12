@@ -16,7 +16,7 @@ const { items, note } = Astro.props;
     title="Ways to work with us"
     lede="Pick the shape that matches your project. Scope and price are confirmed after a short call."
   />
-  <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  <ul class="grid gap-4 md:grid-cols-2">
     {
       items.map((p, i) => (
         <li
@@ -24,13 +24,13 @@ const { items, note } = Astro.props;
         >
           {p.featured && <p class="eyebrow text-accent-text">Most requested</p>}
           <h3 class={`text-title3 font-semibold text-ink ${p.featured ? "mt-2" : ""}`}>{p.name}</h3>
-          <p class="mt-2 text-footnote text-muted">{p.tagline}</p>
+          <p class="mt-2 text-body text-muted">{p.tagline}</p>
           <p class="mt-4 flex flex-wrap gap-2">
             {p.meta.map((m) => (
               <span class="chip">{m}</span>
             ))}
           </p>
-          <ul class="mt-5 space-y-2 text-footnote text-ink">
+          <ul class="mt-5 space-y-2 text-body text-ink">
             {p.includes.map((b) => (
               <li class="flex gap-2">
                 <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />

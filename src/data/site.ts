@@ -125,7 +125,10 @@ export const NAV: NavItem[] = [
 ];
 
 /** Full pages, linked from the footer and the About card. */
-export const PAGES: NavItem[] = [{ href: "/about/", label: "About" }];
+export const PAGES: NavItem[] = [
+  { href: "/guides/", label: "Guides" },
+  { href: "/about/", label: "About" },
+];
 
 export const hero = {
   eyebrow: "Founder-led software studio, Metro Manila, Philippines",
@@ -776,6 +779,7 @@ export const aboutPage = {
 export const footer = {
   line: "Founder-led software development studio in Metro Manila, Philippines: websites, mobile apps, custom systems, and capstone projects.",
   links: [
+    { href: "/guides/", label: "Guides" },
     { href: "/about/", label: "About" },
     { href: "/privacy/", label: "Privacy" },
     { href: "https://christianaquino.dev", label: "Founder portfolio", external: true },

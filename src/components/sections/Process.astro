@@ -15,7 +15,7 @@ const { steps } = Astro.props;
       title="How a project runs"
       lede="Understand the problem, shape the system, build deliberately, test thoroughly, and launch with support in place."
     />
-    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {
         steps.map((s, i) => (
           <li class={`reveal d${(i % 5) + 1} card flex flex-col p-5`}>
@@ -26,7 +26,7 @@ const { steps } = Astro.props;
               <span class="sr-only">Step {i + 1}: </span>
               {s.title}
             </h3>
-            <p class="mt-2 text-footnote text-muted">{s.body}</p>
+            <p class="mt-2 text-body text-muted">{s.body}</p>
             <p class="mt-auto pt-4 text-caption text-muted">
               <span class="font-semibold text-ink">You receive:</span> {s.deliverable}
             </p>

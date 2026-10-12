@@ -70,22 +70,22 @@
    Type scale - one ramp, each step paired with its line height.
    --------------------------------------------------------------- */
 @theme {
-  --text-caption: 0.75rem;
+  --text-caption: 0.875rem;
   --text-caption--line-height: 1.5;
-  --text-footnote: 0.8125rem;
+  --text-footnote: 0.9375rem;
   --text-footnote--line-height: 1.55;
-  --text-body: 1rem;
-  --text-body--line-height: 1.65;
-  --text-callout: 1.0625rem;
-  --text-callout--line-height: 1.6;
-  --text-headline: 1.125rem;
-  --text-headline--line-height: 1.45;
-  --text-title3: 1.3125rem;
-  --text-title3--line-height: 1.3;
-  --text-title2: 1.75rem;
-  --text-title2--line-height: 1.18;
-  --text-title1: 2.25rem;
-  --text-title1--line-height: 1.08;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-callout: 1.1875rem;
+  --text-callout--line-height: 1.55;
+  --text-headline: 1.25rem;
+  --text-headline--line-height: 1.4;
+  --text-title3: 1.5rem;
+  --text-title3--line-height: 1.25;
+  --text-title2: 2rem;
+  --text-title2--line-height: 1.15;
+  --text-title1: 2.5rem;
+  --text-title1--line-height: 1.1;
   --text-large: 3rem;
   --text-large--line-height: 1.04;
   --text-huge: 3.75rem;
@@ -388,7 +388,7 @@ html.theme-fade * {
 /* Small label above headings and inside cards */
 .eyebrow {
   font-family: var(--font-display);
-  font-size: var(--text-footnote);
+  font-size: var(--text-caption);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -508,7 +508,7 @@ html.theme-fade * {
   border-radius: var(--radius-control);
   background-color: rgb(var(--surface));
   padding: 0.625rem 0.875rem;
-  font-size: 1rem;
+  font-size: var(--text-body);
   line-height: 1.5;
   color: rgb(var(--ink));
   transition:

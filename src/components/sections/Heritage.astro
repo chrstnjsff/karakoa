@@ -23,7 +23,7 @@ const { heritage } = Astro.props;
     <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
       <div>
         <SectionHeading eyebrow={heritage.eyebrow} title={heritage.title} />
-        <p class="reveal d1 -mt-4 text-body text-muted">{heritage.intro}</p>
+        <p class="reveal d1 -mt-4 text-callout text-muted">{heritage.intro}</p>
         <div class="reveal d2 mt-8 overflow-hidden rounded-2xl">
           <Image
             src={night}
@@ -43,8 +43,8 @@ const { heritage } = Astro.props;
               <span class="tnum font-display text-title3 font-semibold text-accent-text" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <p class="mt-2 text-footnote text-ink">{f.fact}</p>
-              <p class="mt-auto border-t border-line/10 pt-3 text-footnote text-muted">
+              <p class="mt-2 text-body text-ink">{f.fact}</p>
+              <p class="mt-auto border-t border-line/10 pt-3 text-body text-muted">
                 <span class="font-semibold text-teal-text">For us: </span>
                 {f.lesson}
               </p>

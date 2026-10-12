@@ -1,0 +1,152 @@
+---
+// One page per guide in src/content/guides, with Article and breadcrumb
+// schema and a share image generated from the title.
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
+import { SITE, founder, calendlyUrl } from "../../data/site";
+
+export async function getStaticPaths() {
+  const guides = await getCollection("guides");
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const { Content, headings } = await render(guide);
+const pageUrl = `${SITE.url}/guides/${guide.id}/`;
+const others = (await getCollection("guides"))
+  .filter((g) => g.id !== guide.id)
+  .sort((a, b) => a.data.order - b.data.order);
+const sections = headings.filter((h) => h.depth === 2);
+const fmt = new Intl.DateTimeFormat("en-PH", { year: "numeric", month: "long", day: "numeric" });
+const isoDate = guide.data.updated.toISOString().slice(0, 10);
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "@id": `${pageUrl}#article`,
+  headline: guide.data.title,
+  description: guide.data.description,
+  url: pageUrl,
+  mainEntityOfPage: pageUrl,
+  image: `${SITE.url}/og/guide-${guide.id}.png`,
+  datePublished: isoDate,
+  dateModified: isoDate,
+  inLanguage: "en",
+  author: { "@id": `${SITE.url}/#founder`, "@type": "Person", name: founder.name },
+  publisher: { "@id": `${SITE.url}/#organization` },
+  audience: { "@type": "EducationalAudience", educationalRole: "student" },
+  isPartOf: { "@id": `${SITE.url}/#website` },
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE.url}/` },
+    { "@type": "ListItem", position: 2, name: "Guides", item: `${SITE.url}/guides/` },
+    { "@type": "ListItem", position: 3, name: guide.data.title, item: pageUrl },
+  ],
+};
+---
+
+<Base
+  title={guide.data.seoTitle}
+  description={guide.data.description}
+  ogImage={`/og/guide-${guide.id}.png`}
+  jsonLd={[articleLd, breadcrumbLd]}
+>
+  <article class="mx-auto max-w-6xl px-5 pb-16 sm:px-6 lg:pb-24">
+    <nav aria-label="Breadcrumb" class="pt-8 text-footnote text-muted">
+      <ol class="flex flex-wrap items-center gap-2">
+        <li><a href="/" class="link-ul">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="/guides/" class="link-ul">Guides</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-ink" aria-current="page">{guide.data.title}</li>
+      </ol>
+    </nav>
+
+    <header class="max-w-3xl pb-10 pt-8 lg:pt-12">
+      <p class="eyebrow">{guide.data.audience}</p>
+      <h1 class="mt-4 text-title1 font-semibold text-ink sm:text-large">{guide.data.title}</h1>
+      <p class="mt-5 text-callout text-muted">{guide.data.summary}</p>
+      <p class="mt-4 text-footnote text-muted">
+        By <a href="/about/" class="link-ul text-ink">{founder.name}</a>. Updated{" "}
+        <time datetime={isoDate}>{fmt.format(guide.data.updated)}</time>.
+      </p>
+    </header>
+
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+      <div class="prose max-w-3xl">
+        <Content />
+      </div>
+
+      <aside class="self-start lg:sticky lg:top-24">
+        <nav class="card p-5" aria-labelledby="toc-title">
+          <p id="toc-title" class="eyebrow">In this guide</p>
+          <ol class="mt-3 space-y-1">
+            {
+              sections.map((s) => (
+                <li>
+                  <a href={`#${s.slug}`} class="inline-flex min-h-9 items-center text-footnote text-muted hover:text-ink">
+                    {s.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+        <div class="card mt-4 p-5">
+          <p class="eyebrow">Sources</p>
+          <ul class="mt-3 space-y-2">
+            {
+              guide.data.sources.map((s) => (
+                <li>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-start gap-1.5 text-caption text-muted hover:text-ink"
+                  >
+                    <Icon name="external" class="mt-0.5 h-3 w-3 shrink-0" />
+                    <span>{s.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <section class="mt-14 border-t border-line/10 pt-10" aria-labelledby="more-title">
+      <h2 id="more-title" class="eyebrow">More guides</h2>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        {
+          others.map((o) => (
+            <li>
+              <a href={`/guides/${o.id}/`} class="card card-lift block p-4 text-body font-semibold text-ink">
+                {o.data.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="card mt-10 p-6 sm:p-8" aria-labelledby="cta-title">
+      <h2 id="cta-title" class="text-title3 font-semibold text-ink">Building a capstone or thesis system?</h2>
+      <p class="mt-2 text-body text-muted">
+        Tell us the title, the deadline, and what your panel asked for. You get a reply within one working day.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href="/services/capstone-thesis-system/" class="btn btn-primary press">
+          See the capstone service
+          <Icon name="arrow" class="h-4 w-4" />
+        </a>
+        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn btn-secondary press">Book a call</a>
+      </div>
+    </section>
+  </article>
+</Base>

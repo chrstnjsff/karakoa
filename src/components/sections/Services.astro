@@ -16,7 +16,7 @@ const { items } = Astro.props;
       title="What we build"
       lede="Everything from a one-page site to a full system. Each service below lists what is included so you know what you are getting before the first call."
     />
-    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <ul class="grid gap-4 sm:grid-cols-2">
       {
         items.map((s, i) => (
           <li id={`service-${s.id}`} class={`reveal d${(i % 4) + 1} card card-lift flex flex-col p-5`}>
@@ -26,9 +26,9 @@ const { items } = Astro.props;
             <h3 class="mt-4 text-headline font-semibold text-ink">
               <a href={`/services/${s.slug}/`} class="link-ul">{s.title}</a>
             </h3>
-            <p class="mt-2 text-footnote text-muted">{s.summary}</p>
+            <p class="mt-2 text-body text-muted">{s.summary}</p>
             <p class="eyebrow mt-5 text-caption">What is included</p>
-            <ul class="mt-2 space-y-1.5 text-footnote text-ink">
+            <ul class="mt-2 space-y-1.5 text-body text-ink">
               {s.includes.map((b) => (
                 <li class="flex gap-2">
                   <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />
@@ -37,7 +37,7 @@ const { items } = Astro.props;
               ))}
             </ul>
             <p class="mt-auto pt-5 text-caption text-muted">{s.stack.join(" · ")}</p>
-            <a href={`/services/${s.slug}/`} class="mt-3 inline-flex min-h-10 items-center gap-1 text-footnote font-semibold text-accent-text">
+            <a href={`/services/${s.slug}/`} class="mt-3 inline-flex min-h-10 items-center gap-1 text-body font-semibold text-accent-text">
               More about this service
               <Icon name="arrow" class="h-3.5 w-3.5" />
             </a>

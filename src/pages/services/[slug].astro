@@ -3,6 +3,7 @@
 // service has its own title, description, H1, FAQ, and Service schema.
 import Base from "../../layouts/Base.astro";
 import Icon from "../../components/Icon.astro";
+import { getCollection } from "astro:content";
 import { SITE, services, calendlyUrl, hours } from "../../data/site";
 
 export function getStaticPaths() {
@@ -12,6 +13,8 @@ export function getStaticPaths() {
 const { service } = Astro.props;
 const pageUrl = `${SITE.url}/services/${service.slug}/`;
 const others = services.filter((s) => s.id !== service.id);
+const guides =
+  service.id === "capstone" ? (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order) : [];
 
 const serviceLd = {
   "@context": "https://schema.org",
@@ -50,7 +53,10 @@ const faqLd = {
 };
 ---
 
-<Base title={service.seoTitle} description={service.seoDescription} jsonLd={[serviceLd, breadcrumbLd, faqLd]}>
+<Base
+  title={service.seoTitle}
+  description={service.seoDescription}
+  ogImage={`/og/service-${service.slug}.png`} jsonLd={[serviceLd, breadcrumbLd, faqLd]}>
   <article class="mx-auto max-w-6xl px-5 pb-16 sm:px-6 lg:pb-24">
     <nav aria-label="Breadcrumb" class="pt-8 text-footnote text-muted">
       <ol class="flex flex-wrap items-center gap-2">
@@ -112,6 +118,25 @@ const faqLd = {
       </ul>
     </section>
 
+    {
+      guides.length > 0 && (
+        <section class="border-t border-line/10 py-12" aria-labelledby="guides-title">
+          <h2 id="guides-title" class="text-title2 font-semibold text-ink">Free guides for students</h2>
+          <p class="mt-2 text-body text-muted">What we tell every student before the first call.</p>
+          <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+            {guides.map((g) => (
+              <li>
+                <a href={`/guides/${g.id}/`} class="card card-lift block p-4">
+                  <span class="block text-body font-semibold text-ink">{g.data.title}</span>
+                  <span class="mt-1 block text-footnote text-muted">{g.data.summary}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
     <section class="border-t border-line/10 py-12" aria-labelledby="faq-title">
       <h2 id="faq-title" class="text-title2 font-semibold text-ink">Questions about this service</h2>
       <div class="mt-6 max-w-3xl divide-y divide-line/10 border-y border-line/10">
@@ -124,7 +149,7 @@ const faqLd = {
                   <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </summary>
-              <p class="pb-4 pr-8 text-footnote text-muted">{item.a}</p>
+              <p class="pb-4 pr-8 text-body text-muted">{item.a}</p>
             </details>
           ))
         }

@@ -4,7 +4,7 @@
 // Base.astro renders and drives.
 import Logo from "./Logo.astro";
 import ThemeSwitch from "./ThemeSwitch.astro";
-import { NAV, SITE, calendlyUrl } from "../data/site";
+import { NAV, PAGES, SITE, calendlyUrl } from "../data/site";
 
 const isHome = Astro.url.pathname === "/";
 const link = (href: string) => (isHome ? href : `/${href}`);
@@ -30,6 +30,17 @@ const link = (href: string) => (isHome ? href : `/${href}`);
             href={link(item.href)}
             data-nav-link
             data-spy={isHome ? "" : undefined}
+            class="inline-flex min-h-11 items-center rounded-lg px-3 text-footnote font-semibold text-muted"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      {
+        PAGES.map((item) => (
+          <a
+            href={item.href}
+            data-nav-link
             class="inline-flex min-h-11 items-center rounded-lg px-3 text-footnote font-semibold text-muted"
           >
             {item.label}

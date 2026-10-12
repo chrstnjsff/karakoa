@@ -125,6 +125,32 @@ test.describe("utility pages", () => {
     }
   });
 
+  test("guides index and every guide render with their share image", async ({ page, request }) => {
+    await page.goto("/guides/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Capstone and thesis guides");
+    const links = await page.locator("ol a.link-ul").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")));
+    expect(links.length).toBeGreaterThanOrEqual(5);
+    for (const href of links) {
+      await page.goto(href!);
+      await expect(page.getByRole("heading", { level: 1 })).not.toBeEmpty();
+      const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+      expect(og).toContain("/og/guide-");
+      const res = await request.get(new URL(og!).pathname);
+      expect(res.status()).toBe(200);
+      expect(res.headers()["content-type"]).toContain("image/png");
+    }
+  });
+
+  test("home, about, and service pages have their own share image", async ({ page, request }) => {
+    for (const path of ["/", "/about/", `/services/${services[0].slug}/`]) {
+      await page.goto(path);
+      const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+      expect(og).toMatch(/\/og\/[a-z0-9-]+\.png$/);
+      const res = await request.get(new URL(og!).pathname);
+      expect(res.status()).toBe(200);
+    }
+  });
+
   test("privacy page renders", async ({ page }) => {
     await page.goto("/privacy/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("How we handle");

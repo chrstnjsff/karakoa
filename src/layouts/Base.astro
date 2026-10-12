@@ -6,7 +6,7 @@ import Header from "../components/Header.astro";
 import Logo from "../components/Logo.astro";
 import ThemeSwitch from "../components/ThemeSwitch.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-import { SITE, NAV, calendlyUrl } from "../data/site";
+import { SITE, NAV, PAGES, calendlyUrl } from "../data/site";
 
 interface Props {
   title: string;
@@ -23,7 +23,7 @@ const { title, description, ogImage = "/og.png", noindex = false, jsonLd = [] } 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageUrl = new URL(ogImage, Astro.site).href;
 const isHome = Astro.url.pathname === "/";
-const link = (href: string) => (isHome ? href : `/${href}`);
+const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${href}`);
 ---
 
 <!doctype html>
@@ -117,7 +117,7 @@ const link = (href: string) => (isHome ? href : `/${href}`);
         <nav aria-label="Primary, mobile">
           <ul>
             {
-              NAV.map((item) => (
+              [...NAV, ...PAGES].map((item) => (
                 <li>
                   <a
                     href={link(item.href)}

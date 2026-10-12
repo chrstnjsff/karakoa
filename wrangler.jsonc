@@ -1,0 +1,16 @@
+// Cloudflare Workers deploy for the static site in dist/.
+// Workers Builds runs `npm run build` then `npx wrangler deploy` on every
+// push to main; `name` must match the Worker in the dashboard.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "karakoa",
+  "compatibility_date": "2026-09-28",
+  // Assets only, no Worker script: requests never invoke code.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+  },
+  "routes": [{ "pattern": "karakoa.dev", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false,
+}

@@ -1,0 +1,44 @@
+{
+  "name": "karakoa",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "brand": "node scripts/brand/build.mjs",
+    "lint:html": "html-validate \"dist/**/*.html\"",
+    "lint:links": "linkinator dist --recurse --skip \"web3forms|m.me|wa.me|viber:|calendly|linkedin|https://karakoa.dev\"",
+    "lint:dash": "node scripts/lint-dash.mjs",
+    "verify": "npm run check && npm run lint:dash && npm test && npm run build && npm run lint:html && npm run lint:links"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/fredoka": "^5.3.0",
+    "@fontsource-variable/nunito-sans": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.64.0",
+    "html-validate": "^11.16.2",
+    "linkinator": "^8.1.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4",
+    "wrangler": "^4.142.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "workerd@1.20261006.1": true
+  }
+}

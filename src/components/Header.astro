@@ -1,0 +1,67 @@
+---
+// Sticky top bar: wordmark, section links (md+), theme switch, and the
+// booking button. Below md the links live in the mobile dialog that
+// Base.astro renders and drives.
+import Logo from "./Logo.astro";
+import ThemeSwitch from "./ThemeSwitch.astro";
+import { NAV, SITE, calendlyUrl } from "../data/site";
+
+const isHome = Astro.url.pathname === "/";
+const link = (href: string) => (isHome ? href : `/${href}`);
+---
+
+<header
+  class="material-bar sticky top-0 z-50 border-b border-line/10"
+  data-inert-when-menu
+>
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
+    <a
+      href={isHome ? "#top" : "/"}
+      class="press -mx-2 inline-flex min-h-11 items-center px-2"
+      aria-label={isHome ? `${SITE.name}, back to top` : `${SITE.name}, home`}
+    >
+      <Logo size={30} />
+    </a>
+
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="Primary">
+      {
+        NAV.map((item) => (
+          <a
+            href={link(item.href)}
+            data-nav-link
+            data-spy={isHome ? "" : undefined}
+            class="inline-flex min-h-11 items-center rounded-lg px-3 text-footnote font-semibold text-muted"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="hidden sm:block">
+        <ThemeSwitch />
+      </div>
+      <a
+        href={calendlyUrl}
+        target="_blank"
+        rel="noopener"
+        class="btn btn-primary press min-h-10 px-3.5 text-footnote sm:px-4"
+      >
+        Book a call
+      </a>
+      <button
+        type="button"
+        id="mobile-nav-open"
+        class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink lg:hidden"
+        aria-label="Open menu"
+        aria-controls="mobileNav"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>

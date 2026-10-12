@@ -1,0 +1,36 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import Icon from "../Icon.astro";
+
+interface Props {
+  about: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    points: { title: string; body: string }[];
+  };
+}
+const { about } = Astro.props;
+---
+
+<section id="about" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-6 lg:py-24" aria-labelledby="about-title">
+  <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div>
+      <SectionHeading eyebrow={about.eyebrow} title={about.title} />
+      <p class="reveal d1 -mt-4 text-body text-muted">{about.body}</p>
+    </div>
+    <ul class="grid gap-4 sm:grid-cols-2">
+      {
+        about.points.map((p, i) => (
+          <li class={`reveal d${(i % 4) + 1} card p-5`}>
+            <span class="grid h-9 w-9 place-items-center rounded-full bg-teal/15 text-teal-text">
+              <Icon name="check" class="h-4 w-4" />
+            </span>
+            <h3 class="mt-4 text-headline font-semibold text-ink">{p.title}</h3>
+            <p class="mt-2 text-footnote text-muted">{p.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

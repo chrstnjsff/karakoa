@@ -1,0 +1,38 @@
+---
+// Direct ways to reach the studio. A channel with an empty value is not
+// rendered, so Messenger stays hidden until the page link is set.
+import Icon from "./Icon.astro";
+import type { Channel } from "../data/site";
+
+interface Props {
+  channels: Channel[];
+}
+const { channels } = Astro.props;
+const visible = channels.filter((c) => c.value && c.href);
+---
+
+<ul class="space-y-2">
+  {
+    visible.map((c) => (
+      <li>
+        <a
+          href={c.href}
+          target={c.external ? "_blank" : undefined}
+          rel={c.external ? "noopener" : undefined}
+          data-contact-email={c.id === "email" ? "" : undefined}
+          class="card card-lift flex items-center gap-4 p-4"
+        >
+          <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-teal/15 text-teal-text">
+            <Icon name={c.icon} class="h-5 w-5" />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-footnote font-semibold text-ink">{c.label}</span>
+            <span class="block truncate text-footnote text-muted">{c.value}</span>
+            {c.note && <span class="block text-caption text-muted">{c.note}</span>}
+          </span>
+          {c.external && <Icon name="external" class="h-4 w-4 shrink-0 text-muted" />}
+        </a>
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,667 @@
+@import "tailwindcss";
+
+/* Dark mode driven by a class on <html>, set pre-paint in Base.astro */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------
+   Palette: taken from the boat mascot. Light mode is the mint sky
+   of the primary logo, dark mode the navy night version. Coral is
+   the single accent in both. RGB triplets so Tailwind can apply
+   opacity modifiers (e.g. text-ink/60). Every text pair below
+   clears 4.5:1 on its background.
+   --------------------------------------------------------------- */
+:root {
+  /* native scrollbars, form controls and autofill follow the theme */
+  color-scheme: light;
+  --bg: 221 243 238; /* #ddf3ee mint */
+  --surface: 255 255 255;
+  --ink: 16 50 74; /* #10324a navy, 11.5:1 on mint */
+  --muted: 63 90 108; /* #3f5a6c, 6.3:1 on mint */
+  --line: 16 50 74;
+  --accent: 217 58 34; /* #d93a22 coral, buttons: white text 4.6:1 */
+  --accent-text: 180 46 26; /* #b42e1a, 5.4:1 on mint */
+  --teal: 42 157 155; /* #2a9d9b wave */
+  --teal-text: 23 109 107; /* #176d6b, 5.3:1 on mint */
+  --sand: 227 167 91; /* #e3a75b hull */
+  --pale: 244 213 141; /* #f4d58d deck */
+  --danger: 180 46 26;
+  --success: 23 109 107;
+  --sel-bg: #10324a;
+  --sel-fg: #ddf3ee;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: 12 42 63; /* #0c2a3f night */
+  --surface: 18 56 79; /* #12384f */
+  --ink: 255 255 255;
+  --muted: 169 194 207; /* #a9c2cf, 8.0:1 on navy */
+  --line: 255 255 255;
+  --accent: 240 85 58; /* #f0553a sail */
+  --accent-text: 255 122 96; /* #ff7a60, 5.8:1 on navy */
+  --teal: 60 196 191; /* #3cc4bf */
+  --teal-text: 60 196 191; /* 6.9:1 on navy */
+  --danger: 255 122 96;
+  --success: 60 196 191;
+  --sel-bg: #f4d58d;
+  --sel-fg: #0c2a3f;
+}
+
+@theme inline {
+  --color-bg: rgb(var(--bg));
+  --color-surface: rgb(var(--surface));
+  --color-ink: rgb(var(--ink));
+  --color-muted: rgb(var(--muted));
+  --color-line: rgb(var(--line));
+  --color-accent: rgb(var(--accent));
+  --color-accent-text: rgb(var(--accent-text));
+  --color-teal: rgb(var(--teal));
+  --color-teal-text: rgb(var(--teal-text));
+  --color-sand: rgb(var(--sand));
+  --color-pale: rgb(var(--pale));
+  --color-danger: rgb(var(--danger));
+  --color-success: rgb(var(--success));
+
+  --font-sans: "Nunito Sans Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fredoka Variable", "Nunito Sans Variable", ui-rounded, system-ui, sans-serif;
+}
+
+/* ---------------------------------------------------------------
+   Type scale - one ramp, each step paired with its line height.
+   --------------------------------------------------------------- */
+@theme {
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
+  --text-footnote: 0.8125rem;
+  --text-footnote--line-height: 1.55;
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-callout: 1.0625rem;
+  --text-callout--line-height: 1.6;
+  --text-headline: 1.125rem;
+  --text-headline--line-height: 1.45;
+  --text-title3: 1.3125rem;
+  --text-title3--line-height: 1.3;
+  --text-title2: 1.75rem;
+  --text-title2--line-height: 1.18;
+  --text-title1: 2.25rem;
+  --text-title1--line-height: 1.08;
+  --text-large: 3rem;
+  --text-large--line-height: 1.04;
+  --text-huge: 3.75rem;
+  --text-huge--line-height: 1.02;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  /* offset anchor targets for the sticky header */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--ink));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis-weight: none;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  h1,
+  h2 {
+    letter-spacing: -0.015em;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+::selection {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Tabular figures keep the stats row and result chips steady */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------
+   Scroll reveal: a short rise, toggled by one IntersectionObserver.
+   Hidden only once JS is known to run (the head script adds .js),
+   so the page never renders blank without JavaScript.
+   --------------------------------------------------------------- */
+.reveal {
+  transition:
+    opacity 0.55s var(--ease-out-soft),
+    transform 0.55s var(--ease-out-soft);
+}
+
+.js .reveal:not(.in) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.d1 { transition-delay: 60ms; }
+.d2 { transition-delay: 120ms; }
+.d3 { transition-delay: 180ms; }
+.d4 { transition-delay: 240ms; }
+.d5 { transition-delay: 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .js .reveal:not(.in) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Link underline that grows from the left on hover
+   --------------------------------------------------------------- */
+.link-ul {
+  background-image: linear-gradient(rgb(var(--accent)), rgb(var(--accent)));
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s;
+}
+
+.link-ul:hover {
+  background-size: 100% 1.5px;
+  color: rgb(var(--accent-text));
+}
+
+/* ---------------------------------------------------------------
+   Press feedback - controls settle slightly under the finger.
+   --------------------------------------------------------------- */
+.press {
+  transition: scale 120ms var(--ease-out-soft);
+}
+
+.press:active {
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press:active {
+    scale: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Header material - translucent where the platform can blur behind
+   it, solid when blur is missing or the reader asked for less
+   transparency or more contrast.
+   --------------------------------------------------------------- */
+.material-bar {
+  background-color: rgb(var(--bg));
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .material-bar {
+    background-color: rgb(var(--bg) / 0.82);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    backdrop-filter: saturate(180%) blur(16px);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material-bar {
+    background-color: rgb(var(--bg));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .material-bar {
+    background-color: rgb(var(--bg));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: rgb(var(--line) / 0.45);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Header nav links: the section in view lights its link.
+   --------------------------------------------------------------- */
+[data-nav-link] {
+  transition: color 0.2s ease;
+}
+
+[data-nav-link]:hover,
+[data-nav-link][aria-current] {
+  color: rgb(var(--ink));
+}
+
+/* ---------------------------------------------------------------
+   Three-state theme switcher (system / light / dark)
+   --------------------------------------------------------------- */
+.theme-opt {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: rgb(var(--muted));
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.theme-opt svg {
+  height: 0.9rem;
+  width: 0.9rem;
+}
+
+.theme-opt:hover {
+  color: rgb(var(--ink));
+}
+
+/* 44pt minimum hit area on touch screens */
+@media (pointer: coarse) {
+  .theme-opt {
+    height: 44px;
+    width: 44px;
+  }
+}
+
+.theme-opt[aria-pressed="true"] {
+  background-color: rgb(var(--ink) / 0.08);
+  color: rgb(var(--ink));
+}
+
+/* ---------------------------------------------------------------
+   Theme switching: a soft cross-fade via the View Transitions API
+   (the toggle script wraps the class change in startViewTransition).
+   --------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fallback for browsers without view transitions: ease the colors */
+html.theme-fade,
+html.theme-fade body,
+html.theme-fade * {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease !important;
+}
+
+/* ---------------------------------------------------------------
+   Quiet scrollbar
+   --------------------------------------------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--muted) / 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--muted) / 0.35);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--muted) / 0.6);
+}
+
+@layer components {
+/* ---------------------------------------------------------------
+   Cards: a rounded surface with a hairline border. Hover lifts a
+   touch and deepens the border; no shadows in the resting state.
+   --------------------------------------------------------------- */
+.card {
+  border: 1px solid rgb(var(--line) / 0.12);
+  border-radius: var(--radius-card);
+  background-color: rgb(var(--surface));
+  transition:
+    border-color 0.25s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .card {
+  border-color: rgb(var(--line) / 0.1);
+}
+
+.card-lift:hover {
+  border-color: rgb(var(--line) / 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -18px rgb(16 50 74 / 0.45);
+}
+
+.dark .card-lift:hover {
+  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift:hover {
+    transform: none;
+  }
+}
+
+/* Small label above headings and inside cards */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--teal-text));
+}
+
+/* Outcome chip that closes a work card */
+.chip {
+  display: inline-block;
+  border: 1px solid rgb(var(--line) / 0.14);
+  border-radius: 9999px;
+  background-color: rgb(var(--ink) / 0.04);
+  padding: 0.1rem 0.6rem;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.7;
+  color: rgb(var(--ink));
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   Wave divider: the mascot's teal wave, repeated as a CSS mask so
+   it follows the theme and costs no image request.
+   --------------------------------------------------------------- */
+.wave {
+  height: 10px;
+  width: 100%;
+  background-color: rgb(var(--teal));
+  opacity: 0.8;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 10'><path d='M0 5c5-5 10-5 15 0s10 5 15 0 7.5-2.5 10 0' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 10'><path d='M0 5c5-5 10-5 15 0s10 5 15 0 7.5-2.5 10 0' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'/></svg>");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 40px 10px;
+  mask-size: 40px 10px;
+}
+
+/* ---------------------------------------------------------------
+   Buttons: rounded, display face, at least 44px tall.
+   --------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: 0 1.25rem;
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    opacity 0.2s,
+    scale 120ms var(--ease-out-soft);
+}
+
+.btn-primary {
+  border-color: rgb(var(--accent));
+  background-color: rgb(var(--accent));
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--accent-text));
+  border-color: rgb(var(--accent-text));
+}
+
+.dark .btn-primary {
+  background-color: rgb(217 58 34);
+  border-color: rgb(217 58 34);
+}
+
+.dark .btn-primary:hover {
+  background-color: rgb(240 85 58);
+  border-color: rgb(240 85 58);
+}
+
+.btn-secondary {
+  border-color: rgb(var(--line) / 0.3);
+  background-color: rgb(var(--surface) / 0.6);
+  color: rgb(var(--ink));
+}
+
+.btn-secondary:hover {
+  border-color: rgb(var(--ink));
+  background-color: rgb(var(--surface));
+}
+
+.btn[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------
+   Form fields: 16px text so iOS never zooms on focus, 44px targets,
+   an accent focus ring, and a red edge plus message when invalid.
+   --------------------------------------------------------------- */
+.field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: var(--text-footnote);
+  font-weight: 600;
+  color: rgb(var(--ink));
+}
+
+.field-input {
+  display: block;
+  width: 100%;
+  min-height: 2.875rem;
+  border: 1px solid rgb(var(--line) / 0.2);
+  border-radius: var(--radius-control);
+  background-color: rgb(var(--surface));
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgb(var(--ink));
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.field-input:hover {
+  border-color: rgb(var(--line) / 0.38);
+}
+
+.field-input:focus-visible {
+  outline: none;
+  border-color: rgb(var(--accent));
+  box-shadow: 0 0 0 3px rgb(var(--accent) / 0.2);
+}
+
+.field-input[aria-invalid="true"] {
+  border-color: rgb(var(--danger));
+}
+
+.field-select {
+  appearance: none;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.dark .field-select option {
+  background-color: rgb(var(--bg));
+}
+
+.field-textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.field-error {
+  margin-top: 0.4rem;
+  font-size: var(--text-footnote);
+  color: rgb(var(--danger));
+}
+
+.contact-alert {
+  border-left: 3px solid rgb(var(--danger));
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  background-color: rgb(var(--danger) / 0.08);
+  padding: 0.75rem 1rem;
+  font-size: var(--text-footnote);
+  color: rgb(var(--ink));
+}
+
+.contact-alert:empty {
+  display: none;
+}
+
+@media (prefers-contrast: more) {
+  .field-input {
+    border-color: rgb(var(--line) / 0.6);
+  }
+  .card {
+    border-color: rgb(var(--line) / 0.5);
+  }
+}
+}
+
+/* ---------------------------------------------------------------
+   FAQ disclosure on native <details>: eased open where supported.
+   --------------------------------------------------------------- */
+.disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure-chevron {
+  transition: rotate 240ms var(--ease-out-soft);
+}
+
+.disclosure[open] .disclosure-chevron {
+  rotate: 180deg;
+}
+
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+@supports selector(::details-content) {
+  .disclosure::details-content {
+    block-size: 0;
+    overflow: clip;
+    opacity: 0;
+    transition:
+      content-visibility 240ms allow-discrete,
+      block-size 240ms var(--ease-out-soft),
+      opacity 240ms var(--ease-out-soft);
+  }
+
+  .disclosure[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Prose: the privacy page body.
+   --------------------------------------------------------------- */
+@layer components {
+  .prose {
+    font-size: var(--text-body);
+    line-height: 1.7;
+    color: rgb(var(--muted));
+  }
+
+  .prose > * + * {
+    margin-top: 1rem;
+  }
+
+  .prose strong {
+    font-weight: 700;
+    color: rgb(var(--ink));
+  }
+
+  .prose a {
+    color: rgb(var(--ink));
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--line) / 0.3);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s;
+  }
+
+  .prose a:hover {
+    text-decoration-color: rgb(var(--accent));
+  }
+
+  .prose h2 {
+    margin-top: 2rem;
+    font-size: var(--text-title3);
+    font-weight: 600;
+    color: rgb(var(--ink));
+  }
+
+  .prose ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .prose li + li {
+    margin-top: 0.4rem;
+  }
+}

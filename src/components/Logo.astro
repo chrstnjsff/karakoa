@@ -1,0 +1,30 @@
+---
+// Wordmark: the boat mark from the app icon next to "karakoa.dev" set in
+// Fredoka, so it stays crisp in both themes and at any size.
+import { Image } from "astro:assets";
+import mark from "../assets/brand/karakoa-app-icon.png";
+
+interface Props {
+  /** Mark size in px; the text scales with it. */
+  size?: number;
+  class?: string;
+}
+const { size = 32, class: className = "" } = Astro.props;
+const fontSize = Math.round(size * 0.72);
+---
+
+<span class={`inline-flex items-center gap-2.5 whitespace-nowrap leading-none ${className}`}>
+  <Image
+    src={mark}
+    alt=""
+    width={size * 2}
+    height={size * 2}
+    densities={[1, 2]}
+    class="shrink-0 rounded-[28%]"
+    style={`width: ${size}px; height: ${size}px`}
+    loading="eager"
+  />
+  <span class="font-display font-semibold tracking-tight text-ink" style={`font-size: ${fontSize}px`}>
+    karakoa<span class="text-accent-text">.dev</span>
+  </span>
+</span>

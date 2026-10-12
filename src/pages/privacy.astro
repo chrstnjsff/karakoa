@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../data/site";
+
+const updated = "2026-10-12";
+---
+
+<Base
+  title={`Privacy · ${SITE.name}`}
+  description="What Karakoa collects when you use this site or send an inquiry, and how it is used."
+>
+  <div class="mx-auto max-w-2xl px-5 pb-20 sm:px-6">
+    <header class="pb-8 pt-14 sm:pt-20">
+      <p class="reveal eyebrow">Privacy</p>
+      <h1 class="reveal d1 mt-4 text-title1 font-semibold text-ink sm:text-large">How we handle your details</h1>
+      <p class="reveal d2 mt-3 text-footnote text-muted">Last updated {updated}</p>
+    </header>
+
+    <div class="reveal d2 prose">
+      <p>
+        This site is a static website. It sets no cookies, runs no analytics, and loads no third-party
+        scripts. Fonts and images are served from this domain.
+      </p>
+
+      <h2>The inquiry form</h2>
+      <p>
+        When you send the form, the details you enter (your name, email, what you need, project size,
+        timeline, and message) are delivered by <a href="https://web3forms.com" rel="noopener" target="_blank">Web3Forms</a>
+        to our inbox. Web3Forms passes the message on and keeps it only for delivery. We use your details to
+        reply to you and, if you go ahead with a project, to work with you. We do not sell or share them.
+      </p>
+
+      <h2>Direct channels</h2>
+      <p>
+        Email, WhatsApp, Viber, and Calendly links open those services. Each one has its own privacy policy
+        that applies when you use it.
+      </p>
+
+      <h2>Hosting</h2>
+      <p>
+        The site is served by Cloudflare, which keeps standard request logs (such as IP address and
+        request time) for security and performance. We do not add tracking of our own.
+      </p>
+
+      <h2>Your choices</h2>
+      <p>
+        Ask us to delete any inquiry you sent and we will. Write to
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+      </p>
+    </div>
+  </div>
+</Base>

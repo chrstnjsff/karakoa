@@ -1,0 +1,362 @@
+---
+import "@fontsource-variable/fredoka";
+import "@fontsource-variable/nunito-sans";
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Logo from "../components/Logo.astro";
+import ThemeSwitch from "../components/ThemeSwitch.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { SITE, NAV, calendlyUrl } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Root-relative share image; defaults to the site-wide card. */
+  ogImage?: string;
+  /** Keep utility pages (e.g. the form thank-you page) out of search. */
+  noindex?: boolean;
+  /** Structured data blocks, each emitted as its own JSON-LD script. */
+  jsonLd?: object[];
+}
+
+const { title, description, ogImage = "/og.png", noindex = false, jsonLd = [] } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+const isHome = Astro.url.pathname === "/";
+const link = (href: string) => (isHome ? href : `/${href}`);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ddf3ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c2a3f" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <script is:inline>
+      // Resolve the theme before first paint, so there is no flash of the wrong theme.
+      // The js class lets CSS hide scroll-reveal content only when JS will show it.
+      (function () {
+        document.documentElement.classList.add("js");
+        try {
+          var pref = localStorage.getItem("theme") || "system";
+          var dark =
+            pref === "dark" ||
+            (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.classList.toggle("dark", dark);
+        } catch (e) {}
+      })();
+    </script>
+
+    {jsonLd.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block)} />)}
+  </head>
+
+  <body class="font-sans antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-footnote focus:font-semibold focus:text-bg"
+    >
+      Skip to content
+    </a>
+
+    <div id="top"></div>
+    <Header />
+
+    <!-- mobile menu: a modal dialog that mirrors the bar it opens from -->
+    <div
+      id="mobileNav"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+      class="fixed inset-0 z-[60] hidden flex-col bg-bg lg:hidden"
+    >
+      <div class="flex h-16 shrink-0 items-center justify-between border-b border-line/10 px-5">
+        <a
+          href={isHome ? "#top" : "/"}
+          class="press -mx-2 inline-flex min-h-11 items-center px-2"
+          aria-label={isHome ? `${SITE.name}, back to top` : `${SITE.name}, home`}
+        >
+          <Logo size={30} />
+        </a>
+        <button
+          type="button"
+          id="mobile-nav-close"
+          class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink"
+          aria-label="Close menu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-10 pt-4">
+        <nav aria-label="Primary, mobile">
+          <ul>
+            {
+              NAV.map((item) => (
+                <li>
+                  <a
+                    href={link(item.href)}
+                    class="flex min-h-12 items-center border-b border-line/10 font-display text-title3 font-medium text-ink"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn btn-primary press mt-6 w-full">
+          Book a call
+        </a>
+        <div class="mt-8 flex items-center justify-between">
+          <span class="text-footnote font-semibold text-muted">Theme</span>
+          <ThemeSwitch idSuffix="-mobile" />
+        </div>
+      </div>
+    </div>
+
+    <main id="main" class="relative flex min-h-[calc(100dvh-4rem)] flex-col" data-inert-when-menu>
+      <div class="flex-1">
+        <slot />
+      </div>
+      <SiteFooter />
+    </main>
+
+    <script is:inline>
+      // ---- theme: system | light | dark -------------------------------
+      (function () {
+        var media = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function read() {
+          try {
+            return localStorage.getItem("theme") || "system";
+          } catch (e) {
+            return "system";
+          }
+        }
+
+        function apply(pref) {
+          var dark = pref === "dark" || (pref === "system" && media.matches);
+          document.documentElement.classList.toggle("dark", dark);
+          document.querySelectorAll("[data-theme-opt]").forEach(function (b) {
+            b.setAttribute("aria-pressed", String(b.dataset.themeOpt === pref));
+          });
+        }
+
+        window.setTheme = function (pref) {
+          try {
+            localStorage.setItem("theme", pref);
+          } catch (e) {}
+          var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (document.startViewTransition && !reduce) {
+            document.startViewTransition(function () {
+              apply(pref);
+            });
+          } else if (!reduce) {
+            var root = document.documentElement;
+            root.classList.add("theme-fade");
+            apply(pref);
+            setTimeout(function () {
+              root.classList.remove("theme-fade");
+            }, 400);
+          } else {
+            apply(pref);
+          }
+        };
+
+        document.querySelectorAll("[data-theme-opt]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            window.setTheme(b.dataset.themeOpt);
+          });
+        });
+
+        // follow the OS while the preference is "system"
+        media.addEventListener("change", function () {
+          if (read() === "system") apply("system");
+        });
+
+        apply(read());
+      })();
+
+      // ---- mobile menu (modal dialog) ----------------------------------
+      (function () {
+        var panel = document.getElementById("mobileNav");
+        var openBtn = document.getElementById("mobile-nav-open");
+        var closeBtn = document.getElementById("mobile-nav-close");
+        if (!panel || !openBtn || !closeBtn) return;
+        var background = document.querySelectorAll("[data-inert-when-menu]");
+
+        function isOpen() {
+          return !panel.classList.contains("hidden");
+        }
+
+        function focusables() {
+          return Array.prototype.filter.call(
+            panel.querySelectorAll("a[href], button:not([disabled])"),
+            function (el) {
+              return el.getClientRects().length > 0;
+            }
+          );
+        }
+
+        function setBackgroundInert(value) {
+          background.forEach(function (el) {
+            el.inert = value;
+          });
+        }
+
+        function open() {
+          panel.classList.remove("hidden");
+          panel.classList.add("flex");
+          openBtn.setAttribute("aria-expanded", "true");
+          document.body.style.overflow = "hidden";
+          setBackgroundInert(true);
+          closeBtn.focus();
+        }
+
+        // restoreFocus is false when a link inside the menu navigates,
+        // so focus follows the link target instead of the menu button.
+        function close(restoreFocus) {
+          panel.classList.add("hidden");
+          panel.classList.remove("flex");
+          openBtn.setAttribute("aria-expanded", "false");
+          document.body.style.overflow = "";
+          setBackgroundInert(false);
+          if (restoreFocus !== false) openBtn.focus();
+        }
+
+        openBtn.addEventListener("click", open);
+        closeBtn.addEventListener("click", function () {
+          close();
+        });
+        panel.querySelectorAll("a").forEach(function (a) {
+          a.addEventListener("click", function () {
+            close(false);
+          });
+        });
+        document.addEventListener("keydown", function (e) {
+          if (!isOpen()) return;
+          if (e.key === "Escape") {
+            close();
+            return;
+          }
+          if (e.key !== "Tab") return;
+          var items = focusables();
+          if (!items.length) return;
+          var first = items[0];
+          var last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        });
+
+        // The menu only exists below lg; growing the window past it must
+        // not leave the page inert behind an invisible dialog.
+        window.matchMedia("(min-width: 1024px)").addEventListener("change", function (e) {
+          if (e.matches && isOpen()) close(false);
+        });
+      })();
+
+      // ---- reveal on scroll --------------------------------------------
+      (function () {
+        var items = document.querySelectorAll(".reveal");
+        if (!items.length) return;
+
+        if (
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+          !("IntersectionObserver" in window)
+        ) {
+          items.forEach(function (el) {
+            el.classList.add("in");
+          });
+          return;
+        }
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("in");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
+        );
+
+        items.forEach(function (el) {
+          io.observe(el);
+        });
+      })();
+
+      // ---- header scrollspy (in-page links only) -----------------------
+      (function () {
+        var links = document.querySelectorAll("[data-spy]");
+        if (!links.length || !("IntersectionObserver" in window)) return;
+
+        var map = {};
+        links.forEach(function (a) {
+          var href = a.getAttribute("href") || "";
+          if (href.charAt(0) !== "#") return;
+          var id = decodeURIComponent(href.slice(1));
+          if (id) (map[id] = map[id] || []).push(a);
+        });
+
+        var current = null;
+        function activate(id) {
+          if (id === current) return;
+          current = id;
+          links.forEach(function (a) {
+            a.removeAttribute("aria-current");
+          });
+          (map[id] || []).forEach(function (a) {
+            a.setAttribute("aria-current", "true");
+          });
+        }
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) activate(entry.target.id);
+            });
+          },
+          { rootMargin: "-35% 0px -55% 0px", threshold: 0 }
+        );
+
+        Object.keys(map).forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) io.observe(el);
+        });
+      })();
+    </script>
+  </body>
+</html>

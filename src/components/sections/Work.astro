@@ -1,0 +1,42 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import type { WorkItem } from "../../data/site";
+
+interface Props {
+  items: WorkItem[];
+}
+const { items } = Astro.props;
+---
+
+<section id="work" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-6 lg:py-24" aria-labelledby="work-title">
+  <SectionHeading
+    eyebrow="Selected work"
+    title="Systems we have built and run"
+    lede="Described by what they do, not who they were for. Every figure is a real result from production."
+  />
+  <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {
+      items.map((w, i) => (
+        <li class={`reveal d${(i % 3) + 1} card card-lift flex flex-col p-6`}>
+          <p class="eyebrow">{w.industry}</p>
+          <h3 class="mt-2 text-title3 font-semibold text-ink">{w.kind}</h3>
+          <dl class="mt-4 space-y-3 text-footnote">
+            <div>
+              <dt class="font-semibold text-ink">Challenge</dt>
+              <dd class="mt-1 text-muted">{w.challenge}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-ink">What we did</dt>
+              <dd class="mt-1 text-muted">{w.approach}</dd>
+            </div>
+          </dl>
+          <ul class="mt-auto flex flex-wrap gap-2 pt-5" aria-label="Results">
+            {w.results.map((r) => (
+              <li class="chip">{r}</li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ul>
+</section>

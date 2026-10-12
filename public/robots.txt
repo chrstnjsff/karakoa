@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://karakoa.dev/sitemap-index.xml

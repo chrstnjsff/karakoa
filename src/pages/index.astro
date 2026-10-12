@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/sections/Hero.astro";
+import About from "../components/sections/About.astro";
+import Services from "../components/sections/Services.astro";
+import Work from "../components/sections/Work.astro";
+import Process from "../components/sections/Process.astro";
+import Packages from "../components/sections/Packages.astro";
+import Founder from "../components/sections/Founder.astro";
+import Faq from "../components/sections/Faq.astro";
+import Contact from "../components/sections/Contact.astro";
+import {
+  SITE,
+  hero,
+  stats,
+  about,
+  services,
+  work,
+  process,
+  packages,
+  pricingNote,
+  founder,
+  faq,
+  hours,
+  channels,
+  contact,
+} from "../data/site";
+
+const title = `${SITE.name} · Websites, mobile apps, and capstone systems`;
+
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: SITE.name,
+  url: `${SITE.url}/`,
+  logo: `${SITE.url}/apple-touch-icon.png`,
+  image: `${SITE.url}/og.png`,
+  description: SITE.description,
+  email: `mailto:${SITE.email}`,
+  telephone: SITE.phoneDisplay,
+  foundingDate: String(SITE.founded),
+  founder: { "@type": "Person", name: founder.name, url: founder.links[0].href },
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: SITE.location.locality,
+    addressRegion: SITE.location.region,
+    addressCountry: SITE.location.country,
+  },
+  areaServed: "Worldwide",
+  knowsAbout: services.map((s) => s.title),
+  sameAs: [SITE.githubUrl],
+};
+
+const faqPage = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faq.flatMap((g) =>
+    g.items.map((i) => ({
+      "@type": "Question",
+      name: i.q,
+      acceptedAnswer: { "@type": "Answer", text: i.a },
+    })),
+  ),
+};
+---
+
+<Base title={title} description={SITE.description} jsonLd={[organization, faqPage]}>
+  <Hero hero={hero} stats={stats} />
+  <About about={about} />
+  <Services items={services} />
+  <Work items={work} />
+  <Process steps={process} />
+  <Packages items={packages} note={pricingNote} />
+  <Founder founder={founder} />
+  <Faq groups={faq} />
+  <Contact contact={contact} channels={channels} hours={hours} />
+</Base>

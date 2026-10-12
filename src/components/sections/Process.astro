@@ -1,0 +1,38 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import type { ProcessStep } from "../../data/site";
+
+interface Props {
+  steps: ProcessStep[];
+}
+const { steps } = Astro.props;
+---
+
+<section id="process" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="process-title">
+  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
+    <SectionHeading
+      eyebrow="Process"
+      title="How a project runs"
+      lede="Understand the problem, shape the system, build deliberately, test thoroughly, and launch with support in place."
+    />
+    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      {
+        steps.map((s, i) => (
+          <li class={`reveal d${(i % 5) + 1} card flex flex-col p-5`}>
+            <span class="tnum font-display text-title2 font-semibold text-accent-text" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <h3 class="mt-2 text-headline font-semibold text-ink">
+              <span class="sr-only">Step {i + 1}: </span>
+              {s.title}
+            </h3>
+            <p class="mt-2 text-footnote text-muted">{s.body}</p>
+            <p class="mt-auto pt-4 text-caption text-muted">
+              <span class="font-semibold text-ink">You receive:</span> {s.deliverable}
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

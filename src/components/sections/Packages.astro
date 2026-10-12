@@ -1,0 +1,53 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import Icon from "../Icon.astro";
+import type { Package } from "../../data/site";
+
+interface Props {
+  items: Package[];
+  note: string;
+}
+const { items, note } = Astro.props;
+---
+
+<section id="packages" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-6 lg:py-24" aria-labelledby="packages-title">
+  <SectionHeading
+    eyebrow="Packages"
+    title="Ways to work with us"
+    lede="Pick the shape that matches your project. Scope and price are confirmed after a short call."
+  />
+  <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    {
+      items.map((p, i) => (
+        <li
+          class={`reveal d${(i % 4) + 1} card card-lift flex flex-col p-6 ${p.featured ? "border-accent/50 ring-1 ring-accent/30" : ""}`}
+        >
+          {p.featured && <p class="eyebrow text-accent-text">Most requested</p>}
+          <h3 class={`text-title3 font-semibold text-ink ${p.featured ? "mt-2" : ""}`}>{p.name}</h3>
+          <p class="mt-2 text-footnote text-muted">{p.tagline}</p>
+          <p class="mt-4 flex flex-wrap gap-2">
+            {p.meta.map((m) => (
+              <span class="chip">{m}</span>
+            ))}
+          </p>
+          <ul class="mt-5 space-y-2 text-footnote text-ink">
+            {p.includes.map((b) => (
+              <li class="flex gap-2">
+                <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href={`#contact`}
+            class={`btn press mt-auto w-full ${p.featured ? "btn-primary" : "btn-secondary"}`}
+            style="margin-top: calc(var(--spacing) * 6)"
+          >
+            {p.cta}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="reveal mt-6 text-footnote text-muted">{note}</p>
+</section>

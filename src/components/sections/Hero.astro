@@ -1,0 +1,63 @@
+---
+import { Picture } from "astro:assets";
+import mascot from "../../assets/brand/karakoa-app-icon.png";
+import Icon from "../Icon.astro";
+import type { Stat } from "../../data/site";
+
+interface Props {
+  hero: {
+    eyebrow: string;
+    title: string;
+    lede: string;
+    primary: { href: string; label: string };
+    secondary: { href: string; label: string };
+  };
+  stats: Stat[];
+}
+const { hero, stats } = Astro.props;
+---
+
+<section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pt-20 lg:pb-24" aria-labelledby="hero-title">
+  <div class="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+    <div>
+      <p class="reveal eyebrow">{hero.eyebrow}</p>
+      <h1 id="hero-title" class="reveal d1 mt-4 text-title1 font-semibold text-ink sm:text-large lg:text-huge">
+        {hero.title}
+      </h1>
+      <p class="reveal d2 mt-6 max-w-xl text-callout text-muted sm:text-headline">{hero.lede}</p>
+      <div class="reveal d3 mt-8 flex flex-wrap gap-3">
+        <a href={hero.primary.href} class="btn btn-primary press">
+          {hero.primary.label}
+          <Icon name="arrow" class="h-4 w-4" />
+        </a>
+        <a href={hero.secondary.href} class="btn btn-secondary press">{hero.secondary.label}</a>
+      </div>
+    </div>
+
+    <div class="reveal d2 mx-auto w-full max-w-sm lg:max-w-md">
+      <div class="card overflow-hidden rounded-[2rem] border-0">
+        <Picture
+          src={mascot}
+          alt="The Karakoa mascot: a smiling wooden boat with a coral sail and a sun on it, riding teal waves."
+          widths={[320, 480, 640, 960]}
+          sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 90vw"
+          formats={["avif", "webp"]}
+          loading="eager"
+          fetchpriority="high"
+          class="block h-auto w-full" pictureAttributes={{ class: "block" }}
+        />
+      </div>
+    </div>
+  </div>
+
+  <dl class="reveal d4 mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line/10 pt-10 sm:mt-20 lg:grid-cols-4">
+    {
+      stats.map((s) => (
+        <div class="flex flex-col">
+          <dt class="order-last mt-1 text-footnote text-muted">{s.label}</dt>
+          <dd class="tnum font-display text-title1 font-semibold text-ink">{s.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>

@@ -1,0 +1,62 @@
+---
+import Logo from "./Logo.astro";
+import { SITE, NAV, footer } from "../data/site";
+
+const year = new Date().getFullYear();
+const isHome = Astro.url.pathname === "/";
+const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : href);
+---
+
+<footer class="border-t border-line/10">
+  <div class="wave" aria-hidden="true"></div>
+  <div class="mx-auto max-w-6xl px-5 py-12 sm:px-6">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div>
+        <Logo size={28} />
+        <p class="mt-4 max-w-sm text-footnote text-muted">{footer.line}</p>
+        <p class="mt-3 text-footnote text-muted">{SITE.location.label}</p>
+      </div>
+      <nav aria-label="Footer sections">
+        <p class="eyebrow">Site</p>
+        <ul class="mt-3 -ml-2">
+          {
+            NAV.map((n) => (
+              <li>
+                <a href={link(n.href)} class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink">
+                  {n.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <nav aria-label="Footer links">
+        <p class="eyebrow">More</p>
+        <ul class="mt-3 -ml-2">
+          <li>
+            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink">
+              {SITE.email}
+            </a>
+          </li>
+          {
+            footer.links.map((l) => (
+              <li>
+                <a
+                  href={l.href}
+                  target={l.external ? "_blank" : undefined}
+                  rel={l.external ? "noopener" : undefined}
+                  class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+    <p class="mt-10 border-t border-line/10 pt-5 text-caption text-muted">
+      © {year} {SITE.name}. Founder-led software studio, {SITE.location.label}.
+    </p>
+  </div>
+</footer>

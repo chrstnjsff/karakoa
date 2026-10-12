@@ -1,0 +1,16 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  /** Center the heading block (used above card grids). */
+  center?: boolean;
+}
+const { eyebrow, title, lede, center = false } = Astro.props;
+---
+
+<div class={`reveal mb-10 max-w-2xl sm:mb-12 ${center ? "mx-auto text-center" : ""}`}>
+  <p class="eyebrow">{eyebrow}</p>
+  <h2 class="mt-3 text-title2 font-semibold text-ink sm:text-title1">{title}</h2>
+  {lede && <p class="mt-4 text-callout text-muted">{lede}</p>}
+</div>

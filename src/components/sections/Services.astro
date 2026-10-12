@@ -1,0 +1,43 @@
+---
+import SectionHeading from "../SectionHeading.astro";
+import Icon from "../Icon.astro";
+import type { Service } from "../../data/site";
+
+interface Props {
+  items: Service[];
+}
+const { items } = Astro.props;
+---
+
+<section id="services" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="services-title">
+  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
+    <SectionHeading
+      eyebrow="Services"
+      title="What we build"
+      lede="Everything from a one-page site to a full system. Each service below lists what is included so you know what you are getting before the first call."
+    />
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        items.map((s, i) => (
+          <li id={`service-${s.id}`} class={`reveal d${(i % 4) + 1} card card-lift flex flex-col p-5`}>
+            <span class="grid h-11 w-11 place-items-center rounded-xl bg-accent/12 text-accent-text">
+              <Icon name={s.icon} class="h-5 w-5" />
+            </span>
+            <h3 class="mt-4 text-headline font-semibold text-ink">{s.title}</h3>
+            <p class="mt-2 text-footnote text-muted">{s.summary}</p>
+            <p class="eyebrow mt-5 text-caption">What is included</p>
+            <ul class="mt-2 space-y-1.5 text-footnote text-ink">
+              {s.includes.map((b) => (
+                <li class="flex gap-2">
+                  <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-auto pt-5 text-caption text-muted">{s.stack.join(" · ")}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

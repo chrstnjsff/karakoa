@@ -1,7 +1,10 @@
 ---
-// Sticky top bar: wordmark, section links (md+), theme switch, and the
-// booking button. Below md the links live in the mobile dialog that
-// Base.astro renders and drives.
+// Sticky top bar: wordmark, section links (xl+), theme switch, and the
+// booking button. Below xl the links live in the mobile dialog that
+// Base.astro renders and drives. The full row needs about 1060px, so the
+// inline links wait for xl; at lg (976px of room) the button wrapped.
+// Below xs the booking button would squeeze the wordmark, so it lives
+// only in the dialog there.
 import Logo from "./Logo.astro";
 import ThemeSwitch from "./ThemeSwitch.astro";
 import { NAV, PAGES, SITE, calendlyUrl } from "../data/site";
@@ -23,7 +26,7 @@ const link = (href: string) => (isHome ? href : `/${href}`);
       <Logo size={30} />
     </a>
 
-    <nav class="hidden items-center gap-1 lg:flex" aria-label="Primary">
+    <nav class="hidden items-center gap-1 xl:flex" aria-label="Primary">
       {
         NAV.map((item) => (
           <a
@@ -57,14 +60,14 @@ const link = (href: string) => (isHome ? href : `/${href}`);
         href={calendlyUrl}
         target="_blank"
         rel="noopener"
-        class="btn btn-primary press min-h-10 px-3.5 text-footnote sm:px-4"
+        class="btn btn-primary press hidden min-h-10 px-3.5 text-footnote xs:inline-flex sm:px-4"
       >
         Book a call
       </a>
       <button
         type="button"
         id="mobile-nav-open"
-        class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink lg:hidden"
+        class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink xl:hidden"
         aria-label="Open menu"
         aria-controls="mobileNav"
         aria-expanded="false"

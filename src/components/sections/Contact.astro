@@ -15,7 +15,7 @@ const { contact, channels, hours } = Astro.props;
 <section id="contact" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="contact-title">
   <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
     <SectionHeading eyebrow={contact.eyebrow} title={contact.title} lede={contact.lede} />
-    <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12">
       <ContactForm />
       <div class="reveal d3">
         <h3 class="eyebrow">Or reach us directly</h3>

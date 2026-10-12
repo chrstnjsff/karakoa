@@ -92,7 +92,7 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      class="fixed inset-0 z-[60] hidden flex-col bg-bg lg:hidden"
+      class="fixed inset-0 z-[60] hidden flex-col bg-bg xl:hidden"
     >
       <div class="flex h-16 shrink-0 items-center justify-between border-b border-line/10 px-5">
         <a
@@ -279,9 +279,9 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
           }
         });
 
-        // The menu only exists below lg; growing the window past it must
+        // The menu only exists below xl; growing the window past it must
         // not leave the page inert behind an invisible dialog.
-        window.matchMedia("(min-width: 1024px)").addEventListener("change", function (e) {
+        window.matchMedia("(min-width: 1280px)").addEventListener("change", function (e) {
           if (e.matches && isOpen()) close(false);
         });
       })();
@@ -343,10 +343,13 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
           });
         }
 
+        // A section leaving the band clears its link, so the hero and the
+        // sections without a nav link light nothing.
         var io = new IntersectionObserver(
           function (entries) {
             entries.forEach(function (entry) {
               if (entry.isIntersecting) activate(entry.target.id);
+              else if (entry.target.id === current) activate(null);
             });
           },
           { rootMargin: "-35% 0px -55% 0px", threshold: 0 }

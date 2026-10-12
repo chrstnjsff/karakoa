@@ -4,6 +4,8 @@ import { defineConfig, devices } from "@playwright/test";
 // server: no HMR socket, so headless Chrome never stalls on it.
 export default defineConfig({
   testDir: "./tests",
+  // The device matrix has its own config: npm run test:devices.
+  testIgnore: "devices.spec.ts",
   fullyParallel: true,
   reporter: [["list"]],
   use: {

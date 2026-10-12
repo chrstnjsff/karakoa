@@ -14,6 +14,7 @@
     "check": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:devices": "playwright test --config playwright.devices.config.ts",
     "brand": "node scripts/brand/build.mjs",
     "lint:html": "html-validate \"dist/**/*.html\"",
     "lint:links": "linkinator dist --recurse --skip \"web3forms|m.me|calendly|linkedin|https://karakoa.dev\"",

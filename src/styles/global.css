@@ -70,6 +70,9 @@
    Type scale - one ramp, each step paired with its line height.
    --------------------------------------------------------------- */
 @theme {
+  /* Smallest phones (320 to 359px) sit below xs */
+  --breakpoint-xs: 22.5rem;
+
   --text-caption: 0.875rem;
   --text-caption--line-height: 1.5;
   --text-footnote: 0.9375rem;
@@ -125,7 +128,8 @@ body {
   h2 {
     letter-spacing: -0.015em;
   }
-  p {
+  p,
+  li {
     text-wrap: pretty;
   }
 }
@@ -428,7 +432,9 @@ html.theme-fade * {
 }
 
 /* ---------------------------------------------------------------
-   Buttons: rounded, display face, at least 44px tall.
+   Buttons: rounded, display face, at least 44px tall. A label too
+   long for a narrow screen wraps centered and balanced, with room
+   above and below; single-line buttons keep their min-height.
    --------------------------------------------------------------- */
 .btn {
   display: inline-flex;
@@ -438,10 +444,12 @@ html.theme-fade * {
   gap: 0.5rem;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
-  padding: 0 1.25rem;
+  padding: 0.5rem 1.25rem;
   font-family: var(--font-display);
   font-size: var(--text-body);
   font-weight: 500;
+  text-align: center;
+  text-wrap: balance;
   cursor: pointer;
   transition:
     background-color 0.2s,
@@ -530,9 +538,11 @@ html.theme-fade * {
   border-color: rgb(var(--danger));
 }
 
+/* A long option ends in an ellipsis instead of a clipped word */
 .field-select {
   appearance: none;
   padding-right: 2.5rem;
+  text-overflow: ellipsis;
   cursor: pointer;
 }
 
@@ -652,6 +662,7 @@ html.theme-fade * {
   .prose h2 {
     margin-top: 2rem;
     font-size: var(--text-title3);
+    line-height: var(--text-title3--line-height);
     font-weight: 600;
     color: rgb(var(--ink));
   }

@@ -22,7 +22,7 @@ const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : h
           {
             services.map((s) => (
               <li>
-                <a href={`/services/${s.slug}/`} class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink">
+                <a href={`/services/${s.slug}/`} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
                   {s.title}
                 </a>
               </li>
@@ -36,7 +36,7 @@ const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : h
           {
             NAV.map((n) => (
               <li>
-                <a href={link(n.href)} class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink">
+                <a href={link(n.href)} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
                   {n.label}
                 </a>
               </li>
@@ -48,7 +48,7 @@ const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : h
         <p class="eyebrow">More</p>
         <ul class="mt-3 -ml-2">
           <li>
-            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink">
+            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
               {SITE.email}
             </a>
           </li>
@@ -59,7 +59,7 @@ const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : h
                   href={l.href}
                   target={l.external ? "_blank" : undefined}
                   rel={l.external ? "noopener" : undefined}
-                  class="inline-flex min-h-10 items-center px-2 text-footnote font-semibold text-muted hover:text-ink"
+                  class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink"
                 >
                   {l.label}
                 </a>

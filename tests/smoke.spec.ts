@@ -47,7 +47,7 @@ test.describe("landing page", () => {
   test("theme switch flips the dark class and persists", async ({ page, isMobile }) => {
     await page.goto("/");
     await settle(page);
-    // Below lg the header switch is inert behind the open menu, so use the
+    // Below xl the header switch is inert behind the open menu, so use the
     // copy inside the dialog there.
     let scope = page.locator("body");
     if (isMobile) {
@@ -86,7 +86,7 @@ test.describe("landing page", () => {
 
 test.describe("mobile menu", () => {
   test("opens, traps focus, and closes on Escape", async ({ page, isMobile }) => {
-    test.skip(!isMobile, "menu only exists below lg");
+    test.skip(!isMobile, "menu only exists below xl");
     await page.goto("/");
     await settle(page);
     await page.getByRole("button", { name: "Open menu" }).click();

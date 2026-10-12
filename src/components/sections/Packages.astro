@@ -30,7 +30,7 @@ const { items, note } = Astro.props;
               <span class="chip">{m}</span>
             ))}
           </p>
-          <ul class="mt-5 space-y-2 text-body text-ink">
+          <ul class="mb-6 mt-5 space-y-2 text-body text-ink">
             {p.includes.map((b) => (
               <li class="flex gap-2">
                 <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />
@@ -41,7 +41,6 @@ const { items, note } = Astro.props;
           <a
             href={p.id === "capstone" ? "/services/capstone-thesis-system/" : "#contact"}
             class={`btn press mt-auto w-full ${p.featured ? "btn-primary" : "btn-secondary"}`}
-            style="margin-top: calc(var(--spacing) * 6)"
           >
             {p.cta}
           </a>

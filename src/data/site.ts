@@ -619,6 +619,7 @@ export const founder = {
   eyebrow: "Who you work with",
   name: "Christian Josef Aquino",
   role: "Founder and lead engineer",
+  photoAlt: "Christian Josef Aquino seated at a marble table, hands folded, with pine trees and hills behind him.",
   bio: "Senior DevOps engineer with 7+ years building and running production systems on AWS, Google Cloud, and Azure for healthcare, enterprise, and telecom platforms. Christian leads every Karakoa project and stays hands-on in the code.",
   note: "Projects stay founder-led, with design, QA, and documentation specialists brought in only when the brief calls for it.",
   links: [

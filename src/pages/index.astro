@@ -1,5 +1,7 @@
 ---
+import { getImage } from "astro:assets";
 import Base from "../layouts/Base.astro";
+import photo from "../assets/founder.jpg";
 import Hero from "../components/sections/Hero.astro";
 import Heritage from "../components/sections/Heritage.astro";
 import About from "../components/sections/About.astro";
@@ -29,6 +31,7 @@ import {
 } from "../data/site";
 
 const title = "Software Development Company in the Philippines | Karakoa";
+const founderPhotoUrl = new URL((await getImage({ src: photo, width: 800, format: "jpeg" })).src, SITE.url).href;
 
 const organization = {
   "@context": "https://schema.org",
@@ -48,6 +51,7 @@ const organization = {
     "@id": `${SITE.url}/#founder`,
     name: founder.name,
     jobTitle: founder.role,
+    image: founderPhotoUrl,
     url: founder.links[0].href,
     sameAs: founder.links.slice(1).map((l) => l.href),
   },

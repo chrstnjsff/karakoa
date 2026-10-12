@@ -1,7 +1,11 @@
 ---
+import { Image, getImage } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
+import photo from "../assets/founder.jpg";
 import { SITE, aboutPage, founder, services } from "../data/site";
+
+const photoUrl = new URL((await getImage({ src: photo, width: 800, format: "jpeg" })).src, SITE.url).href;
 
 const personLd = {
   "@context": "https://schema.org",
@@ -9,6 +13,7 @@ const personLd = {
   "@id": `${SITE.url}/#founder`,
   name: founder.name,
   jobTitle: founder.role,
+  image: photoUrl,
   url: founder.links[0].href,
   worksFor: { "@id": `${SITE.url}/#organization` },
   knowsAbout: founder.skills,
@@ -73,6 +78,15 @@ const aboutLd = {
       </div>
 
       <aside class="card self-start p-6 sm:p-8" aria-labelledby="founder-title">
+        <Image
+          src={photo}
+          alt={founder.photoAlt}
+          widths={[320, 480, 640]}
+          sizes="15rem"
+          format="webp"
+          loading="lazy"
+          class="mb-6 aspect-[4/5] w-full max-w-60 rounded-2xl object-cover"
+        />
         <p class="eyebrow">{founder.eyebrow}</p>
         <h2 id="founder-title" class="mt-3 text-title3 font-semibold text-ink">{founder.name}</h2>
         <p class="mt-1 text-footnote font-semibold text-accent-text">{founder.role}</p>

@@ -15,6 +15,7 @@ const MISSING = "/does-not-exist/";
 const PATHS = [
   "/",
   "/about/",
+  "/faq/",
   "/privacy/",
   "/contact/thanks/",
   "/guides/",
@@ -23,8 +24,8 @@ const PATHS = [
   MISSING,
 ];
 
-// The mobile menu replaces the inline nav below Tailwind's xl breakpoint.
-const XL = 1280;
+// The mobile menu replaces the inline nav below Tailwind's md breakpoint.
+const MD = 768;
 
 /** Scroll top to bottom so lazy images load and reveals run, then show every reveal and wait for it to finish. */
 async function settle(page: Page) {
@@ -85,7 +86,9 @@ async function expectTappable(target: Locator) {
 async function headingVsHeader(page: Page, id: string) {
   return page.evaluate((id) => {
     const target = document.getElementById(id)!;
-    const heading = target.matches("h1, h2, h3") ? target : target.querySelector("h2, h3")!;
+    // A section's first content: its heading, or the founder photo card that
+    // opens About on narrow screens.
+    const heading = target.matches("h1, h2, h3") ? target : target.querySelector("h2, h3, figure")!;
     return {
       heading: heading.getBoundingClientRect().top,
       header: document.querySelector("body > header")!.getBoundingClientRect().bottom,
@@ -143,6 +146,11 @@ function audit() {
     return false;
   };
 
+  // The drawn sample app screens (one image to screen readers, hidden from
+  // them, or a hero sample tab) are pictures with tiny type and clipped,
+  // fixed geometry; rules 2 and 3 skip them.
+  const drawing = (el: Element) => !!el.closest("[role=img], [aria-hidden=true], [role=tabpanel]");
+
   // 1. Nothing sticks out past the left or right edge of the screen.
   const flagged: Element[] = [];
   for (const el of document.body.querySelectorAll("*")) {
@@ -164,7 +172,7 @@ function audit() {
     const parent = el.parentElement!;
     const ps = css(parent);
     if (/^(inline|contents)$/.test(s.display) || /absolute|fixed/.test(s.position)) continue;
-    if (/^(inline|contents)$/.test(ps.display) || ps.overflowX !== "visible") continue;
+    if (/^(inline|contents)$/.test(ps.display) || ps.overflowX !== "visible" || drawing(el)) continue;
     const r = el.getBoundingClientRect();
     const p = parent.getBoundingClientRect();
     const left = p.left + parseFloat(ps.borderLeftWidth) + parseFloat(ps.paddingLeft);
@@ -183,7 +191,7 @@ function audit() {
     const el = walker.currentNode.parentElement;
     if (!el || checked.has(el) || !walker.currentNode.textContent?.trim()) continue;
     checked.add(el);
-    if (!shown(el)) continue;
+    if (!shown(el) || drawing(el)) continue;
     const size = parseFloat(css(el).fontSize);
     if (size < 12) problems.push(`text ${size}px: ${describe(el)}`);
   }
@@ -295,6 +303,10 @@ function audit() {
 
 for (const path of PATHS) {
   test(`renders ${path}`, async ({ page, baseURL }, testInfo) => {
+    // The real Turnstile script logs its own CSP and fingerprinting noise.
+    await page.route("https://challenges.cloudflare.com/turnstile/v0/api.js*", (route) =>
+      route.fulfill({ contentType: "text/javascript", body: "window.turnstile = { render() { return 'w1'; }, reset() {} };" }),
+    );
     const errors: string[] = [];
     page.on("console", (msg) => {
       if (msg.type() !== "error") return;
@@ -361,7 +373,7 @@ test("menu opens, every item is tappable, and it closes", async ({ page }) => {
   await settle(page);
   const open = page.getByRole("button", { name: "Open menu" });
 
-  if (page.viewportSize()!.width >= XL) {
+  if (page.viewportSize()!.width >= MD) {
     await expect(open).toBeHidden();
     for (const link of await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link").all()) {
       await expectTappable(link);
@@ -388,7 +400,7 @@ test("menu opens, every item is tappable, and it closes", async ({ page }) => {
 test("nav links bring each section heading into view below the header", async ({ page }) => {
   await page.goto("/");
   await settle(page);
-  const wide = page.viewportSize()!.width >= XL;
+  const wide = page.viewportSize()!.width >= MD;
 
   for (const item of NAV) {
     if (wide) {

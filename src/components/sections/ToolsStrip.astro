@@ -1,0 +1,65 @@
+---
+// Screen readers get the list once; the copy that makes the loop seamless is
+// hidden from them. The button stops the motion (WCAG 2.2.2).
+import Icon from "../Icon.astro";
+import { techStack } from "../../data/site";
+---
+
+<div class="relative border-b border-line" data-marquee>
+  <div class="overflow-hidden py-4" data-loop>
+    <div class="marquee flex w-max text-sm font-medium whitespace-nowrap text-muted">
+      <ul class="flex gap-12 pr-12" aria-label={techStack.label}>
+        {techStack.items.map((t) => <li>{t}</li>)}
+      </ul>
+      <ul class="flex gap-12 pr-12" aria-hidden="true">
+        {techStack.items.map((t) => <li>{t}</li>)}
+      </ul>
+    </div>
+  </div>
+  <button
+    type="button"
+    class="marquee-toggle absolute top-1/2 right-3 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-line bg-paper text-muted transition-colors hover:text-navy"
+    aria-label="Pause the moving tools list"
+    data-marquee-toggle
+  >
+    <Icon name="pause" class="size-3" />
+    <Icon name="play" class="hidden size-3" />
+  </button>
+</div>
+
+<style is:global>
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
+  [data-marquee][data-paused] .marquee {
+    animation-play-state: paused !important;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      animation: none;
+    }
+    .marquee-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const strip = document.querySelector<HTMLElement>("[data-marquee]");
+  const toggle = strip?.querySelector<HTMLButtonElement>("[data-marquee-toggle]");
+  if (strip && toggle) {
+    const [pauseIcon, playIcon] = toggle.querySelectorAll("svg");
+    toggle.addEventListener("click", () => {
+      const paused = !strip.hasAttribute("data-paused");
+      strip.toggleAttribute("data-paused", paused);
+      toggle.setAttribute("aria-label", paused ? "Play the moving tools list" : "Pause the moving tools list");
+      pauseIcon.classList.toggle("hidden", paused);
+      playIcon.classList.toggle("hidden", !paused);
+    });
+  }
+</script>

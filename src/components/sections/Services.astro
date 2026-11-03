@@ -1,49 +1,937 @@
 ---
-import SectionHeading from "../SectionHeading.astro";
 import Icon from "../Icon.astro";
-import type { Service } from "../../data/site";
-
-interface Props {
-  items: Service[];
-}
-const { items } = Astro.props;
+import ServiceArt from "../ServiceArt.astro";
+import { services, servicesSection } from "../../data/site";
 ---
 
-<section id="services" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="services-title">
-  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
-    <SectionHeading
-      eyebrow="Services"
-      title="What we build"
-      lede="Everything from a one-page site to a full system. Each service below lists what is included so you know what you are getting before the first call."
-    />
-    <ul class="grid gap-4 sm:grid-cols-2">
-      {
-        items.map((s, i) => (
-          <li id={`service-${s.id}`} class={`reveal d${(i % 4) + 1} card card-lift flex flex-col p-5`}>
-            <span class="grid h-11 w-11 place-items-center rounded-xl bg-accent/12 text-accent-text">
-              <Icon name={s.icon} class="h-5 w-5" />
-            </span>
-            <h3 class="mt-4 text-headline font-semibold text-ink">
-              <a href={`/services/${s.slug}/`} class="link-ul">{s.title}</a>
+<section id="services" class="mx-auto max-w-6xl px-5 py-24 sm:py-32" aria-labelledby="services-title">
+  <div class="reveal max-w-2xl">
+    <p class="label">{servicesSection.eyebrow}</p>
+    <h2 id="services-title" class="h2 mt-3">{servicesSection.title}</h2>
+    <p class="lead mt-4 max-w-xl">{servicesSection.lede}</p>
+  </div>
+  <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      services.map((s) => (
+        <a href="#message" data-msg data-type={s.formType} class="svc reveal">
+          <div class="plate" aria-hidden="true">
+            <div class="stage">
+              <ServiceArt id={s.id} />
+            </div>
+          </div>
+          <div class="svc-body">
+            <h3>
+              {s.name}
+              <Icon name="arrow" class="svc-arrow" />
             </h3>
-            <p class="mt-2 text-body text-muted">{s.summary}</p>
-            <p class="eyebrow mt-5 text-caption">What is included</p>
-            <ul class="mt-2 space-y-1.5 text-body text-ink">
-              {s.includes.map((b) => (
-                <li class="flex gap-2">
-                  <Icon name="check" class="mt-1 h-3.5 w-3.5 shrink-0 text-teal-text" />
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
-            <p class="mt-auto pt-5 text-caption text-muted">{s.stack.join("\u00a0· ")}</p>
-            <a href={`/services/${s.slug}/`} class="mt-3 inline-flex min-h-10 items-center gap-1 text-body font-semibold text-accent-text">
-              More about this service
-              <Icon name="arrow" class="h-3.5 w-3.5" />
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+            <p>{s.blurb}</p>
+            <span class="sr-only">Send us a message about this.</span>
+          </div>
+        </a>
+      ))
+    }
   </div>
 </section>
+
+<style is:global>
+  a.svc {
+    --e: cubic-bezier(0.2, 0.7, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--color-body);
+    /* the reveal's rise sits on transform; the hover lift uses translate */
+    transition:
+      border-color 0.25s,
+      translate 0.3s var(--e),
+      opacity 0.6s var(--ease-reveal) var(--stagger, 0s),
+      transform 0.6s var(--ease-reveal) var(--stagger, 0s);
+  }
+  .svc.on {
+    border-color: rgba(11, 44, 68, 0.32);
+  }
+  @media (hover: hover) {
+    .svc:hover {
+      translate: 0 -3px;
+    }
+  }
+  .svc:focus-visible {
+    border-radius: 12px;
+  }
+  .plate {
+    position: relative;
+    height: 158px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-wash);
+  }
+  .stage {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    width: 224px;
+    height: 136px;
+    margin-left: -112px;
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 500;
+    color: #0b2c44;
+    white-space: nowrap;
+  }
+  @media (max-width: 1023px) {
+    .plate {
+      height: 180px;
+    }
+    .stage {
+      top: 24px;
+      transform: scale(1.15);
+      transform-origin: 50% 0;
+    }
+  }
+  .stage * {
+    transition-property: transform, opacity, background-color, border-color, color, stroke-dashoffset, width;
+    transition-duration: 0.45s;
+    transition-timing-function: var(--e);
+    transition-delay: var(--d, 0s);
+  }
+  .svc:not(.on) .stage *,
+  .svc:not(.on) .stage *::before,
+  .svc:not(.on) .stage *::after {
+    transition-delay: 0s !important;
+  }
+  .svc-body {
+    padding: 18px 20px 22px;
+  }
+  .svc h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .svc-body p {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .svc .svc-arrow {
+    width: 16px;
+    height: 16px;
+    color: var(--color-coral-700);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+      opacity 0.25s,
+      transform 0.25s var(--e);
+  }
+  .svc.on .svc-arrow,
+  .svc:focus-visible .svc-arrow {
+    opacity: 1;
+    transform: none;
+  }
+  @media (hover: none) {
+    .svc .svc-arrow {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* shared drawing parts */
+  .stage .pn {
+    position: absolute;
+    border: 1px solid #e1dbd0;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(11, 44, 68, 0.05);
+  }
+  .stage .cut {
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+  }
+  .stage .ln {
+    display: block;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(11, 44, 68, 0.12);
+  }
+  .stage .ln.dk {
+    background: rgba(11, 44, 68, 0.72);
+  }
+  .stage .row {
+    display: flex;
+    align-items: center;
+  }
+  .stage .pill {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    background: #d4421f;
+  }
+  .stage .img {
+    display: block;
+    border-radius: 3px;
+    background: #ebe5da;
+  }
+  .stage .ok {
+    position: relative;
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 99px;
+    background: #3cc4bf;
+  }
+  .stage .ok::after {
+    content: "";
+    position: absolute;
+    top: 2.6px;
+    left: 3px;
+    width: 4px;
+    height: 2px;
+    border: solid #fff;
+    border-width: 0 0 1.4px 1.4px;
+    transform: rotate(-45deg);
+  }
+  .stage .swap {
+    display: inline-grid;
+  }
+  .stage .swap > * {
+    grid-area: 1/1;
+    transition-duration: 0.15s;
+  }
+  .stage .swap > :last-child,
+  .svc.on .stage .swap > :first-child {
+    opacity: 0;
+  }
+  .svc.on .stage .swap > :last-child {
+    opacity: 1;
+  }
+
+  /* websites */
+  .stage .bar {
+    display: flex;
+    height: 17px;
+    align-items: center;
+    gap: 3px;
+    padding: 0 7px;
+    border-bottom: 1px solid #eee8de;
+  }
+  .stage .sv-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 9px;
+    background: #e1dbd0;
+  }
+  .stage .url {
+    height: 10px;
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: 5px;
+    background: #f4f1eb;
+    font-size: 7.5px;
+    font-weight: 400;
+    line-height: 10px;
+    color: #5f6b75;
+  }
+  .stage .vp {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  .stage .pg {
+    overflow: hidden;
+    padding: 8px 9px;
+  }
+  .stage .hero-b {
+    height: 42px;
+    margin-top: 8px;
+    padding: 9px;
+    border-radius: 3px;
+    background: #0b2c44;
+  }
+  .stage .sv-tile {
+    flex: 1;
+    height: 26px;
+    border-radius: 3px;
+    background: #f1ede6;
+  }
+  .stage .pages {
+    transition-duration: 0.7s;
+  }
+  .svc.on .stage .pages {
+    transform: translateY(calc(-1 * var(--h)));
+  }
+  .stage .phone {
+    border-color: #0b2c44;
+    border-radius: 10px;
+    background: #0b2c44;
+  }
+
+  /* mobile apps */
+  .stage .notch {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    z-index: 1;
+    width: 20px;
+    height: 5px;
+    margin-left: -10px;
+    border-radius: 3px;
+    background: #0b2c44;
+  }
+  .stage .screens {
+    position: absolute;
+    top: 14px;
+    bottom: 18px;
+    left: 0;
+    display: flex;
+    width: 200%;
+    transition-duration: 0.6s;
+  }
+  .svc.on .stage .screens {
+    transform: translateX(-50%);
+  }
+  .stage .sv-scr {
+    width: 50%;
+    padding: 4px 7px;
+  }
+  .stage .li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+  }
+  .stage .li > i {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 99px;
+    opacity: 0.85;
+  }
+  .stage .tabs {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    height: 18px;
+    align-items: center;
+    justify-content: space-around;
+    border-top: 1px solid #eee8de;
+  }
+  .stage .tabs > i {
+    width: 5px;
+    height: 5px;
+    border-radius: 9px;
+    background: rgba(11, 44, 68, 0.25);
+  }
+  .stage .tab-ind {
+    position: absolute;
+    bottom: 3px;
+    left: 7px;
+    width: 10px;
+    height: 2px;
+    border-radius: 1px;
+    background: #d4421f;
+  }
+  .svc.on .stage .tab-ind {
+    transform: translateX(23px);
+  }
+  .stage .push {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 6px;
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .svc.on .stage .push {
+    opacity: 1;
+    transform: none;
+  }
+  .stage .push b {
+    display: block;
+    font-size: 8px;
+    font-weight: 600;
+  }
+  .stage .cd {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 9px;
+    background: #d4421f;
+  }
+  .stage .tag {
+    position: absolute;
+    padding: 3px 7px;
+    border: 1px solid #e1dbd0;
+    border-radius: 99px;
+    background: #fff;
+    font-size: 8px;
+    font-weight: 400;
+    color: #3d4a54;
+  }
+
+  /* custom systems */
+  .stage .side {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: 28px;
+    padding-top: 8px;
+    background: #0b2c44;
+  }
+  .stage .side i {
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+  .stage .side i.cur {
+    background: rgba(255, 255, 255, 0.85);
+  }
+  .stage .side i.logo {
+    width: 11px;
+    height: 11px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    background: #f15a3c;
+  }
+  .stage .kpi {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 32px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    background: #f6f3ee;
+  }
+  .stage .kpi b {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .stage .spark {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 10px;
+  }
+  .stage .spark i {
+    width: 4px;
+    border-radius: 1px;
+    background: rgba(11, 44, 68, 0.3);
+  }
+  .stage .spark .gr {
+    background: #d4421f;
+    transform-origin: bottom;
+  }
+  .svc.on .stage .spark .gr {
+    transform: scaleY(2.4);
+  }
+  .stage .trow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    border-top: 1px solid #eee8de;
+  }
+  .stage .sv-st {
+    width: 22px;
+    height: 7px;
+    margin-left: auto;
+    border-radius: 4px;
+    background: #f4d58d;
+  }
+  .svc.on .stage .sv-st,
+  .stage .sv-st.done {
+    background: #3cc4bf;
+  }
+  .stage .toast {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 8.5px;
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .svc.on .stage .toast {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* online stores */
+  .stage .bag {
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    width: 30px;
+    height: 26px;
+    margin-left: -15px;
+    border-radius: 2px 2px 5px 5px;
+    background: #e3a75b;
+  }
+  .stage .bag::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 7px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #b97e3a;
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .stage .bag::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 9px;
+    width: 12px;
+    height: 6px;
+    border-radius: 1px;
+    background: #0b2c44;
+    opacity: 0.85;
+  }
+  .stage .buy {
+    display: grid;
+    place-items: center;
+    height: 18px;
+    margin-top: 7px;
+    border-radius: 4px;
+    background: #0b2c44;
+    font-size: 8.5px;
+    color: #fff;
+  }
+  .svc.on .stage .buy {
+    background: #d4421f;
+  }
+  .stage .fly {
+    position: absolute;
+    top: 113px;
+    left: 72px;
+    width: 7px;
+    height: 7px;
+    border-radius: 9px;
+    background: #d4421f;
+    opacity: 0;
+  }
+  .svc.on .stage .fly {
+    animation: sv-fly 0.55s 0.1s cubic-bezier(0.4, 0, 0.7, 0.4) both;
+  }
+  @keyframes sv-fly {
+    0% {
+      opacity: 1;
+      transform: none;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(100px, -88px) scale(0.6);
+    }
+  }
+  .stage .cart {
+    display: grid;
+    place-items: center;
+  }
+  .stage .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 99px;
+    background: #d4421f;
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.4);
+    transition-timing-function: cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  .svc.on .stage .badge {
+    opacity: 1;
+    transform: none;
+  }
+  .stage .pay {
+    width: 15px;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0.85;
+  }
+  .stage .go {
+    display: block;
+    height: 9px;
+    margin-top: 8px;
+    border-radius: 3px;
+    background: rgba(11, 44, 68, 0.12);
+  }
+  .svc.on .stage .go {
+    background: #3cc4bf;
+  }
+
+  /* ai and automation */
+  .stage .wires {
+    position: absolute;
+    inset: 0;
+    width: 224px;
+    height: 136px;
+    overflow: visible;
+  }
+  .stage .wires path {
+    fill: none;
+    stroke: #d3cbbe;
+    stroke-width: 1.25;
+  }
+  .stage .wires .hot {
+    stroke: #d4421f;
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition-duration: 0.35s;
+  }
+  .svc.on .stage .wires .hot {
+    stroke-dashoffset: 0;
+  }
+  .stage .sv-chip {
+    position: absolute;
+    padding: 3px 7px;
+    border-radius: 99px;
+    background: rgba(11, 44, 68, 0.06);
+    font-size: 8px;
+    font-weight: 400;
+    color: #3d4a54;
+  }
+  .stage .node {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    height: 22px;
+    border: 1px solid #e1dbd0;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 8.5px;
+    box-shadow: 0 1px 2px rgba(11, 44, 68, 0.05);
+  }
+  .stage .node.ai {
+    border-color: #0b2c44;
+    background: #0b2c44;
+    color: #fff;
+  }
+  .svc.on .stage .node:not(.ai) {
+    border-color: rgba(212, 66, 31, 0.55);
+  }
+  .stage .node .ok {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    transform: scale(0);
+  }
+  .svc.on .stage .node .ok {
+    transform: none;
+  }
+
+  /* cloud and devops */
+  .stage .state .run {
+    color: #86560f;
+  }
+  .stage .state .live {
+    color: #13665b;
+  }
+  .stage .sv-seg {
+    display: flex;
+    gap: 3px;
+    margin-top: 7px;
+  }
+  .stage .sv-seg span {
+    flex: 1;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(11, 44, 68, 0.1);
+  }
+  .stage .sv-seg i {
+    display: block;
+    height: 100%;
+    background: #3cc4bf;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition-duration: 0.32s;
+    transition-timing-function: linear;
+  }
+  .svc.on .stage .sv-seg i {
+    transform: none;
+  }
+  .stage .sv-segl {
+    display: flex;
+    gap: 3px;
+    margin-top: 4px;
+    font-size: 7.5px;
+    font-weight: 400;
+    color: #5f6b75;
+  }
+  .stage .sv-segl span {
+    flex: 1;
+  }
+  .stage .region {
+    position: absolute;
+    top: 57px;
+    left: 0;
+    width: 224px;
+    height: 79px;
+    border: 1.25px dashed rgba(11, 44, 68, 0.28);
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .stage .rl {
+    position: absolute;
+    top: -6px;
+    left: 8px;
+    padding: 0 4px;
+    background: var(--color-wash);
+    font-size: 8px;
+    font-weight: 400;
+    color: #5f6b75;
+  }
+  .stage .srv {
+    top: 14px;
+    width: 62px;
+    height: 48px;
+    padding: 7px;
+  }
+  .svc.on .stage .srv {
+    border-color: #3cc4bf;
+  }
+  .stage .v {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 9px;
+    font-size: 8.5px;
+  }
+  .stage .v i {
+    width: 5px;
+    height: 5px;
+    border-radius: 9px;
+    background: #3cc4bf;
+  }
+
+  /* capstone and thesis */
+  .stage .doc {
+    transform: rotate(-4deg);
+    transform-origin: 0 100%;
+  }
+  .svc.on .stage .doc {
+    transform: rotate(-6deg) translateX(-3px);
+  }
+  .stage .doc > span {
+    display: block;
+  }
+  .stage .box {
+    width: 22px;
+    height: 14px;
+    border: 1px solid rgba(11, 44, 68, 0.4);
+    border-radius: 3px;
+  }
+  .stage .ck {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 7px;
+    font-size: 8.5px;
+    font-weight: 400;
+    color: #3d4a54;
+  }
+  .stage .ck i {
+    position: relative;
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border: 1.25px solid rgba(11, 44, 68, 0.35);
+    border-radius: 3px;
+  }
+  .stage .ck.done i,
+  .svc.on .stage .ck i {
+    border-color: #3cc4bf;
+    background: #3cc4bf;
+  }
+  .stage .ck i::after {
+    content: "";
+    position: absolute;
+    top: 1.2px;
+    left: 1.5px;
+    width: 4px;
+    height: 2px;
+    border: solid #fff;
+    border-width: 0 0 1.4px 1.4px;
+    opacity: 0;
+    transform: rotate(-45deg);
+    transition: opacity 0.2s var(--d, 0s);
+  }
+  .stage .ck.done i::after,
+  .svc.on .stage .ck i::after {
+    opacity: 1;
+  }
+  .stage .prog {
+    display: block;
+    height: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: #f1ede6;
+  }
+  .stage .prog i {
+    display: block;
+    width: 50%;
+    height: 100%;
+    background: #d4421f;
+    transition-duration: 0.8s;
+  }
+  .svc.on .stage .prog i {
+    width: 100%;
+  }
+
+  /* consultation */
+  .stage .sk {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 116px;
+    height: 118px;
+  }
+  .stage .sk path {
+    fill: none;
+    stroke: rgba(11, 44, 68, 0.35);
+    stroke-width: 1.25;
+  }
+  .stage .bx {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    height: 18px;
+    border: 1.25px dashed rgba(11, 44, 68, 0.4);
+    border-radius: 4px;
+    background: #fff;
+    font-size: 8px;
+    font-weight: 400;
+    color: #3d4a54;
+  }
+  .stage .pin {
+    position: absolute;
+    top: 57px;
+    left: 37px;
+    display: grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 99px;
+    background: #d4421f;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(212, 66, 31, 0.15);
+    transform: scale(0);
+  }
+  .svc.on .stage .pin {
+    transform: none;
+  }
+  .stage .opt {
+    position: relative;
+    margin-top: 7px;
+    padding: 5px 6px 5px 18px;
+    border: 1px solid #e1dbd0;
+    border-radius: 4px;
+    font-size: 8.5px;
+    font-weight: 400;
+    color: #3d4a54;
+  }
+  .stage .opt::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    width: 7px;
+    height: 7px;
+    margin-top: -4.5px;
+    border: 1.25px solid rgba(11, 44, 68, 0.35);
+    border-radius: 99px;
+    transition:
+      background-color 0.3s var(--d, 0s),
+      border-color 0.3s var(--d, 0s);
+  }
+  .svc.on .stage .opt.pick {
+    border-color: #d4421f;
+    color: #0b2c44;
+  }
+  .svc.on .stage .opt.pick::before {
+    border-color: #d4421f;
+    background: #d4421f;
+  }
+  .stage .rec {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 2px 6px;
+    border-radius: 99px;
+    background: rgba(212, 66, 31, 0.1);
+    font-size: 8px;
+    color: #b9381a;
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  .svc.on .stage .rec {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc,
+    .svc *,
+    .svc *::before,
+    .svc *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+    .svc:hover {
+      translate: none;
+    }
+  }
+</style>
+
+<script>
+  // Touch screens cannot hover, so each card plays once when mostly in view.
+  const cards = document.querySelectorAll<HTMLElement>(".svc");
+  if (window.matchMedia("(hover: hover)").matches) {
+    cards.forEach((c) => {
+      c.addEventListener("pointerenter", () => c.classList.add("on"));
+      c.addEventListener("pointerleave", () => c.classList.remove("on"));
+      c.addEventListener("focus", () => c.classList.add("on"));
+      c.addEventListener("blur", () => c.classList.remove("on"));
+    });
+  } else {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          e.target.classList.add("on");
+          io.unobserve(e.target);
+        }),
+      { threshold: 0.7 },
+    );
+    cards.forEach((c) => io.observe(c));
+  }
+</script>

@@ -1,12 +1,11 @@
 ---
-import "@fontsource-variable/fredoka";
-import "@fontsource-variable/nunito-sans";
+import "@fontsource-variable/roboto";
+import robotoLatin from "@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2?url";
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Logo from "../components/Logo.astro";
-import ThemeSwitch from "../components/ThemeSwitch.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-import { SITE, NAV, PAGES, calendlyUrl } from "../data/site";
+import { SITE, NAV, PAGES } from "../data/site";
 
 interface Props {
   title: string;
@@ -17,9 +16,11 @@ interface Props {
   noindex?: boolean;
   /** Structured data blocks, each emitted as its own JSON-LD script. */
   jsonLd?: object[];
+  /** CSS generated at build time for this page (the work screens' keyframes). */
+  headStyle?: string;
 }
 
-const { title, description, ogImage = "/og.png", noindex = false, jsonLd = [] } = Astro.props;
+const { title, description, ogImage = "/og.png", noindex = false, jsonLd = [], headStyle } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageUrl = new URL(ogImage, Astro.site).href;
 const isHome = Astro.url.pathname === "/";
@@ -41,8 +42,8 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#ddf3ee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0c2a3f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0b2c44" />
+    <link rel="preload" href={robotoLatin} as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
@@ -58,27 +59,18 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
     <meta name="twitter:image" content={ogImageUrl} />
 
     <script is:inline>
-      // Resolve the theme before first paint, so there is no flash of the wrong theme.
-      // The js class lets CSS hide scroll-reveal content only when JS will show it.
-      (function () {
-        document.documentElement.classList.add("js");
-        try {
-          var pref = localStorage.getItem("theme") || "system";
-          var dark =
-            pref === "dark" ||
-            (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-          document.documentElement.classList.toggle("dark", dark);
-        } catch (e) {}
-      })();
+      // Lets CSS hide scroll-reveal content only when JS will show it.
+      document.documentElement.classList.add("js");
     </script>
 
     {jsonLd.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block)} />)}
+    {headStyle && <style is:inline set:html={headStyle} />}
   </head>
 
-  <body class="font-sans antialiased">
+  <body>
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-footnote focus:font-semibold focus:text-bg"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[80] focus:rounded-md focus:bg-paper focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-navy"
     >
       Skip to content
     </a>
@@ -86,43 +78,50 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
     <div id="top"></div>
     <Header />
 
-    <!-- mobile menu: a modal dialog that mirrors the bar it opens from -->
     <div
       id="mobileNav"
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      class="fixed inset-0 z-[60] hidden flex-col bg-bg xl:hidden"
+      class="on-dark fixed inset-0 z-[60] hidden flex-col bg-navy text-foam md:hidden"
     >
-      <div class="flex h-16 shrink-0 items-center justify-between border-b border-line/10 px-5">
+      <div class="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-5">
         <a
           href={isHome ? "#top" : "/"}
-          class="press -mx-2 inline-flex min-h-11 items-center px-2"
+          class="flex min-h-11 items-center"
           aria-label={isHome ? `${SITE.domain}, back to top` : `${SITE.domain}, home`}
         >
-          <Logo size={30} />
+          <Logo mascotId="menu" onDark />
         </a>
         <button
           type="button"
           id="mobile-nav-close"
-          class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink"
+          class="-mr-2.5 grid size-11 place-items-center rounded-md text-foam"
           aria-label="Close menu"
         >
-          <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" class="size-5" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
           </svg>
         </button>
       </div>
-      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-10 pt-4">
+      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-2 pb-10">
         <nav aria-label="Primary, mobile">
           <ul>
             {
-              [...NAV, ...PAGES].map((item) => (
+              NAV.map((item) => (
                 <li>
-                  <a
-                    href={link(item.href)}
-                    class="flex min-h-12 items-center border-b border-line/10 font-display text-title3 font-medium text-ink"
-                  >
+                  <a href={link(item.href)} class="flex min-h-14 items-center border-b border-white/10 text-[22px] font-medium text-white">
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <ul class="mt-6 flex flex-wrap gap-x-6">
+            {
+              PAGES.map((item) => (
+                <li>
+                  <a href={item.href} class="inline-flex min-h-11 items-center text-[17px] text-mist">
                     {item.label}
                   </a>
                 </li>
@@ -130,13 +129,7 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
             }
           </ul>
         </nav>
-        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn btn-primary press mt-6 w-full">
-          Book a call
-        </a>
-        <div class="mt-8 flex items-center justify-between">
-          <span class="text-footnote font-semibold text-muted">Theme</span>
-          <ThemeSwitch idSuffix="-mobile" />
-        </div>
+        <a href={link("#message")} data-msg class="btn-primary mt-8 w-full">Send a message</a>
       </div>
     </div>
 
@@ -148,62 +141,6 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
     </main>
 
     <script is:inline>
-      // ---- theme: system | light | dark -------------------------------
-      (function () {
-        var media = window.matchMedia("(prefers-color-scheme: dark)");
-
-        function read() {
-          try {
-            return localStorage.getItem("theme") || "system";
-          } catch (e) {
-            return "system";
-          }
-        }
-
-        function apply(pref) {
-          var dark = pref === "dark" || (pref === "system" && media.matches);
-          document.documentElement.classList.toggle("dark", dark);
-          document.querySelectorAll("[data-theme-opt]").forEach(function (b) {
-            b.setAttribute("aria-pressed", String(b.dataset.themeOpt === pref));
-          });
-        }
-
-        window.setTheme = function (pref) {
-          try {
-            localStorage.setItem("theme", pref);
-          } catch (e) {}
-          var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          if (document.startViewTransition && !reduce) {
-            document.startViewTransition(function () {
-              apply(pref);
-            });
-          } else if (!reduce) {
-            var root = document.documentElement;
-            root.classList.add("theme-fade");
-            apply(pref);
-            setTimeout(function () {
-              root.classList.remove("theme-fade");
-            }, 400);
-          } else {
-            apply(pref);
-          }
-        };
-
-        document.querySelectorAll("[data-theme-opt]").forEach(function (b) {
-          b.addEventListener("click", function () {
-            window.setTheme(b.dataset.themeOpt);
-          });
-        });
-
-        // follow the OS while the preference is "system"
-        media.addEventListener("change", function () {
-          if (read() === "system") apply("system");
-        });
-
-        apply(read());
-      })();
-
-      // ---- mobile menu (modal dialog) ----------------------------------
       (function () {
         var panel = document.getElementById("mobileNav");
         var openBtn = document.getElementById("mobile-nav-open");
@@ -279,14 +216,15 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
           }
         });
 
-        // The menu only exists below xl; growing the window past it must
+        // The menu only exists below md; growing the window past it must
         // not leave the page inert behind an invisible dialog.
-        window.matchMedia("(min-width: 1280px)").addEventListener("change", function (e) {
+        window.matchMedia("(min-width: 768px)").addEventListener("change", function (e) {
           if (e.matches && isOpen()) close(false);
         });
       })();
 
-      // ---- reveal on scroll --------------------------------------------
+      // Items that enter together stagger by 70ms, unless a d1 to d4 class
+      // already sets their delay.
       (function () {
         var items = document.querySelectorAll(".reveal");
         if (!items.length) return;
@@ -303,14 +241,16 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
 
         var io = new IntersectionObserver(
           function (entries) {
+            var n = 0;
             entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("in");
-                io.unobserve(entry.target);
-              }
+              if (!entry.isIntersecting) return;
+              var el = entry.target;
+              if (!/\bd[1-4]\b/.test(el.className)) el.style.setProperty("--stagger", n++ * 70 + "ms");
+              el.classList.add("in");
+              io.unobserve(el);
             });
           },
-          { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
+          { rootMargin: "0px 0px -12% 0px", threshold: 0 }
         );
 
         items.forEach(function (el) {
@@ -318,7 +258,26 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
         });
       })();
 
-      // ---- header scrollspy (in-page links only) -----------------------
+      // Anything marked data-loop pauses its CSS and SVG animations while unseen.
+      (function () {
+        var loops = document.querySelectorAll("[data-loop]");
+        if (!loops.length || !("IntersectionObserver" in window)) return;
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var el = entry.target;
+            el.classList.toggle("idle", !entry.isIntersecting);
+            el.querySelectorAll("svg").forEach(function (svg) {
+              if (!svg.pauseAnimations) return;
+              if (entry.isIntersecting) svg.unpauseAnimations();
+              else svg.pauseAnimations();
+            });
+          });
+        });
+        loops.forEach(function (el) {
+          io.observe(el);
+        });
+      })();
+
       (function () {
         var links = document.querySelectorAll("[data-spy]");
         if (!links.length || !("IntersectionObserver" in window)) return;

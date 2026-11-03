@@ -1,3 +1,5 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import * as site from "./site";
 
@@ -25,6 +27,18 @@ function strings(value: unknown, out: string[] = []): string[] {
 
 const everyString = strings(site);
 
+// The drawn app screens keep their sample data next to their markup, so
+// the same name rules apply to the component and drawing sources.
+function sources(dir: string, out: { file: string; text: string }[] = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) sources(path, out);
+    else if (/\.(astro|ts)$/.test(entry.name)) out.push({ file: path, text: readFileSync(path, "utf8") });
+  }
+  return out;
+}
+const drawings = [...sources("src/components"), ...sources("src/lib")];
+
 describe("copy rules", () => {
   it("has no em or en dashes", () => {
     const dash = new RegExp("[" + String.fromCharCode(0x2014, 0x2013) + "]");
@@ -34,6 +48,14 @@ describe("copy rules", () => {
 
   it("names no real client, product, or app", () => {
     const hits = everyString.filter((s) => forbidden.some((f) => s.toLowerCase().includes(f)));
+    expect(hits).toEqual([]);
+  });
+
+  it("names no real client, product, or app in the drawn sample screens", () => {
+    expect(drawings.length, "component sources found").toBeGreaterThan(15);
+    const hits = drawings.flatMap(({ file, text }) =>
+      forbidden.filter((f) => new RegExp(`\\b${f}\\b`, "i").test(text)).map((f) => `${file}: ${f}`),
+    );
     expect(hits).toEqual([]);
   });
 
@@ -66,13 +88,19 @@ describe("structure", () => {
     expect(site.SITE.description.length).toBeLessThanOrEqual(160);
   });
 
-  it("gives every service and package at least three bullets", () => {
+  it("gives every service at least three bullets", () => {
     site.services.forEach((s) => expect(s.includes.length).toBeGreaterThanOrEqual(3));
-    site.packages.forEach((p) => expect(p.includes.length).toBeGreaterThanOrEqual(3));
   });
 
-  it("gives every work item results", () => {
-    site.work.forEach((w) => expect(w.results.length).toBeGreaterThanOrEqual(2));
+  it("only picks project types the form offers", () => {
+    const types = site.contact.projectTypes;
+    site.services.forEach((s) => expect(types, s.id).toContain(s.formType));
+    site.packages.forEach((p) => p.formType && expect(types, p.id).toContain(p.formType));
+  });
+
+  it("has one figure per hero proof point and four track record figures", () => {
+    expect(site.hero.proof).toHaveLength(3);
+    expect(site.stats).toHaveLength(4);
   });
 
   it("points every nav link at an in-page anchor", () => {

@@ -120,13 +120,13 @@ const breadcrumbLd = {
       </aside>
     </div>
 
-    <section class="mt-14 border-t border-line/10 pt-10" aria-labelledby="more-title">
+    <section class="mt-14 border-t border-line pt-10" aria-labelledby="more-title">
       <h2 id="more-title" class="eyebrow">More guides</h2>
       <ul class="mt-4 grid gap-3 sm:grid-cols-2">
         {
           others.map((o) => (
             <li>
-              <a href={`/guides/${o.id}/`} class="card card-lift block p-4 text-body font-semibold text-ink">
+              <a href={`/guides/${o.id}/`} class="card card-lift block p-4 text-copy font-semibold text-ink">
                 {o.data.title}
               </a>
             </li>
@@ -137,15 +137,17 @@ const breadcrumbLd = {
 
     <section class="card mt-10 p-6 sm:p-8" aria-labelledby="cta-title">
       <h2 id="cta-title" class="text-title3 font-semibold text-ink">Building a capstone or thesis system?</h2>
-      <p class="mt-2 text-body text-muted">
+      <p class="mt-2 text-copy text-muted">
         Tell us the title, the deadline, and what your panel asked for. You get a reply within one working day.
       </p>
       <div class="mt-6 flex flex-wrap gap-3">
-        <a href="/services/capstone-thesis-system/" class="btn btn-primary press">
+        <a href="/services/capstone-thesis-system/" class="btn-primary">
           See the capstone service
           <Icon name="arrow" class="h-4 w-4" />
         </a>
-        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn btn-secondary press">Book a call</a>
+        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn-ghost">
+          Book a free call<span class="sr-only"> (opens Calendly in a new tab)</span>
+        </a>
       </div>
     </section>
   </article>

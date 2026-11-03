@@ -1,0 +1,413 @@
+---
+// 224 x 136 drawings animated by the .svc rules in sections/Services.astro;
+// --d sets each part's delay. All text is sample data.
+import Icon from "./Icon.astro";
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+---
+
+{
+  id === "websites" && (
+    <>
+      <div class="pn cut" style="left:0;top:0;width:168px;height:136px;overflow:hidden">
+        <div class="bar">
+          <i class="sv-dot" />
+          <i class="sv-dot" />
+          <i class="sv-dot" />
+          <span class="url">
+            <span class="swap">
+              <span>yourbusiness.ph</span>
+              <span>yourbusiness.ph/menu</span>
+            </span>
+          </span>
+        </div>
+        <div class="vp" style="top:17px">
+          <div class="pages" style="--h:120px">
+            <div class="pg" style="height:120px">
+              <div class="row" style="justify-content:space-between">
+                <span class="ln dk" style="width:28px" />
+                <span class="row" style="gap:5px">
+                  <span class="ln" style="width:14px" />
+                  <span class="ln" style="width:14px" />
+                  <span class="ln" style="width:14px" />
+                </span>
+              </div>
+              <div class="hero-b">
+                <span class="ln" style="width:64px;background:rgba(255,255,255,.8)" />
+                <span class="ln" style="width:44px;margin-top:4px;background:rgba(255,255,255,.35)" />
+                <span class="pill" style="width:24px;margin-top:7px" />
+              </div>
+              <div class="row" style="gap:5px;margin-top:7px">
+                <span class="sv-tile" />
+                <span class="sv-tile" />
+                <span class="sv-tile" />
+              </div>
+            </div>
+            <div class="pg" style="height:120px">
+              <div class="row" style="justify-content:space-between">
+                <span class="ln dk" style="width:28px" />
+                <span class="row" style="gap:5px">
+                  <span class="ln" style="width:14px" />
+                  <span class="ln" style="width:14px" />
+                  <span class="ln" style="width:14px" />
+                </span>
+              </div>
+              <div class="row" style="gap:8px;margin-top:9px;align-items:flex-start">
+                <span class="img" style="width:62px;height:48px" />
+                <span style="flex:1">
+                  <span class="ln dk" style="width:52px" />
+                  <span class="ln" style="width:72px;margin-top:5px" />
+                  <span class="ln" style="width:60px;margin-top:4px" />
+                  <span class="pill" style="width:26px;margin-top:8px" />
+                </span>
+              </div>
+              <div class="row" style="gap:5px;margin-top:9px">
+                <span class="ln" style="width:60px" />
+                <span class="ln" style="width:40px" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pn phone" style="left:156px;top:26px;width:58px;height:110px">
+        <div class="vp" style="inset:3px;border-radius:7px">
+          <div class="pages" style="--h:104px;--d:.08s">
+            <div class="pg" style="height:104px;padding:7px 6px">
+              <span class="ln dk" style="width:18px;height:3px" />
+              <div class="hero-b" style="height:34px;padding:7px 6px;margin-top:6px">
+                <span class="ln" style="width:26px;height:3px;background:rgba(255,255,255,.8)" />
+                <span class="pill" style="width:16px;height:5px;margin-top:6px" />
+              </div>
+              <span class="sv-tile" style="display:block;height:14px;margin-top:5px" />
+              <span class="sv-tile" style="display:block;height:14px;margin-top:4px" />
+            </div>
+            <div class="pg" style="height:104px;padding:7px 6px">
+              <span class="ln dk" style="width:18px;height:3px" />
+              <span class="img" style="display:block;height:30px;margin-top:6px" />
+              <span class="ln dk" style="width:30px;height:3px;margin-top:6px" />
+              <span class="ln" style="width:38px;height:3px;margin-top:4px" />
+              <span class="pill" style="width:18px;height:5px;margin-top:6px" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+{
+  id === "mobile-apps" && (
+    <>
+      <div class="pn phone" style="left:73px;top:0;width:78px;height:130px;border-radius:13px">
+        <div class="vp" style="inset:4px;border-radius:10px">
+          <span class="notch" />
+          <div class="screens">
+            <div class="sv-scr">
+              <span class="ln dk" style="width:30px" />
+              <div class="li">
+                <i style="background:#e3a75b" />
+                <span>
+                  <span class="ln dk" style="width:28px;height:3px" />
+                  <span class="ln" style="width:20px;height:3px;margin-top:3px" />
+                </span>
+              </div>
+              <div class="li">
+                <i style="background:#3cc4bf" />
+                <span>
+                  <span class="ln dk" style="width:24px;height:3px" />
+                  <span class="ln" style="width:22px;height:3px;margin-top:3px" />
+                </span>
+              </div>
+              <div class="li">
+                <i style="background:#f15a3c" />
+                <span>
+                  <span class="ln dk" style="width:30px;height:3px" />
+                  <span class="ln" style="width:16px;height:3px;margin-top:3px" />
+                </span>
+              </div>
+            </div>
+            <div class="sv-scr">
+              <span class="img" style="display:block;height:34px" />
+              <span class="ln dk" style="width:38px;margin-top:6px" />
+              <span class="ln" style="width:52px;height:3px;margin-top:5px" />
+              <span class="ln" style="width:44px;height:3px;margin-top:3px" />
+              <span class="pill" style="display:block;width:auto;height:11px;margin-top:8px;border-radius:3px" />
+            </div>
+          </div>
+          <div class="tabs">
+            <i />
+            <i />
+            <i />
+            <b class="tab-ind" />
+          </div>
+        </div>
+      </div>
+      <div class="pn push" style="left:0;top:30px;min-width:66px;--d:.35s">
+        <i class="cd" />
+        <span>
+          <b>Order ready</b>
+          <span class="ln" style="width:34px;height:3px;margin-top:3px" />
+        </span>
+      </div>
+      <div class="tag" style="left:166px;top:46px">iOS</div>
+      <div class="tag" style="left:166px;top:68px">Android</div>
+    </>
+  )
+}
+
+{
+  id === "custom-software" && (
+    <>
+      <div class="pn cut" style="left:0;top:0;width:224px;height:136px;overflow:hidden;display:flex">
+        <div class="side">
+          <i class="logo" />
+          <i class="cur" />
+          <i />
+          <i />
+          <i />
+        </div>
+        <div style="flex:1;padding:8px 9px">
+          <div class="row" style="justify-content:space-between">
+            <span class="ln dk" style="width:48px" />
+            <span class="ln" style="width:22px" />
+          </div>
+          <div class="row" style="gap:5px;margin-top:8px">
+            <div class="kpi">
+              <span class="ln" style="width:22px;height:3px" />
+              <b class="swap" style="--d:.5s">
+                <span>12</span>
+                <span>9</span>
+              </b>
+            </div>
+            <div class="kpi">
+              <span class="ln" style="width:18px;height:3px" />
+              <b class="swap" style="--d:.5s">
+                <span>31</span>
+                <span>34</span>
+              </b>
+            </div>
+            <div class="kpi">
+              <span class="ln" style="width:20px;height:3px" />
+              <span class="spark">
+                <i style="height:5px" />
+                <i style="height:8px" />
+                <i style="height:6px" />
+                <i class="gr" style="height:4px;--d:.5s" />
+              </span>
+            </div>
+          </div>
+          <div class="trow">
+            <span class="ln dk" style="width:44px;height:3px" />
+            <span class="ln" style="width:26px;height:3px" />
+            <i class="sv-st" style="--d:.05s" />
+          </div>
+          <div class="trow">
+            <span class="ln dk" style="width:36px;height:3px" />
+            <span class="ln" style="width:30px;height:3px" />
+            <i class="sv-st" style="--d:.25s" />
+          </div>
+          <div class="trow">
+            <span class="ln dk" style="width:40px;height:3px" />
+            <span class="ln" style="width:22px;height:3px" />
+            <i class="sv-st done" />
+          </div>
+        </div>
+      </div>
+      <div class="pn toast" style="left:112px;top:100px;--d:.55s">
+        <i class="ok" />
+        Request approved
+      </div>
+    </>
+  )
+}
+
+{
+  id === "ecommerce" && (
+    <>
+      <div class="pn cut" style="left:20px;top:0;width:110px;height:136px;padding:6px">
+        <div class="img" style="position:relative;height:58px;background:#f6efe3">
+          <span class="bag" />
+        </div>
+        <span class="ln dk" style="width:62px;margin-top:8px" />
+        <span class="ln" style="width:42px;height:3px;margin-top:4px" />
+        <b style="display:block;margin-top:6px;font-size:10px;font-weight:600">₱1,250</b>
+        <span class="buy">
+          <span class="swap">
+            <span>Add to cart</span>
+            <span>Added</span>
+          </span>
+        </span>
+      </div>
+      <i class="fly" />
+      <div class="pn cart" style="left:146px;top:8px;width:60px;height:40px">
+        <Icon name="cart" class="size-[18px]" />
+        <b class="badge" style="--d:.5s">1</b>
+      </div>
+      <div class="pn" style="left:146px;top:58px;width:72px;height:66px;padding:7px">
+        <span class="ln dk" style="width:30px;height:3px" />
+        <div class="row" style="justify-content:space-between;margin-top:7px">
+          <span class="ln" style="width:22px;height:3px" />
+          <span class="ln" style="width:14px;height:3px" />
+        </div>
+        <div class="row" style="gap:3px;margin-top:9px">
+          <i class="pay" style="background:#0b2c44" />
+          <i class="pay" style="background:#3cc4bf" />
+          <i class="pay" style="background:#e3a75b" />
+        </div>
+        <span class="go" style="--d:.7s" />
+      </div>
+    </>
+  )
+}
+
+{
+  id === "ai-automation" && (
+    <>
+      <svg class="wires" viewBox="0 0 224 136">
+        <path d="M52 67H74" />
+        <path d="M128 67C141 67 141 31 154 31" />
+        <path d="M128 67C141 67 141 103 154 103" />
+        <path class="hot" pathLength="1" style="--d:.15s" d="M52 67H74" />
+        <path class="hot" pathLength="1" style="--d:.55s" d="M128 67C141 67 141 31 154 31" />
+        <path class="hot" pathLength="1" style="--d:.65s" d="M128 67C141 67 141 103 154 103" />
+      </svg>
+      <span class="sv-chip" style="left:0;top:8px">When an email arrives</span>
+      <div class="node" style="left:0;top:56px;width:52px;--d:0s">
+        Email in<i class="ok" />
+      </div>
+      <div class="node ai" style="left:74px;top:56px;width:54px;--d:.4s">
+        AI sorts<i class="ok" />
+      </div>
+      <div class="node" style="left:154px;top:20px;width:70px;--d:.8s">
+        Reply drafted<i class="ok" />
+      </div>
+      <div class="node" style="left:154px;top:92px;width:70px;--d:.9s">
+        Invoice filed<i class="ok" />
+      </div>
+    </>
+  )
+}
+
+{
+  id === "cloud-devops" && (
+    <>
+      <div class="pn" style="left:0;top:0;width:224px;height:47px;padding:7px 9px">
+        <div class="row" style="justify-content:space-between">
+          <b style="font-weight:600">Pipeline</b>
+          <span class="swap state" style="--d:1.3s">
+            <span class="run">Running</span>
+            <span class="live">Live</span>
+          </span>
+        </div>
+        <div class="sv-seg">
+          <span>
+            <i style="--d:0s" />
+          </span>
+          <span>
+            <i style="--d:.3s" />
+          </span>
+          <span>
+            <i style="--d:.6s" />
+          </span>
+        </div>
+        <div class="sv-segl">
+          <span>Build</span>
+          <span>Test</span>
+          <span>Deploy</span>
+        </div>
+      </div>
+      <div class="region">
+        <span class="rl">Production</span>
+        {[9, 80, 151].map((left, i) => (
+          <div class="pn srv" style={`left:${left}px;--d:${(0.9 + i * 0.15).toFixed(2)}s`}>
+            <span class="ln" style="width:30px;height:3px" />
+            <span class="ln" style="width:22px;height:3px;margin-top:3px" />
+            <span class="v">
+              <i />
+              <span class="swap">
+                <span>v1.4</span>
+                <span>v1.5</span>
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+{
+  id === "capstone" && (
+    <>
+      <div class="pn cut doc" style="left:6px;top:8px;width:94px;height:132px;padding:9px">
+        <span style="font-size:8px;color:#5f6b75">Chapter 3</span>
+        <span class="ln dk" style="width:58px;margin-top:4px" />
+        <span class="ln" style="width:74px;height:3px;margin-top:7px" />
+        <span class="ln" style="width:68px;height:3px;margin-top:3px" />
+        <span class="ln" style="width:72px;height:3px;margin-top:3px" />
+        <div class="row" style="gap:0;margin-top:8px;align-items:center">
+          <span class="box" />
+          <span style="width:12px;border-top:1px solid rgba(11,44,68,.4)" />
+          <span class="box" />
+        </div>
+        <span class="ln" style="width:70px;height:3px;margin-top:8px" />
+        <span class="ln" style="width:52px;height:3px;margin-top:3px" />
+      </div>
+      <div class="pn" style="left:92px;top:14px;width:130px;height:112px;padding:8px 9px">
+        <div class="row" style="justify-content:space-between">
+          <b style="font-weight:600">Project plan</b>
+          <span class="swap" style="color:#5f6b75;--d:.6s">
+            <span>2 of 4</span>
+            <span>4 of 4</span>
+          </span>
+        </div>
+        <div class="ck done">
+          <i />
+          Proposal
+        </div>
+        <div class="ck done">
+          <i />
+          System design
+        </div>
+        <div class="ck">
+          <i style="--d:.2s" />
+          Build and test
+        </div>
+        <div class="ck">
+          <i style="--d:.5s" />
+          Defense prep
+        </div>
+        <span class="prog">
+          <i style="--d:.15s" />
+        </span>
+      </div>
+    </>
+  )
+}
+
+{
+  id === "consultation" && (
+    <>
+      <div class="pn" style="left:0;top:6px;width:116px;height:118px;padding:8px 9px">
+        <b style="font-weight:600">Your plan</b>
+        <svg class="sk" viewBox="0 0 116 118">
+          <path d="M30 46V66M83 46V66M51 75H62" />
+        </svg>
+        <span class="bx" style="left:9px;top:28px;width:42px">Web app</span>
+        <span class="bx" style="left:62px;top:28px;width:42px">Admin</span>
+        <span class="bx" style="left:9px;top:66px;width:42px">API</span>
+        <span class="bx" style="left:62px;top:66px;width:42px">Database</span>
+        <i class="pin" style="--d:.1s">1</i>
+      </div>
+      <div class="pn" style="left:126px;top:10px;width:98px;height:112px;padding:8px">
+        <b style="font-weight:600">Recommendation</b>
+        <div class="opt">Build it all</div>
+        <div class="opt pick" style="--d:.45s">Start with v1</div>
+        <span class="rec" style="--d:.65s">Recommended</span>
+      </div>
+    </>
+  )
+}

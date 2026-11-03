@@ -64,7 +64,8 @@ const project = (name: string, device: Device, extra: Project["use"] = {}): Proj
 
 const projects = Object.entries(matrix).map(([name, device]) => project(name, device));
 
-// Dark mode on the smallest iPhone, a mid Android, an iPad, and an Android tablet.
+// The OS dark preference (the site stays light, but form controls and
+// scrollbars follow color-scheme) on a small iPhone, a mid Android, and two tablets.
 for (const name of ["iPhone SE", "Pixel 7", "iPad Mini", "Galaxy Tab S9"]) {
   projects.push(project(`${name} dark`, matrix[name], { colorScheme: "dark" }));
 }

@@ -1,0 +1,286 @@
+---
+// Rendered at build time from a seed, so the sky is identical on every
+// visit and needs no script. Base.astro pauses it off screen.
+
+import { rng } from "../lib/rng";
+
+type Point = [number, number];
+
+interface Props {
+  seed: number;
+  /** Height of the 1440-wide drawing, in the same units. */
+  h: number;
+  count: number;
+  /** Pole of the faint chart, if one is drawn. */
+  chart?: Point;
+  lines?: { pts: Point[]; edges: [number, number][]; lead: number }[];
+  guide?: { at: Point; course?: string };
+  class?: string;
+}
+
+const { seed, h: H, count, chart, lines = [], guide, class: className = "" } = Astro.props;
+
+const W = 1440;
+const GOLD = "#f4d58d";
+const FOAM = "#f3eee4";
+
+const r = rng(seed);
+const r2 = rng(seed * 31 + 5);
+
+const pole = chart ?? [W * 0.8, -H * 0.6];
+const origin = `${((pole[0] / W) * 100).toFixed(1)}% ${((pole[1] / H) * 100).toFixed(1)}%`;
+
+interface Star {
+  cx: string;
+  cy: string;
+  r: string;
+  fill: string;
+  opacity: string;
+  style?: string;
+}
+const layers: Star[][] = [[], [], []];
+
+function star(x: number, y: number, rad: number, fill: string, op: number, twinkle: boolean, layer: number) {
+  const s: Star = { cx: x.toFixed(1), cy: y.toFixed(1), r: rad.toFixed(2), fill, opacity: op.toFixed(2) };
+  if (twinkle) {
+    const t = 4 + r2() * 8;
+    s.style = `--o:${op.toFixed(2)};--t:${t.toFixed(1)}s;--td:${(-r2() * t).toFixed(1)}s`;
+  }
+  layers[layer].push(s);
+}
+
+for (let i = 0; i < count; i++) {
+  const big = r() ** 4;
+  const x = r() * W;
+  const y = r() * H;
+  const rad = 0.5 + big * 1.3;
+  const fill = r() < 0.12 ? GOLD : FOAM;
+  const op = 0.18 + r() * 0.5;
+  const tw = r() < 0.1;
+  if (tw) r();
+  const twinkle = tw || r2() < 0.05;
+  const layer = big > 0.12 ? 2 : r2() < 0.5 ? 0 : 1;
+  star(x, y, rad, fill, op, twinkle, layer);
+}
+
+// a thin band of stars just outside the frame, so the turning layers never show a bare corner
+for (let n = 0, tries = 0; n < Math.round(count * 0.12) && tries < 2000; tries++) {
+  const x = -90 + r2() * (W + 180);
+  const y = -90 + r2() * (H + 180);
+  if (x > 0 && x < W && y > 0 && y < H) continue;
+  const rad = 0.5 + r2() ** 4 * 1.3;
+  star(x, y, rad, FOAM, 0.18 + r2() * 0.4, false, n % 3);
+  n++;
+}
+
+const rings: number[] = [];
+const hourLines: { x2: number; y2: number }[] = [];
+if (chart) {
+  for (let rad = 260; rad < 2000; rad += 230) rings.push(rad);
+  for (let i = 0; i < 9; i++) {
+    const a = Math.PI * (0.18 + i * 0.08);
+    hourLines.push({ x2: chart[0] + Math.cos(a) * 2200, y2: chart[1] + Math.sin(a) * 2200 });
+  }
+}
+
+const mask = `sky-mask-${seed}`;
+const glow = `sky-glow-${seed}`;
+const layerClass = ["l1", "l2", "l3"];
+---
+
+<div class:list={["sky", className]} aria-hidden="true" data-loop>
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin slice" class="sky-l">
+    {
+      chart && (
+        <g fill="none" stroke={FOAM} stroke-opacity="0.05" stroke-width="1">
+          {rings.map((rad) => <circle cx={chart[0]} cy={chart[1]} r={rad} />)}
+          {hourLines.map((l) => <line x1={chart[0]} y1={chart[1]} x2={l.x2.toFixed(1)} y2={l.y2.toFixed(1)} />)}
+        </g>
+      )
+    }
+    {
+      guide && (
+        <>
+          <defs>
+            {guide.course && (
+              <mask id={mask}>
+                <path class="sky-draw" d={guide.course} pathLength="1" fill="none" stroke="#fff" stroke-width="4" />
+              </mask>
+            )}
+            {guide.course && (
+              <radialGradient id={glow}>
+                <stop offset="0" stop-color="#fff7e0" />
+                <stop offset="0.4" stop-color={GOLD} stop-opacity="0.7" />
+                <stop offset="1" stop-color={GOLD} stop-opacity="0" />
+              </radialGradient>
+            )}
+          </defs>
+          <g stroke={GOLD} stroke-width="1" stroke-linecap="round" opacity="0.85">
+            <line x1={guide.at[0] - 9} y1={guide.at[1]} x2={guide.at[0] + 9} y2={guide.at[1]} />
+            <line x1={guide.at[0]} y1={guide.at[1] - 9} x2={guide.at[0]} y2={guide.at[1] + 9} />
+          </g>
+          <circle cx={guide.at[0]} cy={guide.at[1]} r="2.6" fill={GOLD} />
+          {guide.course && (
+            <path
+              d={guide.course}
+              fill="none"
+              stroke="#f15a3c"
+              stroke-opacity="0.55"
+              stroke-width="1.25"
+              stroke-dasharray="3 7"
+              stroke-linecap="round"
+              mask={`url(#${mask})`}
+            />
+          )}
+          {guide.course && (
+            <circle class="sky-light" r="7" fill={`url(#${glow})`} opacity="0">
+              <animateMotion
+                dur="11s"
+                begin="3.8s"
+                repeatCount="indefinite"
+                path={guide.course}
+                keyPoints="0;1;1"
+                keyTimes="0;.42;1"
+                calcMode="spline"
+                keySplines=".45 0 .55 1;0 0 1 1"
+              />
+              <animate
+                attributeName="opacity"
+                dur="11s"
+                begin="3.8s"
+                repeatCount="indefinite"
+                values="0;.8;.8;0;0"
+                keyTimes="0;.05;.34;.42;1"
+              />
+            </circle>
+          )}
+        </>
+      )
+    }
+  </svg>
+  {
+    layers.map((stars, i) => (
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="xMidYMin slice"
+        class={`sky-l drift ${layerClass[i]}`}
+        style={`transform-origin:${origin}`}
+      >
+        {stars.map((s) => (
+          <circle cx={s.cx} cy={s.cy} r={s.r} fill={s.fill} opacity={s.opacity} class={s.style ? "tw" : undefined} style={s.style} />
+        ))}
+        {i === 1 &&
+          lines.map((c, k) => (
+            <>
+              <g
+                class="cl"
+                stroke={GOLD}
+                stroke-opacity="0.22"
+                stroke-width="0.9"
+                fill="none"
+                style={`--t:${(11 + k * 3.7).toFixed(1)}s;animation-delay:${(-k * 4.3).toFixed(1)}s`}
+              >
+                {c.edges.map(([a, b]) => (
+                  <line x1={c.pts[a][0]} y1={c.pts[a][1]} x2={c.pts[b][0]} y2={c.pts[b][1]} />
+                ))}
+              </g>
+              {c.pts.map(([x, y], j) =>
+                j === c.lead ? (
+                  <circle cx={x} cy={y} r="2.2" fill={GOLD} opacity="0.95" class="tw" style={`--o:.95;--t:${9 + k * 2.3}s;--td:${-k * 3}s`} />
+                ) : (
+                  <circle cx={x} cy={y} r="1.5" fill={GOLD} opacity="0.7" />
+                ),
+              )}
+            </>
+          ))}
+      </svg>
+    ))
+  }
+</div>
+
+<style is:global>
+  .sky {
+    position: absolute;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .sky-l {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .sky .drift {
+    will-change: transform;
+    animation: sky-turn var(--dur) ease-in-out infinite alternate;
+    animation-delay: var(--del);
+  }
+  .sky .l1 {
+    --amp: 0.5deg;
+    --dur: 190s;
+    --del: -70s;
+  }
+  .sky .l2 {
+    --amp: 0.85deg;
+    --dur: 150s;
+    --del: -30s;
+  }
+  .sky .l3 {
+    --amp: 1.3deg;
+    --dur: 120s;
+    --del: -55s;
+  }
+  @keyframes sky-turn {
+    from {
+      transform: rotate(calc(var(--amp) * -1));
+    }
+    to {
+      transform: rotate(var(--amp));
+    }
+  }
+  .sky .tw {
+    animation: sky-tw var(--t, 7s) ease-in-out infinite;
+    animation-delay: var(--td, 0s);
+  }
+  @keyframes sky-tw {
+    0%,
+    100% {
+      opacity: var(--o);
+    }
+    30% {
+      opacity: 0.12;
+    }
+    46% {
+      opacity: var(--o);
+    }
+    72% {
+      opacity: calc(var(--o) * 0.55);
+    }
+  }
+  .sky .cl {
+    animation: sky-cl var(--t, 13s) ease-in-out infinite alternate;
+  }
+  @keyframes sky-cl {
+    to {
+      stroke-opacity: 0.12;
+    }
+  }
+  .sky .sky-draw {
+    stroke-dasharray: 1;
+    animation: sky-draw 2.6s cubic-bezier(0.45, 0, 0.55, 1) 0.8s both;
+  }
+  @keyframes sky-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sky .sky-light {
+      display: none;
+    }
+  }
+</style>

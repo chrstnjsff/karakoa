@@ -1,0 +1,31 @@
+---
+import Icon from "../Icon.astro";
+import { packages, pricingSection } from "../../data/site";
+---
+
+<section id="pricing" class="border-t border-line" aria-labelledby="pricing-title">
+  <div class="mx-auto max-w-6xl px-5 py-24 sm:py-32">
+    <div class="reveal max-w-2xl">
+      <p class="label">{pricingSection.eyebrow}</p>
+      <h2 id="pricing-title" class="h2 mt-3">{pricingSection.title}</h2>
+      <p class="lead mt-4 max-w-xl">{pricingSection.lede}</p>
+    </div>
+    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        packages.map((p) => (
+          <div class="reveal flex flex-col rounded-xl border border-line bg-paper p-6">
+            <h3 class="text-lg font-semibold">{p.name}</h3>
+            <p class="mt-1.5 text-[15px]">{p.tagline}</p>
+            <ul class="mt-5 space-y-1 text-sm text-muted">
+              {p.meta.map((m) => <li>{m}</li>)}
+            </ul>
+            <a href="#message" data-msg data-type={p.formType} class="btn-link mt-auto pt-8">
+              {p.cta} <Icon name="arrow" class="size-4" />
+            </a>
+          </div>
+        ))
+      }
+    </div>
+    <p class="reveal mt-8 max-w-2xl text-sm text-muted">{pricingSection.note}</p>
+  </div>
+</section>

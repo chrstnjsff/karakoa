@@ -2,7 +2,7 @@
 // as /og/<slug>.png through the Base layout's ogImage prop.
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
-import { SITE, aboutPage, services } from "../../data/site";
+import { SITE, aboutPage, faqPage, services } from "../../data/site";
 import { homeCard, renderOg, type OgCard } from "../../lib/og";
 
 export async function getStaticPaths() {
@@ -12,6 +12,10 @@ export async function getStaticPaths() {
     {
       slug: "about",
       card: { eyebrow: "About", title: aboutPage.heading, line: "Who you work with, how we work, and why the studio is named after a ship." },
+    },
+    {
+      slug: "faq",
+      card: { eyebrow: "FAQ", title: "Questions about working with Karakoa", line: faqPage.intro },
     },
     {
       slug: "guides",

@@ -1,42 +1,939 @@
 ---
-import SectionHeading from "../SectionHeading.astro";
-import type { WorkItem } from "../../data/site";
+// The screens' keyframes come from src/lib/work-shots.ts.
+import Icon from "../Icon.astro";
+import { work, workSection } from "../../data/site";
+import { care, catalog, gitops, spend, status, team } from "../../lib/work-shots";
 
-interface Props {
-  items: WorkItem[];
-}
-const { items } = Astro.props;
+const byId = Object.fromEntries(work.map((w) => [w.id, w]));
+const order = ["home-care-platform", "workforce-monitoring", "spend-dashboard", "uptime-dashboard", "self-service-cloud", "gitops-delivery"];
+const shots: Record<string, { bg: string; loop: string; label: string }> = {
+  "home-care-platform": {
+    bg: "bg-navy",
+    loop: "12s",
+    label: "Sample scheduling screen: an open visit is assigned to a caregiver, then an admission packet changes from sent to signed.",
+  },
+  "workforce-monitoring": {
+    bg: "bg-wash",
+    loop: "14s",
+    label: "Sample live team view: one person goes idle, another comes back from away, and the counts update.",
+  },
+  "spend-dashboard": {
+    bg: "bg-[#fbf3e6]",
+    loop: "12s",
+    label: "Sample spend dashboard: cost per product and top costs switch from cloud to software, with the budget meter moving.",
+  },
+  "uptime-dashboard": {
+    bg: "bg-[#e4f1ef]",
+    loop: "15s",
+    label: "Sample status page: a check sweeps the services, one service is briefly degraded and recovers, and a project's progress moves forward.",
+  },
+  "self-service-cloud": {
+    bg: "bg-navy",
+    loop: "14s",
+    label: "Sample service catalog: a container service template is picked and requested, then checked, planned, provisioned and deployed.",
+  },
+  "gitops-delivery": {
+    bg: "bg-wash",
+    loop: "12s",
+    label: "Sample delivery pipeline: build, test, scan, staging and production finish in turn, the cluster syncs, and service health turns green.",
+  },
+};
 ---
 
-<section id="work" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-6 lg:py-24" aria-labelledby="work-title">
-  <SectionHeading
-    eyebrow="Selected work"
-    title="Systems we have built and run"
-    lede="Described by what they do, not who they were for. Every figure is a real result from production."
-  />
-  <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {
-      items.map((w, i) => (
-        <li class={`reveal d${(i % 3) + 1} card card-lift flex flex-col p-6`}>
-          <p class="eyebrow">{w.industry}</p>
-          <h3 class="mt-2 text-title3 font-semibold text-ink">{w.kind}</h3>
-          <dl class="mt-4 space-y-3 text-body">
-            <div>
-              <dt class="font-semibold text-ink">Challenge</dt>
-              <dd class="mt-1 text-muted">{w.challenge}</dd>
-            </div>
-            <div>
-              <dt class="font-semibold text-ink">What we did</dt>
-              <dd class="mt-1 text-muted">{w.approach}</dd>
-            </div>
-          </dl>
-          <ul class="mt-auto flex flex-wrap gap-2 pt-5" aria-label="Results">
-            {w.results.map((r) => (
-              <li class="chip">{r}</li>
-            ))}
-          </ul>
-        </li>
-      ))
-    }
-  </ul>
+<section id="work" aria-labelledby="work-title">
+  <div class="mx-auto max-w-6xl px-5 py-24 sm:py-32">
+    <div class="reveal max-w-2xl">
+      <p class="label">{workSection.eyebrow}</p>
+      <h2 id="work-title" class="h2 mt-3">{workSection.title}</h2>
+      <p class="lead mt-4 max-w-xl">{workSection.lede}</p>
+    </div>
+    <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        order.map((id) => {
+          const w = byId[id];
+          const shot = shots[id];
+          return (
+            <article class="work-card reveal overflow-hidden rounded-xl border border-line bg-paper">
+              <div class:list={["shot", shot.bg]} style={`--c:${shot.loop}`} role="img" aria-label={shot.label} data-loop>
+                {id === "home-care-platform" && (
+                  <div class="win">
+                    <div class="win-bar">
+                      <span class="size-3 rounded-[3px] bg-teal" />
+                      <span class="flex gap-3">
+                        <span>Schedule</span>
+                        <span class="t-mute font-normal">Clients</span>
+                        <span class="t-mute font-normal">Documents</span>
+                      </span>
+                      <span class="t-mute ml-auto font-normal">Tue, Nov 4</span>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-2 px-2.5 pt-2">
+                      <div class="flex h-[18px] items-center justify-between">
+                        <span class="stack font-medium text-navy">
+                          <span class="opacity-0" style={care.open}>1 open visit</span>
+                          <span style={care.covered}>All visits covered</span>
+                        </span>
+                        <span
+                          class="rounded-full border border-coral-600/50 bg-[#fdeee9] px-2 py-px text-[10px] font-medium text-coral-700 opacity-0"
+                          style={care.chip}
+                        >
+                          E. Cruz, 2 to 4 PM
+                        </span>
+                      </div>
+                      <div>
+                        <div class="axis">
+                          <span style="left:0">8a</span>
+                          <span style="left:20%">10a</span>
+                          <span style="left:40%">12p</span>
+                          <span style="left:60%">2p</span>
+                          <span style="left:80%">4p</span>
+                        </div>
+                        <div class="sched-row">
+                          <span class="who"><i>MR</i>M. Reyes</span>
+                          <span class="track"><b style="left:0;width:30%">D. Walsh</b><b style="left:50%;width:20%">K. Ito</b></span>
+                        </div>
+                        <div class="sched-row rounded" style={care.row}>
+                          <span class="who"><i>AB</i>A. Brooks</span>
+                          <span class="track">
+                            <b style="left:10%;width:30%">L. Park</b>
+                            <b class="new" style={`left:60%;width:20%;${care.newShift}`}>E. Cruz</b>
+                          </span>
+                        </div>
+                        <div class="sched-row">
+                          <span class="who"><i>JK</i>J. Kim</span>
+                          <span class="track"><b style="left:20%;width:30%">R. Diaz</b><b style="left:70%;width:20%">S. Moore</b></span>
+                        </div>
+                      </div>
+                      <div class="border-t border-[#efeae2] pt-1">
+                        <div class="doc-row">
+                          <span class="font-medium text-navy">Admission packet</span>
+                          <span class="t-mute">E. Cruz</span>
+                          <span class="stack ml-auto justify-items-end">
+                            <span class="st st-gray opacity-0" style={care.sent}>Sent</span>
+                            <span class="st st-sand opacity-0" style={care.viewed}>Viewed</span>
+                            <span class="st st-ok" style={care.signed}><Icon name="check" class="size-2.5" />Signed</span>
+                          </span>
+                        </div>
+                        <div class="doc-row">
+                          <span class="font-medium text-navy">Care plan</span>
+                          <span class="t-mute">D. Walsh</span>
+                          <span class="st st-ok ml-auto"><Icon name="check" class="size-2.5" />Signed</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {id === "workforce-monitoring" && (
+                  <div class="win dark">
+                    <div class="win-bar">
+                      <span class="beacon relative size-1.5 rounded-full bg-teal text-teal" />
+                      <span>Live</span>
+                      <span class="t-mute font-normal">Night shift</span>
+                      <span class="stack ml-auto justify-items-end font-normal tabular-nums">
+                        {team.counts.map((c) => (
+                          <span class:list={["cnt", { "opacity-0": c.hidden }]} style={c.a}>
+                            <i class="dot bg-teal" />{c.on}<i class="dot bg-sand" />{c.idle}<i class="dot bg-[#6b7c8a]" />{c.away}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-2 p-2">
+                      <div class="grid grid-cols-3 gap-1.5">
+                        {team.people.map((p) => (
+                          <div class="tile" style={p.goesIdle?.tile ?? p.comesBack?.tile}>
+                            <div class="scr">
+                              {p.goesIdle ? (
+                                <div class="absolute inset-0" style={`opacity:.35;${p.goesIdle.screen}`}>
+                                  {p.shapes.map((s) => <i style={s} />)}
+                                </div>
+                              ) : p.comesBack ? (
+                                <>
+                                  <div class="absolute inset-0" style={p.comesBack.screen}>
+                                    {p.shapes.map((s) => <i style={s} />)}
+                                  </div>
+                                  <span class="away opacity-0" style={p.comesBack.awayLabel}>Away</span>
+                                </>
+                              ) : (
+                                p.shapes.map((s) => <i style={s} />)
+                              )}
+                            </div>
+                            <div class="tf">
+                              {p.name}
+                              <span class="stack">
+                                {p.goesIdle ? (
+                                  <>
+                                    <span class="opacity-0" style={p.goesIdle.active}><i class="dot bg-teal" />Active</span>
+                                    <span style={p.goesIdle.idle}><i class="dot bg-sand" />Idle 5m</span>
+                                  </>
+                                ) : p.comesBack ? (
+                                  <>
+                                    <span class="opacity-0" style={p.comesBack.away}><i class="dot bg-[#6b7c8a]" />Away</span>
+                                    <span style={p.comesBack.active}><i class="dot bg-teal" />Active</span>
+                                  </>
+                                ) : (
+                                  <span><i class="dot bg-teal" />Active</span>
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div>
+                        <div class="t-mute flex justify-between text-[10px]"><span>Activity, last hour</span><span>every 5 s</span></div>
+                        <div class="mt-1 h-[18px] overflow-hidden">
+                          <div class="flow flex h-full items-end gap-[2px]">
+                            {[...team.beats, ...team.beats].map((b) => (
+                              <i
+                                class="w-[3px] rounded-[1px]"
+                                style={`height:${b.h}%;background:${b.low ? "rgba(227,167,91,.75)" : "rgba(60,196,191,.55)"}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {id === "spend-dashboard" && (
+                  <div class="win">
+                    <div class="win-bar">
+                      <span>Spend</span>
+                      <span class="seg"><i style={spend.toggle} /><span>Cloud</span><span>Software</span></span>
+                      <span class="t-mute ml-auto font-normal">November</span>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-2.5 px-2.5 pt-2">
+                      <div class="flex items-end gap-4">
+                        <div>
+                          <p class="t-mute text-[10px]">Month to date</p>
+                          <p class="stack text-[18px] leading-tight font-semibold text-navy tabular-nums">
+                            <span style={spend.cloud}>$18,420</span>
+                            <span class="opacity-0" style={spend.software}>$6,310</span>
+                          </p>
+                        </div>
+                        <div class="flex-1 pb-0.5">
+                          <div class="flex justify-between text-[10px]">
+                            <span class="t-mute">Of monthly budget</span>
+                            <span class="stack justify-items-end font-medium text-navy tabular-nums">
+                              <span style={spend.cloud}>74%</span>
+                              <span class="opacity-0" style={spend.software}>58%</span>
+                            </span>
+                          </div>
+                          <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f1ede6]">
+                            <i class="block h-full origin-left rounded-full bg-navy" style={`transform:scaleX(.74);${spend.meter}`} />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex gap-3">
+                        <div class="flex-1">
+                          <p class="t-mute text-[10px]">By product</p>
+                          <div class="bars mt-1">
+                            {spend.bars.map((b) => (
+                              <div>
+                                <b style={`${b.rest};${b.a}`} />
+                                <span>{b.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div class="w-[46%]">
+                          <p class="t-mute text-[10px]">Top costs</p>
+                          <div class="mt-1 space-y-1.5">
+                            {spend.top.map((t) => (
+                              <div>
+                                <div class="flex justify-between text-[10px]">
+                                  <span class="stack text-navy">
+                                    <span style={spend.cloud}>{t.cloudName}</span>
+                                    <span class="opacity-0" style={spend.software}>{t.softName}</span>
+                                  </span>
+                                  <span class="stack justify-items-end tabular-nums">
+                                    <span style={spend.cloud}>{t.cloudCost}</span>
+                                    <span class="opacity-0" style={spend.software}>{t.softCost}</span>
+                                  </span>
+                                </div>
+                                <div class="mt-0.5 h-1 overflow-hidden rounded-full bg-[#f1ede6]">
+                                  <i class="block h-full origin-left rounded-full bg-sand" style={`${t.rest};${t.bar}`} />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {id === "uptime-dashboard" && (
+                  <div class="win">
+                    <div class="win-bar">
+                      <span class="stack">
+                        <span class="inline-flex items-center gap-1.5" style={status.ok}>
+                          <span class="beacon relative size-1.5 rounded-full bg-teal text-teal" />
+                          All systems operational
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 opacity-0" style={status.degraded}>
+                          <span class="size-1.5 rounded-full bg-sand" />1 service degraded
+                        </span>
+                      </span>
+                      <span class="stack t-mute ml-auto justify-items-end font-normal">
+                        <span style={status.checked}>Checked just now</span>
+                        <span class="opacity-0" style={status.checking}>Checking</span>
+                      </span>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-2 px-2.5 pt-2">
+                      <div class="relative">
+                        <span class="scan opacity-0" style={status.scan} />
+                        <div class="space-y-[3px]">
+                          {status.rows.map((row) => (
+                            <div class="up-row">
+                              <span class="nm">{row.name}</span>
+                              <span class="ticks">
+                                {row.ticks.map((t) => <i style={t.a ?? (t.bg ? `background:${t.bg}` : undefined)} />)}
+                              </span>
+                              {row.live ? (
+                                <span class="stack w-[52px] justify-items-end text-navy tabular-nums">
+                                  <span style={status.ok}>{row.pct}</span>
+                                  <span class="st st-sand !py-0 opacity-0" style={status.degraded}>Degraded</span>
+                                </span>
+                              ) : (
+                                <span class="w-[52px] text-right text-navy tabular-nums">{row.pct}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div class="space-y-1.5 border-t border-[#efeae2] pt-1.5">
+                        <p class="t-mute text-[10px]">Delivery</p>
+                        <div class="flex items-center gap-2">
+                          <span class="w-[92px] font-medium text-navy">Website relaunch</span>
+                          <span class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#f1ede6]">
+                            <i class="block h-full origin-left rounded-full bg-navy" style={`transform:scaleX(.76);${status.progress}`} />
+                          </span>
+                          <span class="stack w-7 justify-items-end text-navy tabular-nums">
+                            <span class="opacity-0" style={status.before}>68%</span>
+                            <span style={status.after}>76%</span>
+                          </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="w-[92px] font-medium text-navy">Mobile app v2</span>
+                          <span class="t-mute">Sprint 6</span>
+                          <span class="stack ml-auto justify-items-end">
+                            <span class="st st-sand opacity-0" style={status.inQa}>In QA</span>
+                            <span class="st st-ok" style={status.released}><Icon name="check" class="size-2.5" />Released</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {id === "self-service-cloud" && (
+                  <div class="win">
+                    <div class="win-bar">
+                      <span>Service catalog</span>
+                      <span class="t-mute inline-flex h-[18px] items-center gap-1 rounded border border-[#ece7df] px-1.5 font-normal">
+                        <Icon name="search" class="size-2.5" />Search templates
+                      </span>
+                      <span class="st st-gray ml-auto">staging</span>
+                    </div>
+                    <div class="grid flex-1 grid-cols-[1.05fr_1fr] gap-2 p-2">
+                      <div class="grid grid-cols-2 grid-rows-2 gap-1.5">
+                        <div class="tpl"><Icon name="db" class="size-3.5" /><b>Postgres database</b><span>About 8 min</span></div>
+                        <div class="tpl"><Icon name="globe" class="size-3.5" /><b>Static website</b><span>About 3 min</span></div>
+                        <div class="tpl" style={catalog.picked}><Icon name="box" class="size-3.5" /><b>Container service</b><span>About 6 min</span></div>
+                        <div class="tpl"><Icon name="queue" class="size-3.5" /><b>Message queue</b><span>About 4 min</span></div>
+                      </div>
+                      <div class="flex flex-col gap-1.5 rounded-md border border-[#ece7df] p-2">
+                        <p class="stack font-medium text-navy">
+                          <span class="opacity-0" style={catalog.prompt}>Pick a template</span>
+                          <span style={catalog.chosen}>Container service</span>
+                        </p>
+                        <div class="flex items-center gap-2 text-[10px]" style={catalog.name}>
+                          <span class="t-mute w-8">Name</span>
+                          <span class="flex-1 rounded border border-[#ece7df] px-1.5 text-navy">orders-api</span>
+                        </div>
+                        <span class="self-start rounded bg-coral-600 px-2.5 py-0.5 text-[10px] font-medium text-white" style={catalog.press}>
+                          Request
+                        </span>
+                        <div class="mt-0.5 space-y-1">
+                          {catalog.steps.map((step) => (
+                            <div class="pstep">
+                              <span class="stack">
+                                <i class="ring opacity-0" style={step.icon.ring} />
+                                <i class="opacity-0" style={step.icon.spin}><i class="spin block size-full rounded-full" /></i>
+                                <i class="ok" style={step.icon.ok}><Icon name="check" /></i>
+                              </span>
+                              <span style={step.text}>{step.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <span class="st st-ok mt-auto self-start" style={catalog.live}>Live on staging</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {id === "gitops-delivery" && (
+                  <div class="win dark">
+                    <div class="win-bar">
+                      <Icon name="branch" class="size-3" />
+                      <span>main</span>
+                      <span class="t-mute font-normal tabular-nums">a41c9e2</span>
+                      <span class="stack ml-auto justify-items-end">
+                        <span class="st st-dsand opacity-0" style={gitops.outOfSync}>Out of sync</span>
+                        <span class="st st-dcoral opacity-0" style={gitops.syncing}>Syncing</span>
+                        <span class="st st-dok" style={gitops.synced}>Synced, healthy</span>
+                      </span>
+                    </div>
+                    <div class="flex flex-1 flex-col gap-3 p-2.5">
+                      <div class="pipe">
+                        {gitops.stages.map((stage, i) => (
+                          <>
+                            <span class="node relative z-[1]">
+                              <span class="stack">
+                                <i class="ring opacity-0" style={stage.icon.ring} />
+                                <i class="opacity-0" style={stage.icon.spin}><i class="spin block size-full rounded-full" /></i>
+                                <i class="ok" style={stage.icon.ok}><Icon name="check" /></i>
+                              </span>
+                              <span>{stage.label}</span>
+                            </span>
+                            {i < gitops.stages.length - 1 && (
+                              <span class="link"><i style={stage.link} /></span>
+                            )}
+                          </>
+                        ))}
+                      </div>
+                      <div class="grid flex-1 grid-cols-2 gap-2 pb-2">
+                        <div class="flex flex-col rounded-md border border-white/[.06] bg-white/[.04] p-2">
+                          <div class="flex justify-between text-[10px]">
+                            <span class="t-mute">Requests per second</span><span class="text-foam tabular-nums">1.2k</span>
+                          </div>
+                          <div class="mt-1 h-[46px] overflow-hidden">
+                            <svg class="flow h-full" style="width:200%" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true">
+                              <path d={gitops.chart.area} fill="rgba(60,196,191,.12)" />
+                              <path d={gitops.chart.line} fill="none" stroke="#3cc4bf" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="space-y-1.5 rounded-md border border-white/[.06] bg-white/[.04] p-2 text-[10px]">
+                          <p class="t-mute">Health</p>
+                          <p class="flex items-center gap-1.5 text-foam"><i class="dot bg-teal" />web</p>
+                          <p class="flex items-center gap-1.5 text-foam">
+                            <span class="stack">
+                              <i class="dot bg-coral opacity-0" style={gitops.rolling} />
+                              <i class="dot bg-teal" style={gitops.steady} />
+                            </span>
+                            orders-api
+                            <span class="stack t-mute ml-auto justify-items-end">
+                              <span class="opacity-0" style={gitops.rolling}>rolling</span>
+                              <span style={gitops.steady}>12/12</span>
+                            </span>
+                          </p>
+                          <p class="flex items-center gap-1.5 text-foam"><i class="dot bg-teal" />worker</p>
+                          <p class="t-mute flex justify-between"><span>Error rate</span><span class="text-foam tabular-nums">0.02%</span></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div class="p-6">
+                <p class="meta">
+                  {workSection.tag} <span class="px-1 text-line" aria-hidden="true">/</span> {w.industry}
+                </p>
+                <h3 class="mt-1.5 text-lg leading-snug font-semibold">{w.kind}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-muted">{w.summary}</p>
+                <p class="mt-4 text-sm text-body">
+                  {w.results[0]} <span class="px-1 text-line" aria-hidden="true">/</span> {w.results[1]}
+                </p>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
 </section>
+
+<style is:global>
+  .shot {
+    position: relative;
+    height: 232px;
+    overflow: hidden;
+    padding: 18px 18px 0;
+  }
+  .shot .win {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+    background: #fff;
+    color: #3d4a54;
+    font-size: 11px;
+    line-height: 1.35;
+    box-shadow:
+      0 18px 40px -18px rgba(6, 30, 46, 0.5),
+      0 0 0 1px rgba(11, 44, 68, 0.07);
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .work-card:hover .win {
+    transform: translateY(-3px);
+  }
+  .shot .win-bar {
+    display: flex;
+    height: 28px;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    border-bottom: 1px solid #efeae2;
+    color: #0b2c44;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .shot .t-mute {
+    color: #5f6b75;
+  }
+  .shot .win.dark {
+    background: #0f2536;
+    color: #a9b6c1;
+    box-shadow:
+      0 18px 40px -18px rgba(6, 30, 46, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+  .shot .win.dark .win-bar {
+    border-color: rgba(255, 255, 255, 0.07);
+    color: #f3eee4;
+  }
+  .shot .win.dark .t-mute {
+    color: #8c9cab;
+  }
+  .shot .stack {
+    display: inline-grid;
+  }
+  .shot .stack > * {
+    grid-area: 1/1;
+  }
+  .shot .dot {
+    display: inline-block;
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 99px;
+  }
+  .shot .st {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .shot .st svg {
+    stroke-width: 3.2;
+  }
+  .shot .st-gray {
+    background: #eef0f2;
+    color: #5f6b75;
+  }
+  .shot .st-sand {
+    background: #fbefd9;
+    color: #86560f;
+  }
+  .shot .st-ok {
+    background: #dcf3ef;
+    color: #13665b;
+  }
+  .shot .st-dsand {
+    background: rgba(227, 167, 91, 0.16);
+    color: #f0c27e;
+  }
+  .shot .st-dcoral {
+    background: rgba(241, 90, 60, 0.18);
+    color: #ff9a82;
+  }
+  .shot .st-dok {
+    background: rgba(60, 196, 191, 0.16);
+    color: #7fe0db;
+  }
+
+  /* A: schedule */
+  .shot .axis {
+    position: relative;
+    height: 12px;
+    margin-left: 72px;
+    font-size: 9.5px;
+    color: #5f6b75;
+  }
+  .shot .axis span {
+    position: absolute;
+    top: 0;
+    transform: translateX(-2px);
+  }
+  .shot .sched-row {
+    display: flex;
+    height: 22px;
+    align-items: center;
+    gap: 6px;
+  }
+  .shot .who {
+    display: flex;
+    width: 66px;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #0b2c44;
+    white-space: nowrap;
+  }
+  .shot .who i {
+    display: grid;
+    flex: none;
+    width: 15px;
+    height: 15px;
+    place-items: center;
+    border-radius: 99px;
+    background: #e7edf2;
+    font-size: 7.5px;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .shot .track {
+    position: relative;
+    flex: 1;
+    height: 16px;
+    background: repeating-linear-gradient(90deg, #ece7df 0 1px, transparent 1px 20%);
+  }
+  .shot .track::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: 55%;
+    width: 1px;
+    background: #d4421f;
+    opacity: 0.45;
+  }
+  .shot .track b {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 0 4px;
+    border-left: 2px solid #0b2c44;
+    border-radius: 3px;
+    background: #e7edf2;
+    color: #0b2c44;
+    font-size: 9.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    transform-origin: left;
+  }
+  .shot .track b.new {
+    border-color: #d4421f;
+    background: #fde9e3;
+    color: #9a2f15;
+  }
+  .shot .doc-row {
+    display: flex;
+    height: 21px;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* B: team grid */
+  .shot .tile {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .shot .scr {
+    position: relative;
+    height: 42px;
+    margin: 3px 3px 0;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #16324a;
+  }
+  .shot .scr i {
+    position: absolute;
+    display: block;
+    border-radius: 2px;
+    background: rgba(243, 238, 228, 0.16);
+  }
+  .shot .scr .away {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 9.5px;
+    color: #8c9cab;
+  }
+  .shot .tf {
+    display: flex;
+    height: 19px;
+    align-items: center;
+    gap: 4px;
+    padding: 0 5px;
+    font-size: 10px;
+    color: #f3eee4;
+    white-space: nowrap;
+  }
+  .shot .tf .stack {
+    margin-left: auto;
+  }
+  .shot .tf .stack > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    justify-self: end;
+    color: #a9b6c1;
+  }
+  .shot .cnt {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #f3eee4;
+  }
+  .shot .cnt i + * {
+    margin-right: 4px;
+  }
+  .shot .flow {
+    width: max-content;
+    animation: flow var(--c) linear infinite;
+  }
+  @keyframes flow {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* C: spend */
+  .shot .seg {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2px;
+    border-radius: 6px;
+    background: #f1ede6;
+    font-size: 10px;
+  }
+  .shot .seg i {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    width: calc(50% - 2px);
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(11, 44, 68, 0.15);
+  }
+  .shot .seg span {
+    position: relative;
+    padding: 1px 7px;
+    text-align: center;
+  }
+  .shot .bars {
+    position: relative;
+    display: flex;
+    height: 84px;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 6px;
+    padding-bottom: 14px;
+    border-top: 1px solid #efeae2;
+  }
+  .shot .bars::before {
+    content: "";
+    position: absolute;
+    top: 35px;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: #efeae2;
+  }
+  .shot .bars > div {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex: 1;
+    justify-content: center;
+  }
+  .shot .bars b {
+    width: 13px;
+    height: 100%;
+    border-radius: 3px 3px 0 0;
+    background: #0b2c44;
+    transform-origin: bottom;
+  }
+  .shot .bars span {
+    position: absolute;
+    bottom: -14px;
+    font-size: 9.5px;
+    color: #5f6b75;
+  }
+
+  /* D: status */
+  .shot .up-row {
+    display: flex;
+    height: 15px;
+    align-items: center;
+    gap: 8px;
+  }
+  .shot .up-row .nm {
+    width: 78px;
+    color: #0b2c44;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .shot .ticks {
+    display: flex;
+    height: 11px;
+    flex: 1;
+    gap: 1.5px;
+  }
+  .shot .ticks i {
+    flex: 1;
+    border-radius: 1px;
+    background: #3cc4bf;
+  }
+  .shot .scan {
+    position: absolute;
+    top: -1px;
+    right: -10px;
+    left: -10px;
+    height: 16px;
+    background: linear-gradient(90deg, transparent, rgba(60, 196, 191, 0.16) 30%, rgba(60, 196, 191, 0.16) 70%, transparent);
+    pointer-events: none;
+  }
+
+  /* E: catalog */
+  .shot .tpl {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    border: 1px solid #ece7df;
+    border-radius: 6px;
+    background: #fff;
+    color: #0b2c44;
+  }
+  .shot .tpl b {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .shot .tpl > span:last-child {
+    margin-top: auto;
+    font-size: 9.5px;
+    color: #5f6b75;
+  }
+  .shot .pstep {
+    display: flex;
+    height: 14px;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #0b2c44;
+  }
+  .shot .pstep .stack {
+    width: 11px;
+    height: 11px;
+  }
+  .shot .pstep .stack > * {
+    width: 11px;
+    height: 11px;
+    border-radius: 99px;
+  }
+  .shot .ring {
+    border: 1.5px solid #d6d1c8;
+  }
+  .shot .ok {
+    display: grid;
+    place-items: center;
+    background: #3cc4bf;
+    color: #fff;
+  }
+  .shot .ok svg {
+    width: 7px;
+    height: 7px;
+    stroke: #fff;
+    stroke-width: 4;
+  }
+  .shot .spin {
+    border: 1.5px solid rgba(212, 66, 31, 0.2);
+    border-top-color: #d4421f;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* F: pipeline */
+  .shot .pipe {
+    display: flex;
+    align-items: flex-start;
+  }
+  .shot .pipe .node {
+    display: flex;
+    width: 40px;
+    flex: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 9.5px;
+    color: #a9b6c1;
+  }
+  .shot .pipe .node .stack,
+  .shot .pipe .node .stack > * {
+    width: 15px;
+    height: 15px;
+    border-radius: 99px;
+  }
+  .shot .pipe .ring {
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .shot .pipe .spin {
+    border-color: rgba(241, 90, 60, 0.25);
+    border-top-color: #f15a3c;
+  }
+  .shot .pipe .ok svg {
+    width: 9px;
+    height: 9px;
+    stroke: #0f2536;
+  }
+  .shot .pipe .link {
+    height: 1.5px;
+    flex: 1;
+    margin: 7px -10px 0;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .shot .pipe .link i {
+    display: block;
+    height: 100%;
+    background: #3cc4bf;
+    transform-origin: left;
+  }
+
+  /* hovering a card plays its screen even if the page thinks it is off screen */
+  .work-card:hover .shot.idle,
+  .work-card:hover .shot.idle * {
+    animation-play-state: running !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shot * {
+      animation: none !important;
+    }
+    .work-card:hover .win {
+      transform: none;
+    }
+  }
+</style>

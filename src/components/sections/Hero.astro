@@ -1,171 +1,532 @@
 ---
+// Every name and number inside the sample screens is made up.
+// src/scripts/hero.ts drives the tabs; without script the first screen shows.
+import Sky from "../Sky.astro";
 import Icon from "../Icon.astro";
-import HeroFilm from "../HeroFilm.astro";
-import type { Stat, heroFilm, techStack } from "../../data/site";
+import MascotSvg from "../MascotSvg.astro";
+import { calendlyUrl, hero } from "../../data/site";
 
-interface Props {
-  hero: {
-    eyebrow: string;
-    title: string;
-    lede: string;
-    primary: { href: string; label: string };
-    secondary: { href: string; label: string };
-    statsNote: string;
-  };
-  stats: Stat[];
-  film: typeof heroFilm;
-  tech: typeof techStack;
-}
-const { hero, stats, film, tech } = Astro.props;
-// The hero is above the fold, so it renders immediately; the scroll
-// reveal only applies from the stats row down.
+const urls = ["lakbaycoffee.ph", "app.tindahan.ph", "ops.clinic.ph", "thesis.group4.edu.ph"];
+const rings = [
+  { value: 99, label: "Performance" },
+  { value: 100, label: "Accessibility" },
+  { value: 100, label: "Best practices" },
+  { value: 100, label: "SEO" },
+];
+const menu = [
+  { name: "Barako", price: "PHP 140", tone: "bg-[#3b2414]" },
+  { name: "Spanish latte", price: "PHP 170", tone: "bg-[#c98b4f]" },
+  { name: "Ube cold foam", price: "PHP 185", tone: "bg-[#efdcc0]" },
+];
+const bars = [
+  ["45%", "bg-navy/20"],
+  ["62%", "bg-navy/20"],
+  ["55%", "bg-navy/20"],
+  ["78%", "bg-navy/20"],
+  ["70%", "bg-navy/20"],
+  ["92%", "bg-coral-600"],
+  ["30%", "bg-wash"],
+];
+const upNext = [
+  { time: "2:30 PM, home visit", status: "Confirmed", tone: "" },
+  { time: "3:00 PM, intake", status: "Pending", tone: "!border-transparent !bg-gold/40" },
+  { time: "4:15 PM, follow-up", status: "Confirmed", tone: "" },
+  { time: "5:00 PM, review", status: "Late", tone: "!border-coral-600 !bg-coral-600 !text-white" },
+];
+const milestones = [
+  { name: "Chapters 1 to 3", done: true },
+  { name: "Working system", done: true },
+  { name: "Diagrams and manual", done: true },
+  { name: "Defense rehearsal", done: false },
+];
 ---
 
-<section class="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:px-6 sm:pt-20 lg:pb-24" aria-labelledby="hero-title">
-  <div class="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
-    <div>
-      <p class="eyebrow">{hero.eyebrow}</p>
-      <h1 id="hero-title" class="mt-4 text-title2 font-semibold text-ink xs:text-title1 sm:text-large lg:text-huge">
-        {hero.title}
-      </h1>
-      <p class="mt-6 max-w-xl text-callout text-muted sm:text-headline">{hero.lede}</p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href={hero.primary.href} class="btn btn-primary press">
-          {hero.primary.label}
-          <Icon name="arrow" class="h-4 w-4" />
-        </a>
-        <a href={hero.secondary.href} class="btn btn-secondary press">{hero.secondary.label}</a>
-      </div>
-    </div>
+<section class="on-dark relative overflow-hidden bg-navy" aria-labelledby="hero-title" data-hero-root>
+  <Sky
+    class="sky-hero inset-x-0 top-0 h-[calc(100%-11rem)] w-full sm:h-[calc(100%-14rem)]"
+    seed={7}
+    h={900}
+    count={150}
+    chart={[1180, -420]}
+    lines={[
+      { pts: [[208, 150], [226, 318], [148, 246], [292, 230], [262, 372]], edges: [[0, 1], [2, 3]], lead: 0 },
+      {
+        pts: [[1050, 250], [1112, 292], [1184, 280], [1236, 340], [1218, 412], [1290, 452]],
+        edges: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]],
+        lead: 2,
+      },
+      { pts: [[90, 560], [160, 600], [230, 585]], edges: [[0, 1], [1, 2]], lead: 1 },
+    ]}
+    guide={{ at: [1300, 150], course: "M1300 162 C 1360 300, 1330 470, 1215 640" }}
+  />
+  <div class="absolute inset-x-0 bottom-0 h-44 bg-cream sm:h-56"></div>
 
-    <div class="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none">
-      <HeroFilm film={film} />
+  <div class="relative mx-auto max-w-6xl px-5 pt-16 text-center sm:pt-24">
+    <p data-hero style="--i:0" class="text-sm font-medium text-gold/90 sm:text-[15px]">{hero.eyebrow}</p>
+    <h1
+      id="hero-title"
+      data-hero
+      style="--i:1"
+      class="mt-5 text-[40px] leading-[1.08] font-semibold tracking-[-0.03em] !text-white sm:text-[56px] lg:text-[64px] lg:leading-[1.05]"
+    >
+      {hero.title}
+    </h1>
+    <p data-hero style="--i:2" class="mx-auto mt-5 max-w-[34rem] text-[17px] leading-relaxed text-foam/85 sm:text-xl">
+      {hero.lede}
+    </p>
+    <div data-hero style="--i:3" class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href={calendlyUrl} target="_blank" rel="noopener" class="btn-primary">
+        <Icon name="calendar" class="size-4" />{hero.book}<span class="sr-only"> (opens Calendly in a new tab)</span>
+      </a>
+      <a href={hero.secondary.href} class="btn-ghost-dark">{hero.secondary.label} <Icon name="arrow" class="size-4" /></a>
+    </div>
+    <ul data-hero style="--i:4" class="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-mist">
+      {
+        hero.proof.map((p) => (
+          <li>
+            <b class="font-semibold text-white">{p.value}</b> {p.label}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div
+      data-hero
+      style="--i:5"
+      role="tablist"
+      aria-label="Sample screens"
+      class="mt-14 grid max-w-full grid-cols-2 gap-1 rounded-lg border border-white/10 bg-white/5 p-1 whitespace-nowrap sm:inline-flex"
+    >
+      {
+        hero.tabs.map((label, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`hero-tab-${i}`}
+            aria-controls={`hero-panel-${i}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? 0 : -1}
+            class="tab"
+            data-tab={i}
+            data-url={urls[i]}
+          >
+            {label}
+            <span class="bar" />
+          </button>
+        ))
+      }
     </div>
   </div>
 
-  <dl class="reveal mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line/10 pt-10 sm:mt-20 lg:grid-cols-4">
-    {
-      stats.map((s) => (
-        <div class="flex flex-col">
-          <dt class="order-last mt-1 text-footnote text-muted">{s.label}</dt>
-          <dd class="tnum font-display text-title1 font-semibold text-ink">{s.value}</dd>
-        </div>
-      ))
-    }
-  </dl>
-  <p class="reveal mt-4 text-caption text-muted">{hero.statsNote}</p>
-
-  <div class="reveal mt-14 border-t border-line/10 pt-8" data-marquee>
-    <div class="flex items-center justify-between gap-4">
-      <p class="eyebrow">{tech.label}</p>
-      <button
-        type="button"
-        class="marquee-toggle press"
-        data-marquee-toggle
-        data-playing
-        aria-label="Pause the moving tools list"
-        hidden
-      >
-        <Icon name="pause" class="i-pause h-4 w-4" />
-        <Icon name="play" class="i-play h-4 w-4" />
-      </button>
+  <div class="relative mx-auto mt-5 max-w-5xl px-5 pb-20 sm:pb-28">
+    <div class="absolute -top-16 right-3 z-20 w-28 max-lg:hidden" data-hero style="--i:6" data-loop>
+      <MascotSvg id="hero" />
     </div>
-    <div class="marquee mt-4">
-      <ul class="marquee-track">
-        {tech.items.map((item) => <li class="chip">{item}</li>)}
-      </ul>
-      <ul class="marquee-track" aria-hidden="true">
-        {tech.items.map((item) => <li class="chip">{item}</li>)}
-      </ul>
+    <div
+      data-hero
+      data-window
+      style="--i:6"
+      class="relative z-10 overflow-hidden rounded-xl bg-paper text-left shadow-[0_30px_60px_-30px_rgba(6,30,46,.55)]"
+    >
+      <div class="flex h-10 items-center gap-2 border-b border-line bg-cream px-4">
+        <span class="size-2.5 rounded-full bg-coral/80"></span><span class="size-2.5 rounded-full bg-gold"></span><span
+          class="size-2.5 rounded-full bg-teal/70"></span>
+        <span class="ml-2 text-xs text-muted">Sample screen</span>
+        <div
+          class="mx-auto hidden w-72 items-center justify-center gap-1.5 rounded-md border border-line bg-paper px-3 py-0.5 text-xs text-muted sm:flex"
+        >
+          <Icon name="lock" class="size-3" /><span data-url>{urls[0]}</span>
+        </div>
+        <span class="hidden w-[92px] sm:block"></span>
+      </div>
+
+      <div class="relative h-[440px] sm:h-[460px]">
+        <div
+          id="hero-panel-0"
+          role="tabpanel"
+          aria-labelledby="hero-tab-0"
+          data-panel="0"
+          class="hero-panel is-active play absolute inset-0 grid sm:grid-cols-[1.5fr_1fr]"
+        >
+          <div class="overflow-hidden bg-[#faf5ee] p-6 sm:p-8">
+            <div class="flex items-center justify-between text-xs text-[#6b4a32]">
+              <span class="text-[15px] font-semibold text-[#3b2414]">Lakbay Coffee</span><span class="hidden gap-5 sm:flex"
+                ><span>Menu</span><span>Visit</span><span>Order</span></span
+              >
+            </div>
+            <div class="mt-6 grid grid-cols-[1.2fr_1fr] items-center gap-5">
+              <div data-in>
+                <p class="text-[28px] leading-[1.05] font-semibold tracking-[-0.02em] text-[#3b2414] sm:text-[34px]">
+                  Slow coffee.<br />Fast site.
+                </p>
+                <p class="mt-3 text-sm text-[#6b4a32]">Order ahead, skip the line.</p>
+                <span class="mt-4 inline-block rounded-md bg-[#3b2414] px-4 py-2 text-xs font-medium text-white">Order now</span>
+              </div>
+              <div data-in class="relative grid aspect-square place-items-center overflow-hidden rounded-xl bg-sand/70">
+                <div class="absolute -right-6 -bottom-6 size-28 rounded-full bg-sand"></div>
+                <div class="relative">
+                  <div class="h-16 w-20 rounded-t-md rounded-b-[28px] bg-paper"></div>
+                  <div class="absolute top-3 -right-4 size-8 rounded-full border-[6px] border-paper"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 grid grid-cols-3 gap-3">
+              {
+                menu.map((m) => (
+                  <div data-in class="rounded-lg border border-line bg-paper p-3">
+                    <div class:list={["h-12 rounded-md", m.tone]} />
+                    <p class="mt-2 text-xs font-medium text-[#3b2414]">{m.name}</p>
+                    <p class="text-[11px] text-muted">{m.price}</p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <div class="hidden flex-col justify-center gap-6 border-l border-line p-8 sm:flex">
+            <p class="text-sm font-medium text-navy">Lighthouse scores, mobile</p>
+            <div class="grid grid-cols-2 gap-6">
+              {
+                rings.map((ring) => (
+                  <div class="flex flex-col items-center gap-2">
+                    <svg viewBox="0 0 80 80" class="size-20 max-w-full -rotate-90" aria-hidden="true">
+                      <circle cx="40" cy="40" r="34" stroke="#f1ede6" stroke-width="5" fill="none" />
+                      <circle
+                        data-ring
+                        style={`--v:${ring.value}`}
+                        pathLength="100"
+                        cx="40"
+                        cy="40"
+                        r="34"
+                        stroke="#0b2c44"
+                        stroke-width="5"
+                        fill="none"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                    <span class="-mt-[60px] mb-8 text-xl font-semibold text-navy tabular-nums" data-count={ring.value}>
+                      {ring.value}
+                    </span>
+                    <span class="text-xs text-muted">{ring.label}</span>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="hero-panel-1"
+          role="tabpanel"
+          aria-labelledby="hero-tab-1"
+          data-panel="1"
+          class="hero-panel absolute inset-0 flex items-center justify-center gap-6 overflow-hidden bg-cream px-4 sm:gap-10"
+        >
+          <div data-in class="relative h-[380px] w-[190px] rounded-[34px] bg-deep p-2">
+            <div class="relative h-full overflow-hidden rounded-[28px] bg-paper">
+              <div class="absolute top-2 left-1/2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-deep"></div>
+              <svg viewBox="0 0 190 250" class="h-[205px] w-full bg-[#eaf1ef]" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <path d="M0 60 H190 M0 140 H190 M60 0 V250 M140 0 V250" stroke="#fff" stroke-width="10"></path>
+                <path d="M20 200 Q40 120 100 140 T170 40" stroke="#d7e3e0" stroke-width="6" fill="none" stroke-linecap="round"></path>
+                <path
+                  d="M20 200 Q40 120 100 140 T170 40"
+                  stroke="#d4421f"
+                  stroke-width="3"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-dasharray="5 6"></path>
+                <circle cx="170" cy="40" r="8" fill="#0b2c44"></circle><circle cx="170" cy="40" r="3" fill="#fff"></circle>
+                <!-- the rider starts at the route's first point; the motion path is relative to it -->
+                <circle cx="20" cy="200" r="7" fill="#d4421f" stroke="#fff" stroke-width="3">
+                  <animateMotion data-rider begin="indefinite" dur="4s" fill="freeze" path="M0 0 Q20 -80 80 -60 T150 -160"
+                  ></animateMotion>
+                </circle>
+              </svg>
+              <div class="p-4">
+                <p class="text-[11px] text-muted">Arriving in</p>
+                <p class="text-[26px] leading-tight font-semibold text-navy"><span data-count="3">3</span> min</p>
+                <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-wash">
+                  <div data-grow class="h-full w-4/5 origin-left rounded-full bg-navy"></div>
+                </div>
+                <div class="mt-4 flex items-center gap-2">
+                  <div class="size-8 rounded-full bg-gold/70"></div>
+                  <div><p class="text-xs font-medium text-navy">Rider Jun</p><p class="text-[11px] text-muted">On a scooter</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div data-in class="relative mt-8 hidden h-[380px] w-[190px] rounded-[34px] bg-deep p-2 sm:block">
+            <div class="h-full overflow-hidden rounded-[28px] bg-paper p-4 pt-9">
+              <div class="flex items-center justify-between">
+                <p class="text-base font-semibold text-navy">Shop</p>
+                <span class="relative size-5 text-navy">
+                  <Icon name="cart" class="size-5" />
+                  <span
+                    data-pop="badge"
+                    class="absolute -top-2 -right-2 grid size-4 place-items-center rounded-full bg-coral-600 text-[9px] font-medium text-white"
+                    >1</span
+                  >
+                </span>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2.5">
+                <div class="h-20 rounded-lg bg-gold/50"></div><div class="h-20 rounded-lg bg-wash"></div>
+                <div class="h-20 rounded-lg bg-wash"></div><div class="h-20 rounded-lg bg-sand/40"></div>
+              </div>
+              <div class="mt-3 space-y-1.5"><div class="h-2 w-3/4 rounded bg-wash"></div><div class="h-2 w-1/2 rounded bg-wash"></div></div>
+              <div class="mt-4 rounded-md bg-navy py-2.5 text-center text-xs font-medium text-white">Checkout with GCash</div>
+            </div>
+          </div>
+          <div
+            data-pop="toast"
+            class="absolute top-6 right-4 flex w-60 items-center gap-3 rounded-lg border border-line bg-paper p-3 shadow-[0_8px_20px_-8px_rgba(6,30,46,.18)] sm:right-16"
+          >
+            <span class="grid size-8 place-items-center rounded-md bg-coral-600 text-white"><Icon name="cart" class="size-4" /></span>
+            <div><p class="text-xs font-medium text-navy">Order #1042 is on the way</p><p class="text-[11px] text-muted">Push notification, now</p></div>
+          </div>
+        </div>
+
+        <div
+          id="hero-panel-2"
+          role="tabpanel"
+          aria-labelledby="hero-tab-2"
+          data-panel="2"
+          class="hero-panel absolute inset-0 grid grid-cols-[170px_1fr] max-sm:grid-cols-1"
+        >
+          <aside class="border-r border-line bg-cream p-4 text-sm max-sm:hidden">
+            <p class="font-semibold text-navy">Clinic Ops</p>
+            <ul class="mt-4 space-y-0.5 text-body">
+              <li class="rounded-md border border-line bg-paper px-2.5 py-1.5 font-medium text-navy">Overview</li>
+              <li class="px-2.5 py-1.5">Schedule</li><li class="px-2.5 py-1.5">Patients</li><li class="px-2.5 py-1.5">Staff</li><li
+                class="px-2.5 py-1.5">Billing</li
+              >
+            </ul>
+          </aside>
+          <div class="overflow-hidden p-5 sm:p-6">
+            <div class="flex items-center justify-between">
+              <div><p class="text-lg font-semibold text-navy">Good afternoon, Ana</p><p class="text-xs text-muted">Here is today at a glance.</p></div>
+              <span class="chip"><span class="beacon relative size-1.5 rounded-full bg-teal text-teal"></span>Live</span>
+            </div>
+            <div class="mt-4 grid grid-cols-3 gap-3">
+              <div data-in class="rounded-lg bg-navy p-4 text-white">
+                <p class="text-[11px] text-mist">Visits today</p><p class="text-[28px] font-semibold tabular-nums" data-count="128">128</p><p
+                  class="text-[11px] text-gold">+12% vs last week</p
+                >
+              </div>
+              <div data-in class="rounded-lg border border-line p-4">
+                <p class="text-[11px] text-muted">Staff on shift</p><p class="text-[28px] font-semibold text-navy tabular-nums" data-count="46">46</p><p
+                  class="text-[11px] text-muted">8 starting at 4 PM</p
+                >
+              </div>
+              <div data-in class="rounded-lg border border-line p-4">
+                <p class="text-[11px] text-muted">Forms signed</p><p class="text-[28px] font-semibold text-navy tabular-nums" data-count="312">312</p><p
+                  class="text-[11px] text-muted">All synced</p
+                >
+              </div>
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-[1.3fr_1fr]">
+              <div class="rounded-lg border border-line p-4">
+                <p class="text-xs font-medium text-navy">Visits this week</p>
+                <div class="mt-3 flex h-28 items-end gap-2.5">
+                  {bars.map(([height, tone]) => <div data-bar class:list={["flex-1 origin-bottom rounded-t", tone]} style={`height:${height}`} />)}
+                </div>
+                <div class="mt-1.5 flex justify-between text-[10px] text-muted">
+                  <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                </div>
+              </div>
+              <div class="rounded-lg border border-line p-4 max-sm:hidden">
+                <p class="text-xs font-medium text-navy">Up next</p>
+                <ul class="mt-3 space-y-2.5 text-xs text-body">
+                  {
+                    upNext.map((u) => (
+                      <li data-in class="flex items-center justify-between">
+                        <span>{u.time}</span>
+                        <span class:list={["chip", u.tone]}>{u.status}</span>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="hero-panel-3"
+          role="tabpanel"
+          aria-labelledby="hero-tab-3"
+          data-panel="3"
+          class="hero-panel absolute inset-0 grid sm:grid-cols-[1.2fr_1fr]"
+        >
+          <div class="p-6 sm:p-8">
+            <p class="text-lg font-semibold text-navy">Thesis tracker</p>
+            <p class="text-xs text-muted">BS Information Technology, Group 4</p>
+            <ul class="mt-6 space-y-4 text-sm">
+              {
+                milestones.map((m) => (
+                  <li class="grid grid-cols-[22px_1fr_44px] items-center gap-3">
+                    {m.done ? (
+                      <span data-check class="grid size-5 place-items-center rounded-full bg-navy text-white">
+                        <Icon name="check" class="size-3" />
+                      </span>
+                    ) : (
+                      <span class="grid size-5 place-items-center rounded-full border-[1.5px] border-coral-600" />
+                    )}
+                    <div>
+                      <p class="font-medium text-navy">{m.name}</p>
+                      <div class="mt-1.5 h-1 rounded-full bg-wash">
+                        <div
+                          data-grow
+                          class:list={["h-full origin-left rounded-full", m.done ? "w-full bg-navy" : "w-3/4 bg-coral-600"]}
+                        />
+                      </div>
+                    </div>
+                    <span class:list={["text-right text-xs", m.done ? "text-muted" : "font-medium text-coral-700"]}>
+                      {m.done ? "Done" : "75%"}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div class="hidden place-items-center border-l border-line bg-cream p-8 sm:grid">
+            <div data-in class="relative w-full max-w-[260px] rounded-xl bg-navy p-6 text-center text-white">
+              <div class="mx-auto grid size-14 place-items-center rounded-lg bg-gold text-navy"><Icon name="grad" class="size-7" /></div>
+              <p class="mt-4 text-xl font-semibold">Panel ready</p>
+              <p class="mt-1 text-sm text-mist">Defense on Friday, 9:00 AM</p>
+              <div class="mt-5 flex justify-center gap-1.5">
+                <span class="h-1 w-6 rounded-full bg-gold"></span><span class="h-1 w-6 rounded-full bg-gold"></span><span
+                  class="h-1 w-6 rounded-full bg-gold"></span><span class="h-1 w-6 rounded-full bg-white/20"></span>
+              </div>
+              <span data-check class="chip absolute -top-3 -right-3 !border-coral-600 !bg-coral-600 !text-white">Revisions included</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<script>
-  // The tools strip moves on its own, so it gets a pause button (WCAG
-  // 2.2.2). Under reduced motion it is a static, wrapped list instead.
-  const strip = document.querySelector<HTMLElement>("[data-marquee]");
-  const button = strip?.querySelector<HTMLButtonElement>("[data-marquee-toggle]");
-  if (strip && button && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    button.hidden = false;
-    button.addEventListener("click", () => {
-      const paused = strip.toggleAttribute("data-paused");
-      button.toggleAttribute("data-playing", !paused);
-      button.setAttribute("aria-label", paused ? "Play the moving tools list" : "Pause the moving tools list");
-    });
-  }
-</script>
+<style is:global>
+  @reference "../../styles/global.css";
 
-<style>
-  .marquee {
-    display: flex;
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  .sky-hero {
+    -webkit-mask-image: radial-gradient(ellipse 34% 30% at 50% 30%, transparent 40%, #000 100%);
+    mask-image: radial-gradient(ellipse 34% 30% at 50% 30%, transparent 40%, #000 100%);
   }
 
-  .marquee-track {
-    display: flex;
-    flex: none;
-    gap: 0.75rem;
-    padding-right: 0.75rem;
-    animation: marquee 60s linear infinite;
+  .js [data-hero] {
+    animation: hero-in 0.7s var(--ease-reveal) calc(var(--i, 0) * 70ms) both;
   }
-
-  .marquee:hover .marquee-track,
-  [data-paused] .marquee-track {
-    animation-play-state: paused;
-  }
-
-  .marquee-track li {
-    padding: 0.375rem 0.875rem;
-    font-size: var(--text-footnote);
-    white-space: nowrap;
-  }
-
-  @keyframes marquee {
-    to {
-      transform: translateX(-100%);
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
     }
   }
 
-  .marquee-toggle {
-    display: grid;
-    width: 2.5rem;
-    height: 2.5rem;
-    flex: none;
-    place-items: center;
-    border: 1px solid rgb(var(--line) / 0.15);
-    border-radius: 999px;
-    color: rgb(var(--ink));
-    cursor: pointer;
+  .tab {
+    @apply relative shrink-0 overflow-hidden rounded-md px-4 py-2 text-sm font-medium text-mist transition-colors hover:text-white;
+  }
+  .tab[aria-selected="true"] {
+    @apply bg-paper text-navy;
+  }
+  .tab .bar {
+    @apply absolute right-4 bottom-1 left-4 h-0.5 origin-left scale-x-0 rounded-full bg-coral-600;
+  }
+  [data-auto] .tab[aria-selected="true"] .bar {
+    animation: tab-fill 7s linear forwards;
+  }
+  [data-paused] .tab .bar {
+    animation-play-state: paused !important;
+  }
+  @keyframes tab-fill {
+    to {
+      transform: scaleX(1);
+    }
   }
 
-  .marquee-toggle[hidden] {
-    display: none;
+  .hero-panel {
+    --out2: cubic-bezier(0.5, 1, 0.89, 1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition:
+      opacity 0.25s,
+      transform 0.25s,
+      visibility 0s linear 0.25s;
   }
-
-  .marquee-toggle:hover {
-    border-color: rgb(var(--line) / 0.35);
+  .hero-panel.is-leaving {
+    transform: translateY(-8px);
   }
-
-  .marquee-toggle[data-playing] :global(.i-play),
-  .marquee-toggle:not([data-playing]) :global(.i-pause) {
-    display: none;
+  .hero-panel.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 0.45s var(--out2) 0.12s,
+      transform 0.45s var(--out2) 0.12s,
+      visibility 0s;
+  }
+  .hero-panel:not(.play) [data-in] {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .hero-panel.play [data-in] {
+    transition:
+      opacity 0.45s var(--out2) calc(0.18s + var(--n, 0) * 0.05s),
+      transform 0.45s var(--out2) calc(0.18s + var(--n, 0) * 0.05s);
+  }
+  .hero-panel:not(.play) [data-grow] {
+    transform: scaleX(0);
+  }
+  .hero-panel.play [data-grow] {
+    transition: transform 0.9s var(--out2) calc(0.3s + var(--n, 0) * 0.12s);
+  }
+  .hero-panel [data-ring] {
+    stroke-dasharray: 100;
+    stroke-dashoffset: calc(100 - var(--v));
+  }
+  .hero-panel:not(.play) [data-ring] {
+    stroke-dashoffset: 100;
+  }
+  .hero-panel.play [data-ring] {
+    transition: stroke-dashoffset 1.3s var(--out2) 0.3s;
+  }
+  .hero-panel:not(.play) [data-bar] {
+    transform: scaleY(0);
+  }
+  .hero-panel.play [data-bar] {
+    transition: transform 0.8s var(--ease-reveal) calc(0.25s + var(--n, 0) * 0.07s);
+  }
+  .hero-panel:not(.play) [data-check] {
+    transform: scale(0);
+  }
+  .hero-panel.play [data-check] {
+    transition: transform 0.4s var(--ease-pop) calc(0.3s + var(--n, 0) * 0.2s);
+  }
+  .hero-panel:not(.play) [data-pop="toast"] {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  .hero-panel.play [data-pop="toast"] {
+    transition:
+      opacity 0.5s var(--out2) 1.4s,
+      transform 0.5s var(--out2) 1.4s;
+  }
+  .hero-panel:not(.play) [data-pop="badge"] {
+    transform: scale(0);
+  }
+  .hero-panel.play [data-pop="badge"] {
+    transition: transform 0.4s var(--ease-pop) 2.2s;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .marquee {
-      flex-wrap: wrap;
-      mask-image: none;
-    }
-
-    .marquee-track {
-      flex-wrap: wrap;
-      animation: none !important;
-    }
-
-    .marquee-track[aria-hidden="true"] {
-      display: none;
+    .hero-panel,
+    .hero-panel * {
+      transition: none !important;
     }
   }
 </style>
+
+<script>
+  import "../../scripts/hero.ts";
+</script>

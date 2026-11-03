@@ -1,0 +1,35 @@
+---
+import Sky from "../Sky.astro";
+import Figure from "../Figure.astro";
+import { stats, trackRecord } from "../../data/site";
+---
+
+<section class="on-dark relative overflow-hidden bg-navy" aria-labelledby="record-title">
+  <Sky
+    class="inset-0 h-full w-full"
+    seed={21}
+    h={640}
+    count={70}
+    chart={[-200, -300]}
+    lines={[{ pts: [[1180, 90], [1250, 140], [1330, 120], [1370, 190]], edges: [[0, 1], [1, 2], [2, 3]], lead: 1 }]}
+  />
+  <div class="relative mx-auto max-w-6xl px-5 py-24 sm:py-32">
+    <div class="reveal max-w-2xl">
+      <p class="text-sm font-medium text-gold/90">{trackRecord.eyebrow}</p>
+      <h2 id="record-title" class="h2 mt-3 !text-white">{trackRecord.title}</h2>
+      <p class="mt-4 max-w-xl text-[17px] leading-relaxed text-mist sm:text-lg">{trackRecord.lede}</p>
+    </div>
+    <dl class="mt-14 grid grid-cols-2 gap-x-8 gap-y-12 lg:grid-cols-4">
+      {
+        stats.map((s) => (
+          <div class="reveal flex flex-col border-t border-white/15 pt-6">
+            <dt class="order-2 mt-3 text-[15px] text-mist">{s.label}</dt>
+            <dd class="order-1 text-[44px] leading-none font-medium tracking-[-0.03em] text-white tabular-nums sm:text-[56px]">
+              <Figure figure={s} suffixClass="text-coral" />
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

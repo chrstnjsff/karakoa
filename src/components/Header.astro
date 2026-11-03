@@ -1,81 +1,63 @@
 ---
-// Sticky top bar: wordmark, section links (xl+), theme switch, and the
-// booking button. Below xl the links live in the mobile dialog that
-// Base.astro renders and drives. The full row needs about 1060px, so the
-// inline links wait for xl; at lg (976px of room) the button wrapped.
-// Below xs the booking button would squeeze the wordmark, so it lives
-// only in the dialog there.
+// Below md the links live in the menu dialog in Base.astro; below xs
+// (360px) the button moves there too, so the wordmark never gets squeezed.
 import Logo from "./Logo.astro";
-import ThemeSwitch from "./ThemeSwitch.astro";
-import { NAV, PAGES, SITE, calendlyUrl } from "../data/site";
+import Icon from "./Icon.astro";
+import { NAV, SITE } from "../data/site";
 
 const isHome = Astro.url.pathname === "/";
 const link = (href: string) => (isHome ? href : `/${href}`);
 ---
 
-<header
-  class="material-bar sticky top-0 z-50 border-b border-line/10"
-  data-inert-when-menu
->
-  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
+<header class="on-dark sticky top-0 z-50 border-b border-white/10 bg-navy" data-inert-when-menu>
+  <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-5 sm:gap-6">
     <a
       href={isHome ? "#top" : "/"}
-      class="press -mx-2 inline-flex min-h-11 items-center px-2"
+      class="flex min-h-11 items-center"
       aria-label={isHome ? `${SITE.domain}, back to top` : `${SITE.domain}, home`}
     >
-      <Logo size={30} />
+      <Logo mascotId="hdr" onDark />
     </a>
 
-    <nav class="hidden items-center gap-1 xl:flex" aria-label="Primary">
+    <nav class="nav ml-4 hidden items-center gap-1 self-stretch md:flex [&>a]:flex [&>a]:items-center" aria-label="Primary">
       {
         NAV.map((item) => (
-          <a
-            href={link(item.href)}
-            data-nav-link
-            data-spy={isHome ? "" : undefined}
-            class="inline-flex min-h-11 items-center rounded-lg px-3 text-footnote font-semibold text-muted"
-          >
-            {item.label}
-          </a>
-        ))
-      }
-      {
-        PAGES.map((item) => (
-          <a
-            href={item.href}
-            data-nav-link
-            class="inline-flex min-h-11 items-center rounded-lg px-3 text-footnote font-semibold text-muted"
-          >
+          <a href={link(item.href)} data-spy={isHome ? "" : undefined}>
             {item.label}
           </a>
         ))
       }
     </nav>
 
-    <div class="flex items-center gap-2 sm:gap-3">
-      <div class="hidden sm:block">
-        <ThemeSwitch />
-      </div>
+    <div class="ml-auto flex items-center gap-1.5 sm:gap-4">
+      <span class="hidden items-center gap-2 text-sm text-mist lg:inline-flex">
+        <span class="beacon relative size-1.5 rounded-full bg-gold text-gold" data-loop></span>
+        <span data-clock>Manila</span>
+      </span>
       <a
-        href={calendlyUrl}
-        target="_blank"
-        rel="noopener"
-        class="btn btn-primary press hidden min-h-10 px-3.5 text-footnote xs:inline-flex sm:px-4"
+        href={link("#message")}
+        data-msg
+        class="btn-primary min-h-10 shrink-0 px-3 text-sm whitespace-nowrap max-xs:hidden sm:px-4"
       >
-        Book a call
+        <span class="flex max-sm:hidden md:max-lg:hidden"><Icon name="mail" class="size-4" /></span>
+        Send a message
       </a>
       <button
         type="button"
         id="mobile-nav-open"
-        class="press -mr-2 grid h-11 w-11 place-items-center rounded-lg text-ink xl:hidden"
+        class="-mr-2.5 grid size-11 place-items-center rounded-md text-foam md:hidden"
         aria-label="Open menu"
         aria-controls="mobileNav"
         aria-expanded="false"
       >
-        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="size-5" aria-hidden="true">
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
         </svg>
       </button>
     </div>
   </div>
 </header>
+
+<script>
+  import "../scripts/clock.ts";
+</script>

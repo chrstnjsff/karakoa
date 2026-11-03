@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NAV, channels, heroFilm, services, techStack } from "../src/data/site";
+import { NAV, channels, contact, hero, services, techStack } from "../src/data/site";
 
 // Reveal animations wait for IntersectionObserver callbacks that never fire
 // in a hidden automation tab; force the final state before asserting.
@@ -20,7 +20,7 @@ test.describe("landing page", () => {
     await page.goto("/");
     await settle(page);
 
-    for (const item of NAV) {
+    for (const item of [...NAV, { href: "#contact", label: "Contact" }]) {
       const target = page.locator(item.href);
       await target.scrollIntoViewIfNeeded();
       await expect(target, `${item.href} is visible`).toBeVisible();
@@ -38,97 +38,178 @@ test.describe("landing page", () => {
     await page.goto("/#contact");
     await settle(page);
     for (const c of channels) {
-      const link = page.locator(`a[href="${c.href}"]`).first();
+      const link = page.locator(`#contact a[href="${c.href}"]`).first();
       if (c.value && c.href) await expect(link, `${c.label} link`).toBeVisible();
       else await expect(page.getByText(c.label, { exact: true })).toHaveCount(0);
     }
   });
 
-  test("theme switch flips the dark class and persists", async ({ page, isMobile }) => {
+  test("every booking button opens Calendly in a new tab", async ({ page }) => {
     await page.goto("/");
-    await settle(page);
-    // Below xl the header switch is inert behind the open menu, so use the
-    // copy inside the dialog there.
-    let scope = page.locator("body");
-    if (isMobile) {
-      await page.getByRole("button", { name: "Open menu" }).click();
-      scope = page.getByRole("dialog", { name: "Menu" });
+    const calendly = channels.find((c) => c.id === "calendly")!.href;
+    const links = page.locator(`a[href="${calendly}"]`);
+    expect(await links.count()).toBeGreaterThanOrEqual(3);
+    for (const link of await links.all()) {
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /noopener/);
     }
-    await scope.getByRole("button", { name: "Dark theme" }).first().click();
-    await expect(page.locator("html")).toHaveClass(/dark/);
-    expect(await page.evaluate(() => localStorage.getItem("theme"))).toBe("dark");
-    await page.reload();
-    await expect(page.locator("html")).toHaveClass(/dark/);
   });
 
-  test("empty form submit shows inline errors without a network call", async ({ page }) => {
-    let posted = false;
-    page.on("request", (req) => {
-      if (req.url().includes("web3forms")) posted = true;
-    });
-    await page.goto("/#contact");
-    await settle(page);
-    await page.getByRole("button", { name: "Send project inquiry" }).click();
-    await expect(page.locator("#contact-name-error")).toBeVisible();
-    await expect(page.locator("#contact-name")).toBeFocused();
-    expect(posted).toBe(false);
-  });
-
-  test("faq items open and close", async ({ page }) => {
-    await page.goto("/#faq");
-    await settle(page);
-    const first = page.locator("#faq details").first();
-    await first.locator("summary").click();
-    await expect(first).toHaveAttribute("open", "");
-    await expect(first.locator("p")).toBeVisible();
+  test("shows the time in Manila", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the clock shows from 1024px");
+    await page.goto("/");
+    await expect(page.locator("[data-clock]")).toHaveText(/^Manila \d{1,2}:\d{2} (AM|PM)$/);
   });
 });
 
-test.describe("hero film", () => {
-  test("shows one slide at a time, pauses, and jumps between slides", async ({ page }) => {
+// Stand-in for Cloudflare Turnstile that hands back a token at once, so the
+// tests never depend on Cloudflare's challenge page.
+async function fakeTurnstile(page: Page) {
+  await page.route("https://challenges.cloudflare.com/turnstile/v0/api.js*", (route) =>
+    route.fulfill({
+      contentType: "text/javascript",
+      body: "window.turnstile = { render(el, o) { setTimeout(() => o.callback('test-token'), 10); return 'w1'; }, reset() {} };",
+    }),
+  );
+}
+
+async function fillForm(page: Page, type = "Website") {
+  await page.getByLabel("Name", { exact: true }).fill("Test Person");
+  await page.getByLabel("Email", { exact: true }).fill("test@example.com");
+  await page.getByLabel("Project type").selectOption(type);
+  await page.getByLabel("Message", { exact: true }).fill("Checking the form end to end.");
+}
+
+test.describe("message form", () => {
+  test("empty submit shows inline errors without a network call", async ({ page }) => {
+    let posted = false;
+    page.on("request", (req) => {
+      if (req.url().includes("/api/contact")) posted = true;
+    });
+    await fakeTurnstile(page);
+    await page.goto("/#message");
+    await settle(page);
+    await page.getByRole("button", { name: "Send message" }).click();
+    for (const id of ["msg-name", "msg-email", "msg-type", "msg-body"]) {
+      await expect(page.locator(`#${id}-error`)).toBeVisible();
+      await expect(page.locator(`#${id}`)).toHaveAttribute("aria-invalid", "true");
+    }
+    await expect(page.locator("#msg-name")).toBeFocused();
+    expect(posted).toBe(false);
+  });
+
+  test("a valid message goes to the Worker with a Turnstile token, and success takes focus", async ({ page }) => {
+    let body: Record<string, string> = {};
+    await fakeTurnstile(page);
+    await page.route("**/api/contact", async (route) => {
+      body = route.request().postDataJSON();
+      await route.fulfill({ json: { ok: true } });
+    });
+    await page.goto("/#message");
+    await settle(page);
+    await fillForm(page);
+    await page.getByRole("button", { name: "Send message" }).click();
+
+    await expect(page.getByRole("heading", { name: "Message sent" })).toBeFocused();
+    expect(body).toMatchObject({
+      name: "Test Person",
+      email: "test@example.com",
+      service: "Website",
+      "cf-turnstile-response": "test-token",
+    });
+    expect(body).not.toHaveProperty("botcheck");
+  });
+
+  test("a field the server refuses is flagged inline", async ({ page }) => {
+    await fakeTurnstile(page);
+    await page.route("**/api/contact", (route) =>
+      route.fulfill({ status: 422, json: { ok: false, error: "Check the highlighted fields.", fields: { email: "Enter an email address like name@example.com." } } }),
+    );
+    await page.goto("/#message");
+    await settle(page);
+    await fillForm(page);
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page.locator("#msg-email-error")).toHaveText("Enter an email address like name@example.com.");
+    await expect(page.locator("#msg-email")).toBeFocused();
+    await expect(page.locator("[data-success]")).toBeHidden();
+  });
+
+  test("a failed send explains itself and offers the email address", async ({ page }) => {
+    await fakeTurnstile(page);
+    await page.route("**/api/contact", (route) => route.abort());
+    await page.goto("/#message");
+    await settle(page);
+    await fillForm(page, "Consultation");
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page.getByRole("alert")).toContainText("could not be sent");
+    await expect(page.getByRole("alert").getByRole("link")).toHaveAttribute("href", "mailto:hello@karakoa.dev");
+    await expect(page.locator("[data-success]")).toBeHidden();
+  });
+
+  test("a blocked spam check stops the send and says why", async ({ page }) => {
+    let posted = false;
+    page.on("request", (req) => {
+      if (req.url().includes("/api/contact")) posted = true;
+    });
+    await page.route("https://challenges.cloudflare.com/**", (route) => route.abort());
+    await page.goto("/#message");
+    await settle(page);
+    await fillForm(page);
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page.getByRole("alert")).toContainText("spam check could not load");
+    expect(posted).toBe(false);
+  });
+
+  test("a service card opens the form with its project type picked", async ({ page }) => {
     await page.goto("/");
-    const film = page.getByRole("region", { name: heroFilm.label });
-    await expect(film).toBeVisible();
-    await expect(film.locator("[data-slide][data-active]")).toHaveCount(1);
-    await expect(film.locator("[data-slide]")).toHaveCount(heroFilm.slides.length);
+    await settle(page);
+    const store = services.find((s) => s.id === "ecommerce")!;
+    await page.locator(`a.svc[data-type="${store.formType}"]`).click();
+    await expect(page).toHaveURL(/#message$/);
+    await expect(page.getByLabel("Project type")).toHaveValue(store.formType);
+    expect(contact.projectTypes).toContain(store.formType);
+  });
+});
 
-    await film.getByRole("button", { name: "Pause slides" }).click();
-    await expect(film).toHaveAttribute("data-paused", "");
-    const clock = await film.evaluate((el) => el.querySelector("[data-seg][data-state='now'] .fill")?.getAnimations()[0]?.playState);
-    expect(clock, "the slide clock stops").toBe("paused");
+test.describe("hero sample screens", () => {
+  test("tabs switch screens by click and by arrow keys", async ({ page }) => {
+    await page.goto("/");
+    const tabs = page.getByRole("tablist", { name: "Sample screens" }).getByRole("tab");
+    await expect(tabs).toHaveCount(hero.tabs.length);
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
 
-    const build = heroFilm.slides.findIndex((s) => s.id === "build");
-    await film.locator("[data-seg]").nth(build).click();
-    await expect(film.locator("[data-slide='build']")).toHaveAttribute("data-active", "");
-    await expect(film.locator("[data-seg]").nth(build)).toHaveAttribute("aria-current", "step");
-    expect(await film.locator("[data-slide]:not([data-active])").evaluateAll((els) => els.every((el) => (el as HTMLElement).inert))).toBe(true);
+    await tabs.nth(2).click();
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("#hero-panel-2")).toBeVisible();
+    await expect(page.locator("#hero-panel-0")).toBeHidden();
+    // Choosing a tab stops the automatic advance.
+    await expect(page.locator("[data-hero-root]")).not.toHaveAttribute("data-auto");
 
     await page.keyboard.press("ArrowRight");
-    await expect(film.locator(`[data-slide='${heroFilm.slides[build + 1].id}']`)).toHaveAttribute("data-active", "");
-
-    await film.getByRole("button", { name: "Play slides" }).click();
-    await expect(film).not.toHaveAttribute("data-paused", "");
+    await expect(tabs.nth(3)).toBeFocused();
+    await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("ArrowRight");
+    await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
   });
 
-  test("moves on to the next slide by itself", async ({ page }) => {
+  test("moves on to the next screen by itself", async ({ page }) => {
     await page.goto("/");
-    // Below the fold (phones) the film holds still until it is seen.
-    await page.locator("[data-film]").scrollIntoViewIfNeeded();
-    const second = page.locator(`[data-slide='${heroFilm.slides[1].id}']`);
-    await expect(second).toHaveAttribute("data-active", "", { timeout: heroFilm.slides[0].ms + 3000 });
+    await page.locator("[data-window]").scrollIntoViewIfNeeded();
+    // Hovering pauses the advance; keep the pointer away from the hero.
+    await page.mouse.move(1, page.viewportSize()!.height - 1);
+    const second = page.getByRole("tab", { name: hero.tabs[1] });
+    await expect(second).toHaveAttribute("aria-selected", "true", { timeout: 10_000 });
   });
 
-  test("starts paused when the reader asks for reduced motion", async ({ page }) => {
+  test("holds still for reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    const film = page.getByRole("region", { name: heroFilm.label });
-    await expect(film.getByRole("button", { name: "Play slides" })).toBeVisible();
-    await expect(film).toHaveAttribute("data-paused", "");
+    await expect(page.locator("[data-hero-root]")).not.toHaveAttribute("data-auto");
+    await expect(page.locator("#hero-panel-0")).toBeVisible();
   });
 
   test("tools strip lists every tool once for readers and can be paused", async ({ page }) => {
     await page.goto("/");
-    await settle(page);
     const strip = page.locator("[data-marquee]");
     await expect(strip.locator("ul:not([aria-hidden]) li")).toHaveCount(techStack.items.length);
     await strip.getByRole("button", { name: "Pause the moving tools list" }).click();
@@ -138,8 +219,8 @@ test.describe("hero film", () => {
 });
 
 test.describe("mobile menu", () => {
-  test("opens, traps focus, and closes on Escape", async ({ page, isMobile }) => {
-    test.skip(!isMobile, "menu only exists below xl");
+  test("opens, traps focus, and closes on Escape", async ({ page }) => {
+    test.skip(page.viewportSize()!.width >= 768, "the menu only exists below 768px");
     await page.goto("/");
     await settle(page);
     await page.getByRole("button", { name: "Open menu" }).click();
@@ -155,7 +236,7 @@ test.describe("mobile menu", () => {
 test.describe("utility pages", () => {
   test("thanks page and 404 render and are noindex", async ({ page }) => {
     await page.goto("/contact/thanks/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Inquiry sent");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Message sent");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
 
     const res = await page.goto("/this-does-not-exist");
@@ -166,7 +247,19 @@ test.describe("utility pages", () => {
   test("about page renders with the founder", async ({ page }) => {
     await page.goto("/about/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("About Karakoa");
-    await expect(page.getByText("Christian Josef Aquino")).toBeVisible();
+    await expect(page.getByText("Christian Josef Aquino").first()).toBeVisible();
+  });
+
+  test("faq page answers open and close", async ({ page }) => {
+    await page.goto("/faq/");
+    await settle(page);
+    const first = page.locator("details").first();
+    await first.locator("summary").click();
+    await expect(first).toHaveAttribute("open", "");
+    await expect(first.locator("p")).toBeVisible();
+    expect(await page.locator('script[type="application/ld+json"]').allTextContents()).toContainEqual(
+      expect.stringContaining('"FAQPage"'),
+    );
   });
 
   test("every service page renders its own title, h1, and faq", async ({ page }) => {
@@ -194,8 +287,8 @@ test.describe("utility pages", () => {
     }
   });
 
-  test("home, about, and service pages have their own share image", async ({ page, request }) => {
-    for (const path of ["/", "/about/", `/services/${services[0].slug}/`]) {
+  test("home, about, faq, and service pages have their own share image", async ({ page, request }) => {
+    for (const path of ["/", "/about/", "/faq/", `/services/${services[0].slug}/`]) {
       await page.goto(path);
       const og = await page.locator('meta[property="og:image"]').getAttribute("content");
       expect(og).toMatch(/\/og\/[a-z0-9-]+\.png$/);

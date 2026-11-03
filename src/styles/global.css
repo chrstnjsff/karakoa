@@ -1,73 +1,47 @@
 @import "tailwindcss";
 
-/* Dark mode driven by a class on <html>, set pre-paint in Base.astro */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ---------------------------------------------------------------
-   Palette: taken from the boat mascot. Light mode is the mint sky
-   of the primary logo, dark mode the navy night version. Coral is
-   the single accent in both. RGB triplets so Tailwind can apply
-   opacity modifiers (e.g. text-ink/60). Every text pair below
-   clears 4.5:1 on its background.
+   Palette, taken from the logo: navy base, coral sail, sand hull,
+   gold trim, teal waves, on warm cream. `static` keeps every token
+   in the output, because component styles read them as CSS vars.
    --------------------------------------------------------------- */
-:root {
-  /* native scrollbars, form controls and autofill follow the theme */
-  color-scheme: light;
-  --bg: 221 243 238; /* #ddf3ee mint */
-  --surface: 255 255 255;
-  --ink: 16 50 74; /* #10324a navy, 11.5:1 on mint */
-  --muted: 63 90 108; /* #3f5a6c, 6.3:1 on mint */
-  --line: 16 50 74;
-  --accent: 217 58 34; /* #d93a22 coral, buttons: white text 4.6:1 */
-  --accent-text: 180 46 26; /* #b42e1a, 5.4:1 on mint */
-  --teal: 42 157 155; /* #2a9d9b wave */
-  --teal-text: 23 109 107; /* #176d6b, 5.3:1 on mint */
-  --sand: 227 167 91; /* #e3a75b hull */
-  --pale: 244 213 141; /* #f4d58d deck */
-  --danger: 180 46 26;
-  --success: 23 109 107;
-  --sel-bg: #10324a;
-  --sel-fg: #ddf3ee;
-}
+@theme static {
+  --font-sans: "Roboto Variable", Roboto, Arial, Helvetica, sans-serif;
+  --font-display: "Roboto Variable", Roboto, Arial, Helvetica, sans-serif;
 
-.dark {
-  color-scheme: dark;
-  --bg: 12 42 63; /* #0c2a3f night */
-  --surface: 18 56 79; /* #12384f */
-  --ink: 255 255 255;
-  --muted: 169 194 207; /* #a9c2cf, 8.0:1 on navy */
-  --line: 255 255 255;
-  --accent: 240 85 58; /* #f0553a sail */
-  --accent-text: 255 122 96; /* #ff7a60, 5.8:1 on navy */
-  --teal: 60 196 191; /* #3cc4bf */
-  --teal-text: 60 196 191; /* 6.9:1 on navy */
-  --danger: 255 122 96;
-  --success: 60 196 191;
-  --sel-bg: #f4d58d;
-  --sel-fg: #0c2a3f;
-}
+  --color-navy: #0b2c44; /* primary brand base, headings */
+  --color-deep: #061e2e; /* darker navy, contact field */
+  --color-coral: #f15a3c; /* logo sail; marks on navy */
+  --color-coral-600: #d4421f; /* primary button fill (white text 4.6:1) */
+  --color-coral-700: #b9381a; /* coral text and links on light, button hover */
+  --color-sand: #e3a75b; /* logo hull */
+  --color-gold: #f4d58d; /* logo trim; stars */
+  --color-teal: #3cc4bf; /* logo waves */
 
-@theme inline {
-  --color-bg: rgb(var(--bg));
-  --color-surface: rgb(var(--surface));
-  --color-ink: rgb(var(--ink));
-  --color-muted: rgb(var(--muted));
-  --color-line: rgb(var(--line));
-  --color-accent: rgb(var(--accent));
-  --color-accent-text: rgb(var(--accent-text));
-  --color-teal: rgb(var(--teal));
-  --color-teal-text: rgb(var(--teal-text));
-  --color-sand: rgb(var(--sand));
-  --color-pale: rgb(var(--pale));
-  --color-danger: rgb(var(--danger));
-  --color-success: rgb(var(--success));
+  --color-cream: #f8f6f2; /* page */
+  --color-paper: #ffffff; /* cards and panels */
+  --color-wash: #f1ede6; /* quiet fills */
+  --color-line: #e6e1d8; /* borders */
+  --color-body: #3d4a54; /* body text on light */
+  --color-muted: #5f6b75; /* secondary text on light, 5.2:1 on cream */
+  --color-foam: #f3eee4; /* text on navy */
+  --color-mist: #a9b6c1; /* secondary text on navy */
 
-  --font-sans: "Nunito Sans Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Fredoka Variable", "Nunito Sans Variable", ui-rounded, system-ui, sans-serif;
+  /* Role names the inner pages use, mapped onto the palette */
+  --color-ink: #0b2c44;
+  --color-bg: #f8f6f2;
+  --color-surface: #ffffff;
+  --color-accent: #d4421f;
+  --color-accent-text: #b9381a;
+  --color-teal-text: #13665b;
+  --color-pale: #f4d58d;
+  --color-danger: #b9381a;
+  --color-success: #13665b;
 }
 
 /* ---------------------------------------------------------------
-   Type scale - one ramp, each step paired with its line height.
+   Type scale for the inner pages: one ramp, each step paired with
+   its line height.
    --------------------------------------------------------------- */
 @theme {
   /* Smallest phones (320 to 359px) sit below xs */
@@ -77,8 +51,8 @@
   --text-caption--line-height: 1.5;
   --text-footnote: 0.9375rem;
   --text-footnote--line-height: 1.55;
-  --text-body: 1.0625rem;
-  --text-body--line-height: 1.6;
+  --text-copy: 1.0625rem;
+  --text-copy--line-height: 1.6;
   --text-callout: 1.1875rem;
   --text-callout--line-height: 1.55;
   --text-headline: 1.25rem;
@@ -91,12 +65,11 @@
   --text-title1--line-height: 1.1;
   --text-large: 3rem;
   --text-large--line-height: 1.04;
-  --text-huge: 3.75rem;
-  --text-huge--line-height: 1.02;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --radius-card: 1rem;
-  --radius-control: 0.75rem;
+  /* power3.out and back.out(2) */
+  --ease-reveal: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-pop: cubic-bezier(0.34, 1.7, 0.64, 1);
 }
 
 /* ---------------------------------------------------------------
@@ -104,29 +77,26 @@
    --------------------------------------------------------------- */
 html {
   scroll-behavior: smooth;
-  /* offset anchor targets for the sticky header */
+  /* anchor targets clear the 64px sticky header */
   scroll-padding-top: 5rem;
 }
 
 body {
-  background-color: rgb(var(--bg));
-  color: rgb(var(--ink));
+  background-color: var(--color-cream);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-synthesis-weight: none;
 }
 
 @layer base {
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
+    color: var(--color-navy);
     text-wrap: balance;
-  }
-  h1,
-  h2 {
-    letter-spacing: -0.015em;
   }
   p,
   li {
@@ -135,42 +105,175 @@ body {
 }
 
 ::selection {
-  background: var(--sel-bg);
-  color: var(--sel-fg);
+  background: var(--color-navy);
+  color: var(--color-foam);
 }
 
 :focus-visible {
-  outline: 2px solid rgb(var(--accent));
+  outline: 2px solid var(--color-navy);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-/* Tabular figures keep the stats row and result chips steady */
+.on-dark :focus-visible {
+  outline-color: var(--color-gold);
+}
+
+/* Anything a script reveals must stay hidden even if a class sets display */
+[hidden] {
+  display: none !important;
+}
+
 .tnum {
   font-variant-numeric: tabular-nums;
 }
 
 /* ---------------------------------------------------------------
-   Scroll reveal: a short rise, toggled by one IntersectionObserver.
-   Hidden only once JS is known to run (the head script adds .js),
-   so the page never renders blank without JavaScript.
+   Shared pieces from the approved design
+   --------------------------------------------------------------- */
+@layer components {
+  .label {
+    @apply text-sm font-medium text-coral-700;
+  }
+  .h2 {
+    @apply text-[30px] leading-[1.15] font-semibold tracking-[-0.02em] sm:text-[40px];
+  }
+  .lead {
+    @apply text-[17px] leading-relaxed text-body sm:text-lg;
+  }
+  .meta {
+    @apply text-sm text-muted;
+  }
+
+  /* Buttons: one height, a label too long for a narrow screen wraps */
+  .btn-primary,
+  .btn-ghost,
+  .btn-ghost-dark {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-1.5 text-center text-[15px] font-medium transition-colors;
+    text-wrap: balance;
+  }
+  .btn-primary {
+    @apply bg-coral-600 text-white hover:bg-coral-700;
+  }
+  .btn-ghost {
+    @apply border border-line bg-paper text-navy hover:border-navy/30;
+  }
+  .btn-ghost-dark {
+    @apply border border-white/20 text-foam hover:border-white/35 hover:bg-white/8;
+  }
+  .btn-link {
+    @apply inline-flex items-center gap-1.5 text-[15px] font-medium text-coral-700 underline-offset-4 hover:underline;
+  }
+  [aria-disabled="true"]:is(.btn-primary, .btn-ghost) {
+    @apply cursor-progress opacity-75;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-paper px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-body;
+  }
+
+  /* Inner pages: a white card with a hairline border, no resting shadow */
+  .card {
+    @apply rounded-xl border border-line bg-paper;
+    transition:
+      border-color 0.25s ease,
+      translate 0.3s var(--ease-out-soft);
+  }
+  .card-lift:hover {
+    @apply border-navy/30;
+    translate: 0 -2px;
+  }
+
+  .eyebrow {
+    @apply text-sm font-medium text-coral-700;
+  }
+
+  /* Link underline that grows from the left on hover */
+  .link-ul {
+    background-image: linear-gradient(var(--color-coral-600), var(--color-coral-600));
+    background-size: 0% 1.5px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.2s;
+  }
+  .link-ul:hover {
+    background-size: 100% 1.5px;
+    color: var(--color-coral-700);
+  }
+}
+
+/* Press feedback: controls settle slightly under the finger */
+.press {
+  transition: scale 120ms var(--ease-out-soft);
+}
+.press:active {
+  scale: 0.97;
+}
+
+/* Header links; the section in view gets a coral underline */
+.nav a {
+  @apply rounded-md px-3 py-2 text-[15px] font-medium text-mist transition-colors hover:text-white;
+}
+.nav a[aria-current="true"] {
+  @apply text-white;
+  border-radius: 0;
+  box-shadow: inset 0 -2px 0 var(--color-coral);
+}
+
+.ico {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.ico svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Live dot: a soft ring that keeps widening */
+.beacon::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.3;
+  animation: beacon 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes beacon {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Base.astro toggles .idle on [data-loop] elements while they are off screen */
+.idle,
+.idle * {
+  animation-play-state: paused !important;
+}
+
+/* ---------------------------------------------------------------
+   Scroll reveal: a short rise. Hidden only once JS is known to run
+   (the head script adds .js), so the page never renders blank
+   without JavaScript. Items revealed together stagger by --stagger.
    --------------------------------------------------------------- */
 .reveal {
   transition:
-    opacity 0.55s var(--ease-out-soft),
-    transform 0.55s var(--ease-out-soft);
+    opacity 0.6s var(--ease-reveal) var(--stagger, 0s),
+    transform 0.6s var(--ease-reveal) var(--stagger, 0s);
 }
-
 .js .reveal:not(.in) {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(20px);
 }
 
-.d1 { transition-delay: 60ms; }
-.d2 { transition-delay: 120ms; }
-.d3 { transition-delay: 180ms; }
-.d4 { transition-delay: 240ms; }
-.d5 { transition-delay: 300ms; }
+.d1 { --stagger: 60ms; }
+.d2 { --stagger: 120ms; }
+.d3 { --stagger: 180ms; }
+.d4 { --stagger: 240ms; }
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -182,6 +285,11 @@ body {
     transform: none;
     transition: none;
   }
+  .press:active,
+  .card-lift:hover {
+    scale: none;
+    translate: none;
+  }
   *,
   *::before,
   *::after {
@@ -192,415 +300,18 @@ body {
 }
 
 /* ---------------------------------------------------------------
-   Link underline that grows from the left on hover
-   --------------------------------------------------------------- */
-.link-ul {
-  background-image: linear-gradient(rgb(var(--accent)), rgb(var(--accent)));
-  background-size: 0% 1.5px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  transition: background-size 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s;
-}
-
-.link-ul:hover {
-  background-size: 100% 1.5px;
-  color: rgb(var(--accent-text));
-}
-
-/* ---------------------------------------------------------------
-   Press feedback - controls settle slightly under the finger.
-   --------------------------------------------------------------- */
-.press {
-  transition: scale 120ms var(--ease-out-soft);
-}
-
-.press:active {
-  scale: 0.97;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .press:active {
-    scale: none;
-  }
-}
-
-/* ---------------------------------------------------------------
-   Header material - translucent where the platform can blur behind
-   it, solid when blur is missing or the reader asked for less
-   transparency or more contrast.
-   --------------------------------------------------------------- */
-.material-bar {
-  background-color: rgb(var(--bg));
-}
-
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .material-bar {
-    background-color: rgb(var(--bg) / 0.82);
-    -webkit-backdrop-filter: saturate(180%) blur(16px);
-    backdrop-filter: saturate(180%) blur(16px);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .material-bar {
-    background-color: rgb(var(--bg));
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-  .material-bar {
-    background-color: rgb(var(--bg));
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    border-color: rgb(var(--line) / 0.45);
-  }
-}
-
-/* ---------------------------------------------------------------
-   Header nav links: the section in view lights its link.
-   --------------------------------------------------------------- */
-[data-nav-link] {
-  transition: color 0.2s ease;
-}
-
-[data-nav-link]:hover,
-[data-nav-link][aria-current] {
-  color: rgb(var(--ink));
-}
-
-/* ---------------------------------------------------------------
-   Three-state theme switcher (system / light / dark)
-   --------------------------------------------------------------- */
-.theme-opt {
-  display: inline-flex;
-  height: 32px;
-  width: 32px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  color: rgb(var(--muted));
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.theme-opt svg {
-  height: 0.9rem;
-  width: 0.9rem;
-}
-
-.theme-opt:hover {
-  color: rgb(var(--ink));
-}
-
-/* 44pt minimum hit area on touch screens */
-@media (pointer: coarse) {
-  .theme-opt {
-    height: 44px;
-    width: 44px;
-  }
-}
-
-.theme-opt[aria-pressed="true"] {
-  background-color: rgb(var(--ink) / 0.08);
-  color: rgb(var(--ink));
-}
-
-/* ---------------------------------------------------------------
-   Theme switching: a soft cross-fade via the View Transitions API
-   (the toggle script wraps the class change in startViewTransition).
-   --------------------------------------------------------------- */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.45s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Fallback for browsers without view transitions: ease the colors */
-html.theme-fade,
-html.theme-fade body,
-html.theme-fade * {
-  transition:
-    background-color 0.35s ease,
-    border-color 0.35s ease,
-    color 0.35s ease,
-    fill 0.35s ease,
-    stroke 0.35s ease !important;
-}
-
-/* ---------------------------------------------------------------
-   Quiet scrollbar
-   --------------------------------------------------------------- */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(var(--muted) / 0.35) transparent;
-}
-
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: rgb(var(--muted) / 0.35);
-  border-radius: 4px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--muted) / 0.6);
-}
-
-@layer components {
-/* ---------------------------------------------------------------
-   Cards: a rounded surface with a hairline border. Hover lifts a
-   touch and deepens the border; no shadows in the resting state.
-   --------------------------------------------------------------- */
-.card {
-  border: 1px solid rgb(var(--line) / 0.12);
-  border-radius: var(--radius-card);
-  background-color: rgb(var(--surface));
-  transition:
-    border-color 0.25s ease,
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dark .card {
-  border-color: rgb(var(--line) / 0.1);
-}
-
-.card-lift:hover {
-  border-color: rgb(var(--line) / 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -18px rgb(16 50 74 / 0.45);
-}
-
-.dark .card-lift:hover {
-  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.7);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card-lift:hover {
-    transform: none;
-  }
-}
-
-/* Small label above headings and inside cards */
-.eyebrow {
-  font-family: var(--font-display);
-  font-size: var(--text-caption);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgb(var(--teal-text));
-}
-
-/* Outcome chip that closes a work card */
-.chip {
-  display: inline-block;
-  border: 1px solid rgb(var(--line) / 0.14);
-  border-radius: 9999px;
-  background-color: rgb(var(--ink) / 0.04);
-  padding: 0.1rem 0.6rem;
-  font-size: var(--text-caption);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.7;
-  color: rgb(var(--ink));
-  white-space: nowrap;
-}
-
-/* ---------------------------------------------------------------
-   Wave divider: the mascot's teal wave, repeated as a CSS mask so
-   it follows the theme and costs no image request.
-   --------------------------------------------------------------- */
-.wave {
-  height: 10px;
-  width: 100%;
-  background-color: rgb(var(--teal));
-  opacity: 0.8;
-  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 10'><path d='M0 5c5-5 10-5 15 0s10 5 15 0 7.5-2.5 10 0' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'/></svg>");
-  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 10'><path d='M0 5c5-5 10-5 15 0s10 5 15 0 7.5-2.5 10 0' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'/></svg>");
-  -webkit-mask-repeat: repeat-x;
-  mask-repeat: repeat-x;
-  -webkit-mask-size: 40px 10px;
-  mask-size: 40px 10px;
-}
-
-/* ---------------------------------------------------------------
-   Buttons: rounded, display face, at least 44px tall. A label too
-   long for a narrow screen wraps centered and balanced, with room
-   above and below; single-line buttons keep their min-height.
-   --------------------------------------------------------------- */
-.btn {
-  display: inline-flex;
-  min-height: 2.875rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  padding: 0.5rem 1.25rem;
-  font-family: var(--font-display);
-  font-size: var(--text-body);
-  font-weight: 500;
-  text-align: center;
-  text-wrap: balance;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    border-color 0.2s,
-    color 0.2s,
-    opacity 0.2s,
-    scale 120ms var(--ease-out-soft);
-}
-
-.btn-primary {
-  border-color: rgb(var(--accent));
-  background-color: rgb(var(--accent));
-  color: #ffffff;
-}
-
-.btn-primary:hover {
-  background-color: rgb(var(--accent-text));
-  border-color: rgb(var(--accent-text));
-}
-
-.dark .btn-primary {
-  background-color: rgb(217 58 34);
-  border-color: rgb(217 58 34);
-}
-
-.dark .btn-primary:hover {
-  background-color: rgb(240 85 58);
-  border-color: rgb(240 85 58);
-}
-
-.btn-secondary {
-  border-color: rgb(var(--line) / 0.3);
-  background-color: rgb(var(--surface) / 0.6);
-  color: rgb(var(--ink));
-}
-
-.btn-secondary:hover {
-  border-color: rgb(var(--ink));
-  background-color: rgb(var(--surface));
-}
-
-.btn[aria-disabled="true"] {
-  cursor: progress;
-  opacity: 0.6;
-}
-
-/* ---------------------------------------------------------------
-   Form fields: 16px text so iOS never zooms on focus, 44px targets,
-   an accent focus ring, and a red edge plus message when invalid.
-   --------------------------------------------------------------- */
-.field-label {
-  display: block;
-  margin-bottom: 0.4rem;
-  font-size: var(--text-footnote);
-  font-weight: 600;
-  color: rgb(var(--ink));
-}
-
-.field-input {
-  display: block;
-  width: 100%;
-  min-height: 2.875rem;
-  border: 1px solid rgb(var(--line) / 0.2);
-  border-radius: var(--radius-control);
-  background-color: rgb(var(--surface));
-  padding: 0.625rem 0.875rem;
-  font-size: var(--text-body);
-  line-height: 1.5;
-  color: rgb(var(--ink));
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-.field-input:hover {
-  border-color: rgb(var(--line) / 0.38);
-}
-
-.field-input:focus-visible {
-  outline: none;
-  border-color: rgb(var(--accent));
-  box-shadow: 0 0 0 3px rgb(var(--accent) / 0.2);
-}
-
-.field-input[aria-invalid="true"] {
-  border-color: rgb(var(--danger));
-}
-
-/* A long option ends in an ellipsis instead of a clipped word */
-.field-select {
-  appearance: none;
-  padding-right: 2.5rem;
-  text-overflow: ellipsis;
-  cursor: pointer;
-}
-
-.dark .field-select option {
-  background-color: rgb(var(--bg));
-}
-
-.field-textarea {
-  min-height: 9rem;
-  resize: vertical;
-}
-
-.field-error {
-  margin-top: 0.4rem;
-  font-size: var(--text-footnote);
-  color: rgb(var(--danger));
-}
-
-.contact-alert {
-  border-left: 3px solid rgb(var(--danger));
-  border-radius: 0 var(--radius-control) var(--radius-control) 0;
-  background-color: rgb(var(--danger) / 0.08);
-  padding: 0.75rem 1rem;
-  font-size: var(--text-footnote);
-  color: rgb(var(--ink));
-}
-
-.contact-alert:empty {
-  display: none;
-}
-
-@media (prefers-contrast: more) {
-  .field-input {
-    border-color: rgb(var(--line) / 0.6);
-  }
-  .card {
-    border-color: rgb(var(--line) / 0.5);
-  }
-}
-}
-
-/* ---------------------------------------------------------------
    FAQ disclosure on native <details>: eased open where supported.
    --------------------------------------------------------------- */
 .disclosure > summary {
   list-style: none;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
-
 .disclosure > summary::-webkit-details-marker {
   display: none;
 }
-
 .disclosure-chevron {
   transition: rotate 240ms var(--ease-out-soft);
 }
-
 .disclosure[open] .disclosure-chevron {
   rotate: 180deg;
 }
@@ -621,7 +332,6 @@ html.theme-fade * {
       block-size 240ms var(--ease-out-soft),
       opacity 240ms var(--ease-out-soft);
   }
-
   .disclosure[open]::details-content {
     block-size: auto;
     opacity: 1;
@@ -629,50 +339,48 @@ html.theme-fade * {
 }
 
 /* ---------------------------------------------------------------
-   Prose: the privacy page body.
+   Prose: guide and privacy bodies.
    --------------------------------------------------------------- */
 @layer components {
   .prose {
-    font-size: var(--text-body);
+    font-size: var(--text-copy);
     line-height: 1.7;
-    color: rgb(var(--muted));
+    color: var(--color-body);
   }
-
   .prose > * + * {
     margin-top: 1rem;
   }
-
   .prose strong {
-    font-weight: 700;
-    color: rgb(var(--ink));
+    font-weight: 600;
+    color: var(--color-navy);
   }
-
   .prose a {
-    color: rgb(var(--ink));
+    color: var(--color-navy);
     text-decoration: underline;
-    text-decoration-color: rgb(var(--line) / 0.3);
+    text-decoration-color: color-mix(in srgb, var(--color-navy) 30%, transparent);
     text-underline-offset: 3px;
     transition: text-decoration-color 0.2s;
   }
-
   .prose a:hover {
-    text-decoration-color: rgb(var(--accent));
+    text-decoration-color: var(--color-coral-600);
   }
-
   .prose h2 {
     margin-top: 2rem;
     font-size: var(--text-title3);
     line-height: var(--text-title3--line-height);
     font-weight: 600;
-    color: rgb(var(--ink));
   }
-
   .prose ul {
     list-style: disc;
     padding-left: 1.25rem;
   }
-
   .prose li + li {
     margin-top: 0.4rem;
   }
+}
+
+/* Quiet scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-muted) 35%, transparent) transparent;
 }

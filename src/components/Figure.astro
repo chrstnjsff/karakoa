@@ -1,0 +1,19 @@
+---
+import type { Figure } from "../data/site";
+
+interface Props {
+  figure: Figure;
+  suffixClass: string;
+}
+const { figure, suffixClass } = Astro.props;
+const decimals = figure.decimals ?? 0;
+const value = figure.count.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+---
+
+<span data-count={figure.count} data-decimals={decimals || undefined} data-count-on-view>{value}</span>{
+  figure.suffix && <span class={suffixClass}>{figure.suffix}</span>
+}
+
+<script>
+  import "../scripts/counters.ts";
+</script>

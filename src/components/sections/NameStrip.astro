@@ -1,0 +1,16 @@
+---
+import Icon from "../Icon.astro";
+import MascotSvg from "../MascotSvg.astro";
+import { nameStrip } from "../../data/site";
+---
+
+<section class="mx-auto max-w-6xl px-5 pb-20" aria-labelledby="name-title">
+  <div class="reveal grid items-center gap-6 rounded-xl bg-wash p-6 sm:grid-cols-[100px_1fr_auto] sm:p-8">
+    <div class="w-20 sm:w-24" data-loop><MascotSvg id="name" /></div>
+    <div>
+      <h2 id="name-title" class="label">{nameStrip.eyebrow}</h2>
+      <p class="mt-2 text-xl leading-snug font-medium tracking-[-0.01em] text-navy sm:text-[22px]">{nameStrip.line}</p>
+    </div>
+    <a href={nameStrip.cta.href} class="btn-ghost">{nameStrip.cta.label} <Icon name="arrow" class="size-4" /></a>
+  </div>
+</section>

@@ -1,76 +1,50 @@
 ---
 import Logo from "./Logo.astro";
-import { SITE, NAV, footer, services } from "../data/site";
+import { SITE, PAGES, founder, services } from "../data/site";
 
 const year = new Date().getFullYear();
-const isHome = Astro.url.pathname === "/";
-const link = (href: string) => (href.startsWith("#") && !isHome ? `/${href}` : href);
+const pages = [...PAGES, { href: "/about/", label: "About" }, { href: "/privacy/", label: "Privacy" }];
 ---
 
-<footer class="border-t border-line/10">
-  <div class="wave" aria-hidden="true"></div>
-  <div class="mx-auto max-w-6xl px-5 py-12 sm:px-6">
-    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1.2fr_0.8fr_0.8fr]">
-      <div>
-        <Logo size={28} />
-        <p class="mt-4 max-w-sm text-footnote text-muted">{footer.line}</p>
-        <p class="mt-3 text-footnote text-muted">{SITE.location.label}</p>
-      </div>
-      <nav aria-label="Services">
-        <p class="eyebrow">Services</p>
-        <ul class="mt-3 -ml-2">
-          {
-            services.map((s) => (
-              <li>
-                <a href={`/services/${s.slug}/`} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
-                  {s.title}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-      <nav aria-label="Footer sections">
-        <p class="eyebrow">Site</p>
-        <ul class="mt-3 -ml-2">
-          {
-            NAV.map((n) => (
-              <li>
-                <a href={link(n.href)} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
-                  {n.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-      <nav aria-label="Footer links">
-        <p class="eyebrow">More</p>
-        <ul class="mt-3 -ml-2">
-          <li>
-            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink">
-              {SITE.email}
-            </a>
-          </li>
-          {
-            footer.links.map((l) => (
-              <li>
-                <a
-                  href={l.href}
-                  target={l.external ? "_blank" : undefined}
-                  rel={l.external ? "noopener" : undefined}
-                  class="inline-flex min-h-10 items-center px-2 py-2 text-footnote font-semibold text-muted hover:text-ink"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+<footer class="border-t border-line">
+  <div class="mx-auto max-w-6xl px-5 py-10">
+    <div class="flex flex-wrap items-center gap-x-8 gap-y-4 text-sm text-muted">
+      <a href="/" class="flex min-h-11 items-center" aria-label={`${SITE.domain}, home`}><Logo /></a>
+      <span>{SITE.location.label}</span>
+      <nav class="flex flex-wrap gap-x-6 gap-y-1 sm:ml-auto" aria-label="Footer">
+        {pages.map((p) => <a href={p.href} class="inline-flex min-h-11 items-center hover:text-navy">{p.label}</a>)}
       </nav>
     </div>
-    <p class="mt-10 border-t border-line/10 pt-5 text-caption text-muted">
-      © {year} {SITE.name}. Founder-led software studio, {SITE.location.label}.
-    </p>
+
+    <nav class="mt-6 border-t border-line pt-5 text-sm text-muted" aria-label="Services">
+      <ul class="flex flex-wrap gap-x-5 gap-y-1">
+        {
+          services.map((s) => (
+            <li>
+              <a href={`/services/${s.slug}/`} class="inline-flex min-h-9 items-center hover:text-navy">
+                {s.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="mt-4 flex flex-col-reverse gap-x-8 gap-y-3 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-[13px]">&copy; {year} {SITE.name}. Founder-led software studio, {SITE.location.label}.</p>
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-1">
+        <li>
+          <a href={`mailto:${SITE.email}`} class="inline-flex min-h-9 items-center hover:text-navy">{SITE.email}</a>
+        </li>
+        {
+          founder.links.slice(1).map((l) => (
+            <li>
+              <a href={l.href} target="_blank" rel="noopener" class="inline-flex min-h-9 items-center hover:text-navy">
+                {l.label}<span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </footer>

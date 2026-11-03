@@ -1,38 +1,86 @@
 ---
-import SectionHeading from "../SectionHeading.astro";
-import type { ProcessStep } from "../../data/site";
+// The desktop course is driven by src/scripts/process.ts; without script,
+// or with reduced motion, the whole course shows.
+import MascotSvg from "../MascotSvg.astro";
+import { process, processSection } from "../../data/site";
 
-interface Props {
-  steps: ProcessStep[];
-}
-const { steps } = Astro.props;
+const route = "M20 110 C 140 30, 240 30, 260 80 S 400 150, 500 90 S 660 20, 740 80 S 900 140, 980 60";
+const num = (i: number) => String(i + 1).padStart(2, "0");
 ---
 
-<section id="process" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="process-title">
-  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
-    <SectionHeading
-      eyebrow="Process"
-      title="How a project runs"
-      lede="Understand the problem, shape the system, build deliberately, test thoroughly, and launch with support in place."
-    />
-    <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {
-        steps.map((s, i) => (
-          <li class={`reveal d${(i % 5) + 1} card flex flex-col p-5`}>
-            <span class="tnum font-display text-title2 font-semibold text-accent-text" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <h3 class="mt-2 text-headline font-semibold text-ink">
-              <span class="sr-only">Step {i + 1}: </span>
-              {s.title}
-            </h3>
-            <p class="mt-2 text-body text-muted">{s.body}</p>
-            <p class="mt-auto pt-4 text-caption text-muted">
-              <span class="font-semibold text-ink">You receive:</span> {s.deliverable}
-            </p>
-          </li>
-        ))
-      }
-    </ol>
+<section id="process" class="relative overflow-x-clip border-t border-line bg-cream" aria-labelledby="process-title" data-process>
+  <div class="process-pin">
+    <div class="mx-auto max-w-6xl px-5 py-24 sm:py-28 lg:flex lg:min-h-screen lg:flex-col lg:justify-center">
+      <div class="reveal max-w-2xl">
+        <p class="label">{processSection.eyebrow}</p>
+        <h2 id="process-title" class="h2 mt-3">{processSection.title}</h2>
+        <p class="lead mt-4 max-w-xl">{processSection.lede}</p>
+      </div>
+
+      <div class="relative mt-16 hidden lg:block" data-chart>
+        <svg viewBox="0 0 1000 160" class="w-full overflow-visible" aria-hidden="true">
+          <path
+            d={route}
+            fill="none"
+            stroke="#0b2c44"
+            stroke-opacity=".22"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-dasharray="2 7"></path>
+          <path data-route d={route} pathLength="1" fill="none" stroke="#d4421f" stroke-width="2" stroke-linecap="round"></path>
+          <g data-waypoints></g>
+        </svg>
+        <div class="invisible absolute top-0 left-0 w-16" data-boat>
+          <MascotSvg id="boat" />
+        </div>
+        <ol class="mt-12 grid grid-cols-5 gap-6">
+          {
+            process.map((step, i) => (
+              <li class="step border-t-2 border-line pt-5" data-step={i}>
+                <p class="text-sm font-medium text-coral-700 tabular-nums">{num(i)}</p>
+                <h3 class="mt-1 text-lg font-semibold">{step.title}</h3>
+                <p class="mt-1 text-sm text-muted">{step.deliverable}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <ol class="mt-10 divide-y divide-line rounded-xl border border-line bg-paper lg:hidden">
+        {
+          process.map((step, i) => (
+            <li class="reveal flex items-baseline gap-4 p-4 sm:p-5">
+              <span class="text-sm font-medium text-coral-700 tabular-nums">{num(i)}</span>
+              <div>
+                <p class="text-[17px] font-semibold text-navy">{step.title}</p>
+                <p class="text-sm text-muted">{step.deliverable}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </div>
 </section>
+
+<style is:global>
+  [data-process][data-pinned] .process-pin {
+    position: sticky;
+    top: 0;
+  }
+  .step {
+    transition:
+      opacity 0.15s,
+      border-color 0.15s;
+  }
+  .js [data-pinned] .step:not(.on) {
+    opacity: 0.4;
+  }
+  .step.on {
+    border-top-color: #d4421f;
+  }
+</style>
+
+<script>
+  import "../../scripts/process.ts";
+</script>

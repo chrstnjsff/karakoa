@@ -44,7 +44,7 @@ const aboutLd = {
       <div>
         <section aria-labelledby="name-title">
           <h2 id="name-title" class="text-title2 font-semibold text-ink">Why the name</h2>
-          <p class="mt-3 text-body text-muted">{aboutPage.nameStory}</p>
+          <p class="mt-3 text-copy text-muted">{aboutPage.nameStory}</p>
         </section>
 
         <section class="mt-12" aria-labelledby="how-title">
@@ -52,7 +52,7 @@ const aboutLd = {
           <ul class="mt-4 space-y-3">
             {
               aboutPage.howWeWork.map((p) => (
-                <li class="flex gap-3 text-body text-muted">
+                <li class="flex gap-3 text-copy text-muted">
                   <Icon name="check" class="mt-1.5 h-4 w-4 shrink-0 text-teal-text" />
                   <span>{p}</span>
                 </li>
@@ -67,7 +67,7 @@ const aboutLd = {
             {
               services.map((s) => (
                 <li>
-                  <a href={`/services/${s.slug}/`} class="btn btn-secondary press min-h-10 px-3.5 text-footnote">
+                  <a href={`/services/${s.slug}/`} class="btn-ghost min-h-10 px-3.5 text-footnote">
                     {s.title}
                   </a>
                 </li>
@@ -95,7 +95,7 @@ const aboutLd = {
           <p class="eyebrow">{founder.eyebrow}</p>
           <h2 id="founder-title" class="mt-3 text-title3 font-semibold text-ink">{founder.name}</h2>
           <p class="mt-1 text-footnote font-semibold text-accent-text">{founder.role}</p>
-          <p class="mt-4 text-body text-muted">{founder.bio}</p>
+          <p class="mt-4 text-copy text-muted">{founder.bio}</p>
           <p class="mt-3 text-footnote text-muted">{founder.note}</p>
           <h3 class="eyebrow mt-6">Certifications</h3>
           <ul class="mt-2 space-y-1 text-footnote text-ink">
@@ -109,7 +109,7 @@ const aboutLd = {
             {
               founder.links.map((l) => (
                 <li>
-                  <a href={l.href} target="_blank" rel="noopener" class="btn btn-secondary press min-h-10 px-3.5 text-footnote">
+                  <a href={l.href} target="_blank" rel="noopener" class="btn-ghost min-h-10 px-3.5 text-footnote">
                     <Icon name={l.icon} class="h-4 w-4" />
                     {l.label}
                     <Icon name="external" class="h-3.5 w-3.5 text-muted" />
@@ -123,11 +123,11 @@ const aboutLd = {
     </div>
 
     <section class="card mt-14 p-6 sm:p-8" aria-labelledby="cta-title">
-      <h2 id="cta-title" class="text-title3 font-semibold text-ink">Tell us what you are building</h2>
-      <p class="mt-2 text-body text-muted">You get a reply within one working day with a recommended way to start.</p>
+      <h2 id="cta-title" class="text-title3 font-semibold text-ink">Tell us what you are building.</h2>
+      <p class="mt-2 text-copy text-muted">You get a reply within one working day with a recommended way to start.</p>
       <div class="mt-6 flex flex-wrap gap-3">
-        <a href="/#contact" class="btn btn-primary press">Send an inquiry</a>
-        <a href={`mailto:${SITE.email}`} class="btn btn-secondary press">{SITE.email}</a>
+        <a href="/#message" class="btn-primary"><Icon name="mail" class="size-4" />Send a message</a>
+        <a href={`mailto:${SITE.email}`} class="btn-ghost">{SITE.email}</a>
       </div>
     </section>
   </article>

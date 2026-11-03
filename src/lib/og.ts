@@ -1,6 +1,7 @@
 // Build-time share images: satori lays out a small card as SVG, sharp
-// rasterises it to a 1200x630 PNG. Fonts come from the static Fontsource
-// packages (satori reads woff, not woff2) and the mark is the app icon.
+// rasterises it to a 1200x630 PNG in the site's navy, coral, and Roboto.
+// Fonts come from the static Fontsource package (satori reads woff, not
+// woff2) and the mark is the app icon.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import satori from "satori";
@@ -11,18 +12,18 @@ const root = process.cwd();
 const font = (pkg: string, file: string) => readFileSync(join(root, "node_modules", "@fontsource", pkg, "files", file));
 
 const fonts = [
-  { name: "Fredoka", data: font("fredoka", "fredoka-latin-600-normal.woff"), weight: 600 as const, style: "normal" as const },
-  { name: "Nunito Sans", data: font("nunito-sans", "nunito-sans-latin-600-normal.woff"), weight: 600 as const, style: "normal" as const },
-  { name: "Nunito Sans", data: font("nunito-sans", "nunito-sans-latin-400-normal.woff"), weight: 400 as const, style: "normal" as const },
+  { name: "Roboto", data: font("roboto", "roboto-latin-600-normal.woff"), weight: 600 as const, style: "normal" as const },
+  { name: "Roboto", data: font("roboto", "roboto-latin-500-normal.woff"), weight: 500 as const, style: "normal" as const },
+  { name: "Roboto", data: font("roboto", "roboto-latin-400-normal.woff"), weight: 400 as const, style: "normal" as const },
 ];
 
 const icon = `data:image/png;base64,${readFileSync(join(root, "src", "assets", "brand", "karakoa-app-icon.png")).toString("base64")}`;
 
-const navy = "#0c2a3f";
+const navy = "#0b2c44";
 const white = "#ffffff";
-const muted = "#a9c2cf";
-const coral = "#ff7a60";
-const teal = "#3cc4bf";
+const mist = "#a9b6c1";
+const coral = "#f4704f";
+const gold = "#f4d58d";
 
 export interface OgCard {
   /** Small label above the title, for example "Guide" or "Service". */
@@ -49,30 +50,30 @@ export async function renderOg(card: OgCard): Promise<Buffer> {
       padding: "64px 72px 56px",
       backgroundColor: navy,
       color: white,
-      fontFamily: "Nunito Sans",
+      fontFamily: "Roboto",
     },
     [
       h("div", { display: "flex", alignItems: "center", gap: 20 }, [
         { type: "img", props: { src: icon, width: 72, height: 72, style: { borderRadius: 18 } } },
-        h("div", { display: "flex", fontFamily: "Fredoka", fontWeight: 600, fontSize: 40, letterSpacing: -0.5 }, [
+        h("div", { display: "flex", fontWeight: 600, fontSize: 40, letterSpacing: -0.4 }, [
           h("span", {}, "karakoa"),
-          h("span", { color: coral }, ".dev"),
+          h("span", { color: coral, fontWeight: 400 }, ".dev"),
         ]),
       ]),
       h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
         h(
           "div",
-          { fontSize: 22, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: teal },
+          { fontSize: 26, fontWeight: 500, color: gold },
           card.eyebrow,
         ),
         h(
           "div",
-          { fontFamily: "Fredoka", fontWeight: 600, fontSize: titleSize, lineHeight: 1.08, letterSpacing: -1, maxWidth: 1000 },
+          { fontWeight: 600, fontSize: titleSize, lineHeight: 1.08, letterSpacing: -1.5, maxWidth: 1000 },
           card.title,
         ),
       ]),
       h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 40 }, [
-        h("div", { fontSize: 24, color: muted, maxWidth: 820, lineHeight: 1.4 }, card.line),
+        h("div", { fontSize: 24, color: mist, maxWidth: 820, lineHeight: 1.4 }, card.line),
         h("div", { width: 120, height: 8, borderRadius: 4, backgroundColor: coral, flexShrink: 0 }),
       ]),
     ],

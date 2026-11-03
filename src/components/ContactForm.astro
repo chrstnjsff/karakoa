@@ -1,57 +1,36 @@
 ---
-// Web3Forms inquiry form, progressively enhanced:
-// - Without JS it is a plain HTML POST; Web3Forms answers with a 303
-//   to /contact/thanks/ (the `redirect` field, same-domain on the free plan).
-// - With JS (src/scripts/contact.ts) it validates inline, posts JSON,
-//   and swaps in a success panel without leaving the page.
-import { SITE, WEB3FORMS_ACCESS_KEY, contact } from "../data/site";
-
-const redirect = new URL("/contact/thanks/", SITE.url).href;
+// Posts to the Worker at /api/contact (worker/index.ts). Without script the
+// form still posts and the Worker answers with a page.
+import Icon from "./Icon.astro";
+import { TURNSTILE_SITE_KEY, contact } from "../data/site";
 ---
 
-<div class="reveal d2">
+<div id="message" class="scroll-mt-24">
   <form
-    action="https://api.web3forms.com/submit"
+    action="/api/contact"
     method="POST"
-    class="card p-5 sm:p-7"
+    class="msg rounded-xl bg-paper p-5 sm:p-7"
+    aria-labelledby="msg-title"
+    aria-describedby="msg-privacy"
     data-contact
-    aria-describedby="contact-privacy"
+    data-sitekey={TURNSTILE_SITE_KEY}
   >
-    <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
-    <input type="hidden" name="subject" value={`New inquiry from ${SITE.domain}`} />
-    <input type="hidden" name="from_name" value={SITE.domain} />
-    <input type="hidden" name="redirect" value={redirect} />
     <!-- honeypot: people never see or fill it, bots do -->
-    <input
-      type="checkbox"
-      name="botcheck"
-      class="hidden"
-      style="display: none"
-      tabindex="-1"
-      aria-hidden="true"
-    />
+    <input type="checkbox" name="botcheck" class="hidden" style="display: none" tabindex="-1" aria-hidden="true" />
 
-    <h3 class="text-title3 font-semibold text-ink">{contact.formTitle}</h3>
+    <h3 id="msg-title" class="text-[22px] font-semibold tracking-[-0.01em]">{contact.formTitle}</h3>
+    <p class="mt-1.5 text-[15px] text-muted">{contact.formLede}</p>
 
-    <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
       <div>
-        <label for="contact-name" class="field-label">Name</label>
-        <input
-          id="contact-name"
-          name="name"
-          type="text"
-          autocomplete="name"
-          required
-          maxlength="100"
-          class="field-input"
-          aria-describedby="contact-name-error"
-        />
-        <p id="contact-name-error" class="field-error" hidden></p>
+        <label for="msg-name" class="f-label">Name</label>
+        <input id="msg-name" name="name" type="text" autocomplete="name" required maxlength="100" class="f-in" aria-describedby="msg-name-error" />
+        <p id="msg-name-error" class="f-err" hidden></p>
       </div>
       <div>
-        <label for="contact-email" class="field-label">Email</label>
+        <label for="msg-email" class="f-label">Email</label>
         <input
-          id="contact-email"
+          id="msg-email"
           name="email"
           type="email"
           autocomplete="email"
@@ -59,91 +38,150 @@ const redirect = new URL("/contact/thanks/", SITE.url).href;
           spellcheck="false"
           required
           maxlength="254"
-          class="field-input"
-          aria-describedby="contact-email-error"
+          class="f-in"
+          aria-describedby="msg-email-error"
         />
-        <p id="contact-email-error" class="field-error" hidden></p>
-      </div>
-    </div>
-
-    <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
-      <div>
-        <label for="contact-service" class="field-label">What do you need?</label>
-        <div class="relative">
-          <select id="contact-service" name="service" class="field-input field-select">
-            {contact.services.map((s) => <option value={s}>{s}</option>)}
-          </select>
-          <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </div>
-      </div>
-      <div>
-        <label for="contact-scale" class="field-label">Project size</label>
-        <div class="relative">
-          <select id="contact-scale" name="scale" class="field-input field-select">
-            {contact.scales.map((s) => <option value={s}>{s}</option>)}
-          </select>
-          <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden="true">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        </div>
+        <p id="msg-email-error" class="f-err" hidden></p>
       </div>
     </div>
 
     <div class="mt-5">
-      <label for="contact-timeline" class="field-label">
-        Deadline or timeline <span class="font-normal text-muted">(optional)</span>
-      </label>
-      <input
-        id="contact-timeline"
-        name="timeline"
-        type="text"
-        maxlength="120"
-        class="field-input"
-        placeholder="e.g. defense in March, launch before December"
-      />
+      <label for="msg-type" class="f-label">Project type</label>
+      <div class="relative">
+        <select id="msg-type" name="service" required class="f-in" aria-describedby="msg-type-error">
+          <option value="">Choose one</option>
+          {contact.projectTypes.map((t) => <option>{t}</option>)}
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+      <p id="msg-type-error" class="f-err" hidden></p>
     </div>
 
     <div class="mt-5">
-      <label for="contact-message" class="field-label">Tell us about the project</label>
+      <label for="msg-body" class="f-label">Message</label>
       <textarea
-        id="contact-message"
+        id="msg-body"
         name="message"
-        rows="6"
+        rows="5"
         required
         minlength="10"
         maxlength="5000"
-        spellcheck="true"
-        class="field-input field-textarea"
-        placeholder="What it is, who it is for, what is blocking you, and what success looks like."
-        aria-describedby="contact-message-error"></textarea>
-      <p id="contact-message-error" class="field-error" hidden></p>
+        class="f-in"
+        placeholder={contact.messagePlaceholder}
+        aria-describedby="msg-body-error"></textarea>
+      <p id="msg-body-error" class="f-err" hidden></p>
     </div>
 
-    <div class="contact-alert mt-5" role="alert" id="contact-alert"></div>
+    <!-- Turnstile stays invisible unless Cloudflare needs the visitor to click -->
+    <div class="mt-5 empty:hidden" data-turnstile></div>
+
+    <div class="f-alert" role="alert" data-alert></div>
 
     <div class="mt-6 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <p id="contact-privacy" class="text-caption text-muted">
-        Delivered by Web3Forms. Your details are only used to reply to you.{" "}
-        <a href="/privacy/" class="link-ul text-ink">Privacy</a>
+      <p id="msg-privacy" class="text-[13px] leading-snug text-muted">
+        {contact.privacy} <a href="/privacy/" class="text-navy underline underline-offset-2">Privacy</a>
       </p>
-      <button type="submit" class="btn btn-primary press shrink-0" data-submit>Send project inquiry</button>
+      <button type="submit" class="btn-primary shrink-0" data-submit>
+        <Icon name="mail" class="size-4" /><span data-label>Send message</span>
+      </button>
     </div>
-    <p class="sr-only" role="status" aria-live="polite" id="contact-status"></p>
+    <p class="sr-only" role="status" aria-live="polite" data-status></p>
   </form>
 
-  <div id="contact-success" class="card p-5 sm:p-7" hidden>
-    <p class="eyebrow">Sent</p>
-    <h3 class="mt-3 text-title3 font-semibold text-ink outline-none" tabindex="-1" data-success-heading>
-      Inquiry sent
-    </h3>
-    <p class="mt-3 text-body text-muted" data-success-text>
+  <div class="msg rounded-xl bg-paper p-5 sm:p-7" hidden data-success>
+    <span class="inline-grid size-9 place-items-center rounded-full bg-[#dcf3ef] text-[#13665b]"><Icon name="check" class="size-4" /></span>
+    <h3 tabindex="-1" class="mt-4 text-[22px] font-semibold tracking-[-0.01em] outline-none" data-success-heading>Message sent</h3>
+    <p class="mt-2 text-[15px] leading-relaxed" data-success-text>
       Thanks for reaching out. We reply to the email address you gave within one working day.
     </p>
-    <button type="button" class="btn btn-secondary press mt-6" data-send-another>Send another inquiry</button>
+    <button type="button" class="btn-ghost mt-6" data-send-another>Send another message</button>
   </div>
 </div>
+
+<style is:global>
+  .msg {
+    color: #3d4a54;
+  }
+  .msg :focus-visible {
+    outline-color: var(--color-navy);
+  }
+  .msg .f-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-navy);
+  }
+  .msg .f-in {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d9d2c6;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 16px;
+    color: var(--color-navy);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .msg textarea.f-in {
+    height: auto;
+    min-height: 128px;
+    padding: 10px 12px;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  .msg select.f-in {
+    appearance: none;
+    padding-right: 38px;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .msg select.f-in:invalid {
+    color: #6b747c;
+  }
+  .msg .f-in::placeholder {
+    color: #6b747c;
+  }
+  .msg .f-in:hover {
+    border-color: #bfb6a8;
+  }
+  .msg .f-in:focus {
+    outline: none;
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgba(11, 44, 68, 0.12);
+  }
+  .msg .f-in[aria-invalid="true"] {
+    border-color: var(--color-coral-700);
+  }
+  .msg .f-err {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--color-coral-700);
+  }
+  .msg .f-alert:empty {
+    display: none;
+  }
+  .msg .f-alert {
+    margin-top: 18px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #fbeae5;
+    font-size: 14px;
+    color: #8f2c14;
+  }
+  .msg .f-alert a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .msg [data-submit][aria-busy] {
+    opacity: 0.75;
+    cursor: progress;
+  }
+</style>
 
 <script>
   import "../scripts/contact.ts";

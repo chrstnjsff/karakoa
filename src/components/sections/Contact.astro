@@ -1,29 +1,42 @@
 ---
-import SectionHeading from "../SectionHeading.astro";
+import Sky from "../Sky.astro";
+import Icon from "../Icon.astro";
 import ContactForm from "../ContactForm.astro";
-import ContactChannels from "../ContactChannels.astro";
-import type { Channel } from "../../data/site";
-
-interface Props {
-  contact: { eyebrow: string; title: string; lede: string };
-  channels: Channel[];
-  hours: string;
-}
-const { contact, channels, hours } = Astro.props;
+import { SITE, calendlyUrl, contact } from "../../data/site";
 ---
 
-<section id="contact" class="scroll-mt-20 border-t border-line/10 bg-surface/40" aria-labelledby="contact-title">
-  <div class="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:py-24">
-    <SectionHeading eyebrow={contact.eyebrow} title={contact.title} lede={contact.lede} />
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:gap-12">
-      <ContactForm />
-      <div class="reveal d3">
-        <h3 class="eyebrow">Or reach us directly</h3>
-        <div class="mt-3">
-          <ContactChannels channels={channels} />
-        </div>
-        <p class="mt-4 text-caption text-muted">Replies and calls: {hours}.</p>
+<section id="contact" class="mx-auto max-w-6xl scroll-mt-20 px-5 pb-24" aria-labelledby="contact-title">
+  <div class="reveal on-dark relative overflow-hidden rounded-xl bg-deep px-5 py-10 text-white sm:px-12 sm:py-16">
+    <Sky class="inset-0 h-full w-full" seed={42} h={420} count={45} guide={{ at: [1010, 70], course: "M1000 80 C 900 160, 780 200, 640 330" }} />
+    <div class="relative grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)] lg:gap-16">
+      <div class="lg:pt-3">
+        <h2 id="contact-title" class="text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] !text-white sm:text-[48px]">
+          {contact.title}
+        </h2>
+        <p class="mt-4 max-w-md text-lg leading-relaxed text-mist">{contact.lede}</p>
+        <a href={calendlyUrl} target="_blank" rel="noopener" class="btn-primary mt-8">
+          <Icon name="calendar" class="size-4" />{contact.book}<span class="sr-only"> (opens Calendly in a new tab)</span>
+        </a>
+        <dl class="mt-10 grid max-w-sm gap-5 border-t border-white/10 pt-7 text-[15px]">
+          <div class="relative pl-7">
+            <dt class="text-sm text-mist"><Icon name="calendar" class="absolute top-0.5 left-0 size-4 text-gold" />Call hours</dt>
+            <dd class="mt-0.5 text-foam">{contact.callHours}</dd>
+          </div>
+          <div class="relative pl-7">
+            <dt class="text-sm text-mist"><Icon name="mail" class="absolute top-0.5 left-0 size-4 text-gold" />Email</dt>
+            <dd class="mt-0.5">
+              <a data-contact-email href={`mailto:${SITE.email}`} class="text-foam underline decoration-white/30 underline-offset-4 hover:decoration-white">
+                {SITE.email}
+              </a>
+            </dd>
+          </div>
+          <div class="relative pl-7">
+            <dt class="text-sm text-mist"><Icon name="check" class="absolute top-0.5 left-0 size-4 text-gold" />Replies</dt>
+            <dd class="mt-0.5 text-foam">{contact.replies}</dd>
+          </div>
+        </dl>
       </div>
+      <ContactForm />
     </div>
   </div>
 </section>

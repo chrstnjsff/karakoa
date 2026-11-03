@@ -2,12 +2,12 @@
 import Base from "../layouts/Base.astro";
 import { SITE } from "../data/site";
 
-const updated = "2026-10-12";
+const updated = "2026-11-03";
 ---
 
 <Base
   title={`Privacy · ${SITE.name}`}
-  description="What Karakoa collects when you use this site or send an inquiry, and how it is used."
+  description="What Karakoa collects when you use this site or send a message, and how it is used."
 >
   <div class="mx-auto max-w-2xl px-5 pb-20 sm:px-6">
     <header class="pb-8 pt-14 sm:pt-20">
@@ -18,16 +18,19 @@ const updated = "2026-10-12";
 
     <div class="reveal d2 prose">
       <p>
-        This site is a static website. It sets no cookies and loads no advertising or tracking
-        scripts. Fonts and images are served from this domain.
+        This site sets no cookies of its own and loads no advertising or tracking scripts. Fonts and
+        images are served from this domain.
       </p>
 
-      <h2>The inquiry form</h2>
+      <h2>The message form</h2>
       <p>
-        When you send the form, the details you enter (your name, email, what you need, project size,
-        timeline, and message) are delivered by <a href="https://web3forms.com" rel="noopener" target="_blank">Web3Forms</a>{" "}
-        to our inbox. Web3Forms passes the message on and keeps it only for delivery. We use your details to
-        reply to you and, if you go ahead with a project, to work with you. We do not sell or share them.
+        When you send the form, the details you enter (your name, email, project type, and message) go to our
+        server on Cloudflare, which emails them to our inbox. We use your details to reply to you and, if you go
+        ahead with a project, to work with you. We do not sell or share them.
+      </p>
+      <p>
+        To keep out spam, the form uses <a href="https://www.cloudflare.com/application-services/products/turnstile/" rel="noopener" target="_blank">Cloudflare Turnstile</a>,
+        which loads only when you reach the form and checks your browser for signs of automation.
       </p>
 
       <h2>Direct channels</h2>
@@ -45,7 +48,7 @@ const updated = "2026-10-12";
 
       <h2>Your choices</h2>
       <p>
-        Ask us to delete any inquiry you sent and we will. Write to{" "}
+        Ask us to delete any message you sent and we will. Write to{" "}
         <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
       </p>
     </div>

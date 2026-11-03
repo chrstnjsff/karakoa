@@ -3,34 +3,17 @@ import { getImage } from "astro:assets";
 import Base from "../layouts/Base.astro";
 import photo from "../assets/founder.jpg";
 import Hero from "../components/sections/Hero.astro";
-import Heritage from "../components/sections/Heritage.astro";
-import About from "../components/sections/About.astro";
+import ToolsStrip from "../components/sections/ToolsStrip.astro";
 import Services from "../components/sections/Services.astro";
-import Work from "../components/sections/Work.astro";
 import Process from "../components/sections/Process.astro";
-import Packages from "../components/sections/Packages.astro";
-import Founder from "../components/sections/Founder.astro";
-import Faq from "../components/sections/Faq.astro";
+import TrackRecord from "../components/sections/TrackRecord.astro";
+import Work from "../components/sections/Work.astro";
+import About from "../components/sections/About.astro";
+import Pricing from "../components/sections/Pricing.astro";
+import NameStrip from "../components/sections/NameStrip.astro";
 import Contact from "../components/sections/Contact.astro";
-import {
-  SITE,
-  hero,
-  stats,
-  heroFilm,
-  techStack,
-  heritage,
-  about,
-  services,
-  work,
-  process,
-  packages,
-  pricingNote,
-  founder,
-  faq,
-  hours,
-  channels,
-  contact,
-} from "../data/site";
+import { SITE, founder, services } from "../data/site";
+import { workKeyframes } from "../lib/work-shots";
 
 const title = "Software Development Company in the Philippines | Karakoa";
 const founderPhotoUrl = new URL((await getImage({ src: photo, width: 800, format: "jpeg" })).src, SITE.url).href;
@@ -92,30 +75,17 @@ const website = {
   name: SITE.name,
   publisher: { "@id": `${SITE.url}/#organization` },
 };
-
-const faqPage = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  isPartOf: { "@id": `${SITE.url}/#website` },
-  mainEntity: faq.flatMap((g) =>
-    g.items.map((i) => ({
-      "@type": "Question",
-      name: i.q,
-      acceptedAnswer: { "@type": "Answer", text: i.a },
-    })),
-  ),
-};
 ---
 
-<Base title={title} ogImage="/og/home.png" description={SITE.description} jsonLd={[organization, website, faqPage]}>
-  <Hero hero={hero} stats={stats} film={heroFilm} tech={techStack} />
-  <Heritage heritage={heritage} />
-  <About about={about} />
-  <Services items={services} />
-  <Work items={work} />
-  <Process steps={process} />
-  <Packages items={packages} note={pricingNote} />
-  <Founder founder={founder} />
-  <Faq groups={faq} />
-  <Contact contact={contact} channels={channels} hours={hours} />
+<Base title={title} ogImage="/og/home.png" description={SITE.description} jsonLd={[organization, website]} headStyle={workKeyframes}>
+  <Hero />
+  <ToolsStrip />
+  <Services />
+  <Process />
+  <TrackRecord />
+  <Work />
+  <About />
+  <Pricing />
+  <NameStrip />
+  <Contact />
 </Base>

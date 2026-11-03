@@ -1,16 +1,32 @@
-// Cloudflare Workers deploy for the static site in dist/.
+// Cloudflare Workers deploy for karakoa.dev.
 // Workers Builds runs `npm run build` then `npx wrangler deploy` on every
 // push to main; `name` must match the Worker in the dashboard.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "karakoa",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-09-28",
-  // Assets only, no Worker script: requests never invoke code.
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
+    // Pages are served straight from assets; only the form endpoint runs code.
+    "run_worker_first": ["/api/*"],
   },
+  // Email Routing only lets a Worker send to verified destination addresses.
+  // This is the inbox hello@karakoa.dev forwards to, so form messages land
+  // in the same place as mail sent to hello@ directly.
+  "send_email": [{ "name": "INQUIRY_MAIL", "destination_address": "chrstnjsff@gmail.com" }],
+  "ratelimits": [{ "name": "INQUIRY_LIMIT", "namespace_id": "4401", "simple": { "limit": 5, "period": 60 } }],
+  "vars": {
+    "MAIL_FROM": "website@karakoa.dev",
+    "MAIL_TO": "chrstnjsff@gmail.com",
+    "TURNSTILE_HOSTNAMES": "karakoa.dev",
+  },
+  // TURNSTILE_SECRET is a secret: `wrangler secret put TURNSTILE_SECRET`
+  // in production, `.dev.vars` locally.
   "routes": [{ "pattern": "karakoa.dev", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false,
+  "observability": { "enabled": true },
 }

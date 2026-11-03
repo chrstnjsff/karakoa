@@ -1,14 +1,15 @@
 # Karakoa site
 
 Business website for Karakoa (karakoa.dev), a founder-led software studio.
-Astro 7 static site, Tailwind v4 (CSS-first tokens in `src/styles/global.css`), self-hosted Fontsource fonts, deployed as a Cloudflare Worker with static assets only.
+Astro 7 static site, Tailwind v4 (CSS-first tokens in `src/styles/global.css`), self-hosted Fontsource fonts, deployed as a Cloudflare Worker: static assets, plus a small script for `/api/contact`.
 
 ## Where things live
 
 - All copy: `src/data/site.ts`. Sections take their slice as props; `src/pages/index.astro` is the only importer.
 - Layout and head: `src/layouts/Base.astro`. Theme is a `.dark` class on `<html>`, set before first paint.
 - Sections: `src/components/sections/*.astro`.
-- Contact form: `src/components/ContactForm.astro` + `src/scripts/contact.ts` (Web3Forms, works with and without JS).
+- Contact form: `src/components/ContactForm.astro` + `src/scripts/contact.ts` post to the Worker in `worker/index.ts`, which validates, checks Cloudflare Turnstile, rate-limits, and emails the owner through Email Routing (`send_email` binding). Public contact address: hello@karakoa.dev.
+- Worker secret `TURNSTILE_SECRET`: `.dev.vars` locally (gitignored), `wrangler secret put` in production. `npm run dev:worker` serves `dist/` with the Worker.
 - Brand sources: `src/assets/brand/*.png`; derived icons and the share image are built by `npm run brand` into `public/`.
 
 ## Rules

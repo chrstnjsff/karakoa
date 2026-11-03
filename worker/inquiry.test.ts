@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { contact } from "../src/data/site";
 import { notification, validate } from "./inquiry";
 
 const good = { name: "Ana Cruz", email: "ana@example.com", service: "Website", message: "We need a site for our bakery." };
@@ -6,6 +7,12 @@ const good = { name: "Ana Cruz", email: "ana@example.com", service: "Website", m
 describe("validate", () => {
   it("accepts a complete message and trims it", () => {
     expect(validate({ ...good, name: "  Ana Cruz  " })).toEqual({ inquiry: good });
+  });
+
+  it("accepts every project type the form offers", () => {
+    for (const service of contact.projectTypes) {
+      expect(validate({ ...good, service })).toEqual({ inquiry: { ...good, service } });
+    }
   });
 
   it("names every missing field", () => {

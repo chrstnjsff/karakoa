@@ -7,8 +7,12 @@ const { title, mark } = pricingSection;
 const at = title.indexOf(mark);
 ---
 
-<section id="pricing" class="border-t border-line" aria-labelledby="pricing-title">
-  <div class="relative mx-auto max-w-6xl px-5 py-24 sm:py-32">
+<section id="pricing" class="relative border-t border-line" aria-labelledby="pricing-title">
+  <svg class="pk-hills pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full sm:h-20 lg:h-24" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 40C160 22 300 20 460 34S760 60 940 42 1260 16 1440 32V80H0Z" fill="#b7d0d2" opacity=".4" />
+    <path d="M0 60C180 48 340 46 520 56S860 74 1040 58 1320 44 1440 54V80H0Z" fill="#b7d0d2" opacity=".55" />
+  </svg>
+  <div class="relative mx-auto max-w-6xl px-5 pt-24 pb-28 sm:pt-32 sm:pb-36 lg:pb-40">
     <svg class="pk-spark pointer-events-none absolute top-24 right-12 hidden size-4 md:block" viewBox="-5 -5 10 10" aria-hidden="true">
       <path d="M0-5 1.2-1.2 5 0 1.2 1.2 0 5-1.2 1.2-5 0-1.2-1.2z" fill="#e3a75b" />
     </svg>
@@ -80,7 +84,7 @@ const at = title.indexOf(mark);
       <ol class="grid flex-1 grid-cols-1 gap-x-6 gap-y-5 xs:grid-cols-2 lg:grid-cols-4 xl:flex xl:justify-between xl:gap-3" aria-label="How a project runs">
         {
           pricingSection.steps.map((s, i) => (
-            <li class="flex items-center gap-2.5">
+            <li class="flex items-start gap-2.5">
               <span class="pk-tile size-9 rounded-lg">
                 <Icon name={s.icon} class="size-[18px]" />
               </span>
@@ -89,7 +93,7 @@ const at = title.indexOf(mark);
                 <span class="block text-[13px] leading-snug text-muted xl:whitespace-nowrap">{s.text}</span>
               </span>
               {i < pricingSection.steps.length - 1 && (
-                <svg viewBox="0 0 24 24" class="ml-auto hidden size-3.5 shrink-0 text-navy/40 lg:block xl:ml-2" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="ml-auto hidden size-3.5 shrink-0 self-center text-navy/40 lg:block xl:ml-2" aria-hidden="true">
                   <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               )}
@@ -174,6 +178,11 @@ const at = title.indexOf(mark);
       border-color: var(--color-coral-600);
       box-shadow: 0 16px 34px -16px rgba(212, 66, 31, 0.45);
     }
+  }
+
+  /* Low hills along the foot of the section; they fade into the page below */
+  .pk-hills {
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
   }
 
   /* The underline draws in when the heading arrives */

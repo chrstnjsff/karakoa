@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NAV, channels, contact, hero, services, techStack } from "../src/data/site";
+import { NAV, channels, contact, hero, packages, services, techStack } from "../src/data/site";
 
 // Reveal animations wait for IntersectionObserver callbacks that never fire
 // in a hidden automation tab; force the final state before asserting.
@@ -168,6 +168,18 @@ test.describe("message form", () => {
     await expect(page).toHaveURL(/#message$/);
     await expect(page.getByLabel("Project type")).toHaveValue(store.formType);
     expect(contact.projectTypes).toContain(store.formType);
+  });
+
+  test("every pricing card opens the form with its project type picked", async ({ page }) => {
+    await page.goto("/");
+    await settle(page);
+    for (const p of packages) {
+      expect(contact.projectTypes).toContain(p.formType);
+      await page.getByLabel("Project type").selectOption({ index: 0 });
+      await page.locator(`#pricing a[data-type="${p.formType}"]`).click();
+      await expect(page).toHaveURL(/#message$/);
+      await expect(page.getByLabel("Project type")).toHaveValue(p.formType);
+    }
   });
 });
 

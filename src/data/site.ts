@@ -111,8 +111,8 @@ export interface Package {
   cta: string;
   /** Marks the one featured card; a neutral label, not a sales claim. */
   badge?: string;
-  /** The contact form's project type the link picks, if one fits. */
-  formType?: string;
+  /** The contact form's project type the link picks; one of contact.projectTypes. */
+  formType: string;
 }
 
 export interface FaqGroup {
@@ -684,6 +684,7 @@ export const packages: Package[] = [
     ],
     cta: "Scope a build",
     badge: "Custom development",
+    formType: "App or system",
   },
   {
     id: "capstone",
@@ -843,6 +844,7 @@ export const contact = {
     "Website",
     "Mobile app",
     "Custom system",
+    "App or system",
     "Online store",
     "AI and automation",
     "Cloud and DevOps",

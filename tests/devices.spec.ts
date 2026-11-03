@@ -43,20 +43,24 @@ async function settle(page: Page) {
   });
 }
 
-/** Wait until smooth scrolling has stopped. */
-async function scrollStops(page: Page) {
-  let last = -1;
+/**
+ * Waits for an in-page link to land: the heading sits on screen below the
+ * header and has not moved for three reads in a row.
+ */
+async function expectLanded(page: Page, id: string, label: string) {
+  let tops: number[] = [];
   await expect
     .poll(
       async () => {
-        const y = await page.evaluate(() => scrollY);
-        const still = y === last;
-        last = y;
-        return still;
+        const pos = await headingVsHeader(page, id);
+        tops = [...tops.slice(-2), pos.heading];
+        const still = tops.length === 3 && tops.every((t) => t === tops[0]);
+        const placed = pos.heading >= pos.header - 0.5 && pos.heading < pos.vh;
+        return still && placed ? "landed" : `heading top ${pos.heading}, header bottom ${pos.header}, viewport ${pos.vh}`;
       },
-      { intervals: [150], timeout: 5000 },
+      { message: `${label} lands on screen below the header`, intervals: [150], timeout: 10_000 },
     )
-    .toBe(true);
+    .toBe("landed");
 }
 
 /** Fully on screen, at least 24x24, and the topmost element at its center. */
@@ -397,7 +401,12 @@ test("menu opens, every item is tappable, and it closes", async ({ page }) => {
   await expect(dialog).toBeHidden();
 });
 
+// These check where a link lands, not how it scrolls there. Reduced motion
+// makes the jump instant (same target, same scroll-padding); a smooth scroll
+// on a headless browser sharing the CPU with six others can still be moving
+// ten seconds after the tap.
 test("nav links bring each section heading into view below the header", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await settle(page);
   const wide = page.viewportSize()!.width >= MD;
@@ -409,14 +418,12 @@ test("nav links bring each section heading into view below the header", async ({
       await page.getByRole("button", { name: "Open menu" }).click();
       await page.getByRole("dialog", { name: "Menu" }).getByRole("link", { name: item.label, exact: true }).click();
     }
-    await scrollStops(page);
-    const pos = await headingVsHeader(page, item.href.slice(1));
-    expect(pos.heading, `${item.label} heading clears the header`).toBeGreaterThanOrEqual(pos.header - 0.5);
-    expect(pos.heading, `${item.label} heading is on screen`).toBeLessThan(pos.vh);
+    await expectLanded(page, item.href.slice(1), `${item.label} heading`);
   }
 });
 
 test("guide contents links bring each heading into view below the header", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`/guides/${guides[0]}/`);
   await settle(page);
   const links = page.getByRole("navigation", { name: "In this guide" }).getByRole("link");
@@ -425,9 +432,6 @@ test("guide contents links bring each heading into view below the header", async
   for (const link of await links.all()) {
     const id = decodeURIComponent((await link.getAttribute("href"))!.slice(1));
     await link.click();
-    await scrollStops(page);
-    const pos = await headingVsHeader(page, id);
-    expect(pos.heading, `#${id} clears the header`).toBeGreaterThanOrEqual(pos.header - 0.5);
-    expect(pos.heading, `#${id} is on screen`).toBeLessThan(pos.vh);
+    await expectLanded(page, id, `#${id}`);
   }
 });

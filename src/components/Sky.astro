@@ -1,6 +1,7 @@
 ---
 // Rendered at build time from a seed, so the sky is identical on every
 // visit and needs no script. Base.astro pauses it off screen.
+// tone="light" is the faint navy version drawn behind the cream page.
 
 import { rng } from "../lib/rng";
 
@@ -15,14 +16,27 @@ interface Props {
   chart?: Point;
   lines?: { pts: Point[]; edges: [number, number][]; lead: number }[];
   guide?: { at: Point; course?: string };
+  /** Dotted courses that drift with the constellation lines (light tone). */
+  routes?: string[];
+  tone?: "dark" | "light";
   class?: string;
 }
 
-const { seed, h: H, count, chart, lines = [], guide, class: className = "" } = Astro.props;
+const { seed, h: H, count, chart, lines = [], guide, routes = [], tone = "dark", class: className = "" } = Astro.props;
 
 const W = 1440;
-const GOLD = "#f4d58d";
-const FOAM = "#f3eee4";
+const light = tone === "light";
+const GOLD = light ? "#5f6b75" : "#f4d58d";
+const FOAM = light ? "#0b2c44" : "#f3eee4";
+// Light stars sit on cream, so they keep well under half the dark opacity.
+const dim = light ? 0.4 : 1;
+const ink = {
+  chart: light ? "0.022" : "0.05",
+  line: light ? "0.12" : "0.22",
+  lineTo: light ? "--to:.05;" : "",
+  lead: light ? 0.4 : 0.95,
+  point: light ? "0.28" : "0.7",
+};
 
 const r = rng(seed);
 const r2 = rng(seed * 31 + 5);
@@ -41,6 +55,7 @@ interface Star {
 const layers: Star[][] = [[], [], []];
 
 function star(x: number, y: number, rad: number, fill: string, op: number, twinkle: boolean, layer: number) {
+  op *= dim;
   const s: Star = { cx: x.toFixed(1), cy: y.toFixed(1), r: rad.toFixed(2), fill, opacity: op.toFixed(2) };
   if (twinkle) {
     const t = 4 + r2() * 8;
@@ -88,11 +103,11 @@ const glow = `sky-glow-${seed}`;
 const layerClass = ["l1", "l2", "l3"];
 ---
 
-<div class:list={["sky", className]} aria-hidden="true" data-loop>
+<div class:list={["sky", light && "sky-faint", className]} aria-hidden="true" data-loop>
   <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin slice" class="sky-l">
     {
       chart && (
-        <g fill="none" stroke={FOAM} stroke-opacity="0.05" stroke-width="1">
+        <g fill="none" stroke={FOAM} stroke-opacity={ink.chart} stroke-width="1">
           {rings.map((rad) => <circle cx={chart[0]} cy={chart[1]} r={rad} />)}
           {hourLines.map((l) => <line x1={chart[0]} y1={chart[1]} x2={l.x2.toFixed(1)} y2={l.y2.toFixed(1)} />)}
         </g>
@@ -174,11 +189,11 @@ const layerClass = ["l1", "l2", "l3"];
             <>
               <g
                 class="cl"
-                stroke={GOLD}
-                stroke-opacity="0.22"
+                stroke={light ? FOAM : GOLD}
+                stroke-opacity={ink.line}
                 stroke-width="0.9"
                 fill="none"
-                style={`--t:${(11 + k * 3.7).toFixed(1)}s;animation-delay:${(-k * 4.3).toFixed(1)}s`}
+                style={`${ink.lineTo}--t:${(11 + k * 3.7).toFixed(1)}s;animation-delay:${(-k * 4.3).toFixed(1)}s`}
               >
                 {c.edges.map(([a, b]) => (
                   <line x1={c.pts[a][0]} y1={c.pts[a][1]} x2={c.pts[b][0]} y2={c.pts[b][1]} />
@@ -186,12 +201,16 @@ const layerClass = ["l1", "l2", "l3"];
               </g>
               {c.pts.map(([x, y], j) =>
                 j === c.lead ? (
-                  <circle cx={x} cy={y} r="2.2" fill={GOLD} opacity="0.95" class="tw" style={`--o:.95;--t:${9 + k * 2.3}s;--td:${-k * 3}s`} />
+                  <circle cx={x} cy={y} r="2.2" fill={light ? FOAM : GOLD} opacity={ink.lead} class="tw" style={`--o:${String(ink.lead).replace(/^0/, "")};--t:${9 + k * 2.3}s;--td:${-k * 3}s`} />
                 ) : (
-                  <circle cx={x} cy={y} r="1.5" fill={GOLD} opacity="0.7" />
+                  <circle cx={x} cy={y} r="1.5" fill={light ? FOAM : GOLD} opacity={ink.point} />
                 ),
               )}
             </>
+          ))}
+        {i === 1 &&
+          routes.map((d) => (
+            <path d={d} fill="none" stroke={FOAM} stroke-opacity="0.11" stroke-width="1.1" stroke-dasharray="1.5 9" stroke-linecap="round" />
           ))}
       </svg>
     ))
@@ -249,7 +268,7 @@ const layerClass = ["l1", "l2", "l3"];
       opacity: var(--o);
     }
     30% {
-      opacity: 0.12;
+      opacity: var(--lo, 0.12);
     }
     46% {
       opacity: var(--o);
@@ -258,12 +277,15 @@ const layerClass = ["l1", "l2", "l3"];
       opacity: calc(var(--o) * 0.55);
     }
   }
+  .sky-faint .tw {
+    --lo: 0.02;
+  }
   .sky .cl {
     animation: sky-cl var(--t, 13s) ease-in-out infinite alternate;
   }
   @keyframes sky-cl {
     to {
-      stroke-opacity: 0.12;
+      stroke-opacity: var(--to, 0.12);
     }
   }
   .sky .sky-draw {

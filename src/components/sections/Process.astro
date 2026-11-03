@@ -8,7 +8,7 @@ const route = "M20 110 C 140 30, 240 30, 260 80 S 400 150, 500 90 S 660 20, 740 
 const num = (i: number) => String(i + 1).padStart(2, "0");
 ---
 
-<section id="process" class="relative overflow-x-clip border-t border-line bg-cream" aria-labelledby="process-title" data-process>
+<section id="process" class="relative overflow-x-clip border-t border-line" aria-labelledby="process-title" data-process>
   <div class="process-pin">
     <div class="mx-auto max-w-6xl px-5 py-24 sm:py-28 lg:flex lg:min-h-screen lg:flex-col lg:justify-center">
       <div class="reveal max-w-2xl">
@@ -70,8 +70,13 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   }
   .step {
     transition:
-      opacity 0.15s,
-      border-color 0.15s;
+      opacity 0.4s ease,
+      border-color 0.4s ease;
+  }
+  [data-waypoints] circle {
+    transition:
+      fill 0.4s ease,
+      stroke-opacity 0.4s ease;
   }
   .js [data-pinned] .step:not(.on) {
     opacity: 0.4;

@@ -1,0 +1,72 @@
+---
+// The faint sky behind every page. It is fixed to the viewport and pans a
+// little as the page scrolls, so the whole page reads as one chart. Dark
+// sections are opaque and draw their own sky on top.
+import Sky from "./Sky.astro";
+---
+
+<div class="page-sky">
+  <Sky
+    tone="light"
+    class="page-sky-map inset-x-0 top-0 w-full"
+    seed={11}
+    h={1400}
+    count={120}
+    chart={[1320, -620]}
+    lines={[
+      { pts: [[70, 240], [128, 300], [96, 382], [176, 410], [214, 352]], edges: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1]], lead: 3 },
+      { pts: [[640, 210], [700, 250], [770, 236], [830, 290]], edges: [[0, 1], [1, 2], [2, 3]], lead: 2 },
+      { pts: [[1250, 640], [1310, 700], [1290, 780], [1372, 812], [1396, 740]], edges: [[0, 1], [1, 2], [1, 4], [2, 3]], lead: 1 },
+      { pts: [[560, 1130], [636, 1092], [716, 1150], [806, 1120], [860, 1180]], edges: [[0, 1], [1, 2], [2, 3], [3, 4]], lead: 2 },
+    ]}
+    routes={["M214 410 C 420 600, 1020 520, 1250 640", "M1290 780 C 1180 980, 960 1080, 860 1180"]}
+  />
+</div>
+
+<style is:global>
+  .page-sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+  }
+  .page-sky-map {
+    height: 150lvh;
+  }
+  /* Half a screen of pan over the whole page. Browsers without
+     scroll-linked animation keep the same sky, held still. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .page-sky-map {
+        animation: page-sky-pan linear both;
+      }
+      /* A separate rule, so the minifier cannot fold the timeline into the
+         shorthand, which browsers reject. */
+      .page-sky .page-sky-map {
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+  @keyframes page-sky-pan {
+    to {
+      transform: translateY(-50lvh);
+    }
+  }
+  /* Phones: only the layer carrying the lines drifts. */
+  @media (max-width: 767px) {
+    .page-sky .l1,
+    .page-sky .l3 {
+      animation: none;
+      will-change: auto;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page-sky .drift,
+    .page-sky .tw,
+    .page-sky .cl {
+      animation: none;
+    }
+  }
+</style>

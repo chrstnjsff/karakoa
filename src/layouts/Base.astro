@@ -278,6 +278,9 @@ const link = (href: string) => (isHome || !href.startsWith("#") ? href : `/${hre
         loops.forEach(function (el) {
           io.observe(el);
         });
+        document.addEventListener("visibilitychange", function () {
+          document.documentElement.classList.toggle("tab-hidden", document.hidden);
+        });
       })();
 
       (function () {

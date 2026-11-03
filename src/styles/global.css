@@ -249,9 +249,11 @@ body {
   }
 }
 
-/* Base.astro toggles .idle on [data-loop] elements while they are off screen */
+/* Base.astro pauses [data-loop] elements off screen (.idle) and in a hidden tab (.tab-hidden) */
 .idle,
-.idle * {
+.idle *,
+.tab-hidden [data-loop],
+.tab-hidden [data-loop] * {
   animation-play-state: paused !important;
 }
 

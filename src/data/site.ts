@@ -30,7 +30,16 @@ export type IconName =
   | "queue"
   | "branch"
   | "play"
-  | "pause";
+  | "pause"
+  | "layers"
+  | "refresh"
+  | "bars"
+  | "gear"
+  | "phone"
+  | "doc"
+  | "code"
+  | "rocket"
+  | "coins";
 
 export interface NavItem {
   href: string;
@@ -88,12 +97,20 @@ export interface ProcessStep {
   deliverable: string;
 }
 
+export interface PackageMeta {
+  icon: IconName;
+  text: string;
+}
+
 export interface Package {
   id: string;
   name: string;
+  icon: IconName;
   tagline: string;
-  meta: [string, string];
+  meta: [PackageMeta, PackageMeta];
   cta: string;
+  /** Marks the one featured card; a neutral label, not a sales claim. */
+  badge?: string;
   /** The contact form's project type the link picks, if one fits. */
   formType?: string;
 }
@@ -632,38 +649,63 @@ export const pricingSection = {
   eyebrow: "Pricing",
   title: "Four packages, each quoted after one call.",
   lede: "After the call you get a fixed quote with milestones, before any work starts.",
+  /** The words the heading underlines. */
+  mark: "after one call",
   note: "Projects run on a deposit, milestone payments, and a final payment on handover.",
+  steps: [
+    { icon: "phone", name: "Call", text: "Discuss your goals" },
+    { icon: "doc", name: "Quote", text: "Fixed scope and milestones" },
+    { icon: "code", name: "Build", text: "Regular updates" },
+    { icon: "rocket", name: "Handover", text: "Launch and support" },
+  ] satisfies { icon: IconName; name: string; text: string }[],
 };
 
 export const packages: Package[] = [
   {
     id: "website",
     name: "Website",
+    icon: "globe",
     tagline: "A site for your business, quick to load and easy to update.",
-    meta: ["2 to 4 weeks", "30 days of support"],
+    meta: [
+      { icon: "calendar", text: "2 to 4 weeks" },
+      { icon: "layers", text: "30 days of support" },
+    ],
     cta: "Scope a website",
     formType: "Website",
   },
   {
     id: "app",
     name: "App or system",
+    icon: "layers",
     tagline: "A mobile app, web app, or custom system.",
-    meta: ["4 to 10 weeks", "30 days of support"],
+    meta: [
+      { icon: "calendar", text: "4 to 10 weeks" },
+      { icon: "layers", text: "30 days of support" },
+    ],
     cta: "Scope a build",
+    badge: "Custom development",
   },
   {
     id: "capstone",
     name: "Capstone",
+    icon: "grad",
     tagline: "A working system, documentation, and defense prep.",
-    meta: ["Fits your school calendar", "Panel revisions included"],
+    meta: [
+      { icon: "calendar", text: "Fits your school calendar" },
+      { icon: "layers", text: "Panel revisions included" },
+    ],
     cta: "Ask about capstone",
     formType: "Capstone or thesis",
   },
   {
     id: "support",
     name: "Support",
+    icon: "gear",
     tagline: "Reviews, fixes, and new features after launch.",
-    meta: ["Monthly or hourly", "Report included"],
+    meta: [
+      { icon: "refresh", text: "Monthly or hourly" },
+      { icon: "bars", text: "Report included" },
+    ],
     cta: "Discuss capacity",
     formType: "Support after launch",
   },

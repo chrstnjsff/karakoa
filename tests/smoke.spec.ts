@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { NAV, channels, contact, hero, packages, services, techStack } from "../src/data/site";
+import { NAV, calendlyUrl, channels, contact, hero, packages, services, techStack, whatsappUrl } from "../src/data/site";
 
 // Reveal animations wait for IntersectionObserver callbacks that never fire
 // in a hidden automation tab; force the final state before asserting.
@@ -73,15 +73,22 @@ async function fakeTurnstile(page: Page) {
   );
 }
 
-async function fillForm(page: Page, type = "Website") {
+const stepGroup = (page: Page, legend: string) => page.getByRole("group", { name: new RegExp(legend.replace("?", "\\?")) });
+const legendOf = (page: Page, legend: string) => stepGroup(page, legend).locator("legend");
+const radio = (page: Page, name: string) => page.getByRole("radio", { name, exact: true });
+
+// A tap on an answer moves on by itself, so the test never clicks Next after it.
+async function fillForm(page: Page, type = "Website", timeline = "In 1 to 3 months") {
+  await radio(page, type).click();
+  await expect(legendOf(page, contact.start.legend)).toBeFocused();
+  await radio(page, timeline).click();
+  await expect(legendOf(page, contact.details.legend)).toBeFocused();
   await page.getByLabel("Name", { exact: true }).fill("Test Person");
   await page.getByLabel("Email", { exact: true }).fill("test@example.com");
-  await page.getByLabel("Project type").selectOption(type);
-  await page.getByLabel("Message", { exact: true }).fill("Checking the form end to end.");
 }
 
 test.describe("message form", () => {
-  test("empty submit shows inline errors without a network call", async ({ page }) => {
+  test("Next on an empty step shows its error without a network call", async ({ page }) => {
     let posted = false;
     page.on("request", (req) => {
       if (req.url().includes("/api/contact")) posted = true;
@@ -89,13 +96,38 @@ test.describe("message form", () => {
     await fakeTurnstile(page);
     await page.goto("/#message");
     await settle(page);
-    await page.getByRole("button", { name: "Send message" }).click();
-    for (const id of ["msg-name", "msg-email", "msg-type", "msg-body"]) {
-      await expect(page.locator(`#${id}-error`)).toBeVisible();
-      await expect(page.locator(`#${id}`)).toHaveAttribute("aria-invalid", "true");
-    }
-    await expect(page.locator("#msg-name")).toBeFocused();
+    await page.getByRole("button", { name: "Next" }).click();
+    await expect(page.locator("#msg-service-error")).toHaveText(contact.need.error);
+    await expect(page.locator("#msg-service")).toHaveAttribute("data-invalid", "");
+    await expect(radio(page, contact.projectTypes[0])).toBeFocused();
     expect(posted).toBe(false);
+  });
+
+  test("a tap moves on, arrow keys do not, Next does, and Back keeps the answers", async ({ page }) => {
+    const [soon, later] = contact.timelines;
+    await page.goto("/#message");
+    await settle(page);
+    await radio(page, "Website").click();
+    await expect(legendOf(page, contact.start.legend)).toBeFocused();
+
+    await radio(page, soon).focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(radio(page, later)).toBeChecked();
+    await page.waitForTimeout(300);
+    await expect(page.locator('fieldset[data-step="1"]')).toBeVisible();
+    await expect(page.locator('fieldset[data-step="2"]')).toBeHidden();
+
+    await page.getByRole("button", { name: "Next" }).focus();
+    await page.keyboard.press("Enter");
+    await expect(legendOf(page, contact.details.legend)).toBeFocused();
+
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(legendOf(page, contact.start.legend)).toBeFocused();
+    await expect(radio(page, later)).toBeChecked();
+
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(radio(page, "Website")).toBeChecked();
+    await expect(page.locator("[data-back]")).toBeHidden();
   });
 
   test("a valid message goes to the Worker with a Turnstile token, and success takes focus", async ({ page }) => {
@@ -110,14 +142,30 @@ test.describe("message form", () => {
     await fillForm(page);
     await page.getByRole("button", { name: "Send message" }).click();
 
-    await expect(page.getByRole("heading", { name: "Message sent" })).toBeFocused();
+    await expect(page.getByRole("heading", { name: contact.success.title })).toBeFocused();
     expect(body).toMatchObject({
       name: "Test Person",
       email: "test@example.com",
       service: "Website",
+      timeline: "In 1 to 3 months",
+      message: "",
       "cf-turnstile-response": "test-token",
     });
     expect(body).not.toHaveProperty("botcheck");
+
+    const success = page.locator("[data-success]");
+    const whatsapp = success.locator("[data-whatsapp]");
+    const href = (await whatsapp.getAttribute("href"))!;
+    expect(href.startsWith(whatsappUrl)).toBe(true);
+    expect(new URL(href).searchParams.get("text")).toBe(
+      contact.success.whatsappText({ name: "Test Person", service: "Website", timeline: "In 1 to 3 months" }),
+    );
+    await expect(success.locator("[data-call]")).toHaveAttribute("href", `${calendlyUrl}?name=Test%20Person&email=test%40example.com`);
+    await expect(success).not.toContainText("9295092251");
+
+    await success.getByRole("button", { name: contact.success.another }).click();
+    await expect(legendOf(page, contact.need.legend)).toBeFocused();
+    await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
   });
 
   test("a field the server refuses is flagged inline", async ({ page }) => {
@@ -132,6 +180,20 @@ test.describe("message form", () => {
     await expect(page.locator("#msg-email-error")).toHaveText("Enter an email address like name@example.com.");
     await expect(page.locator("#msg-email")).toBeFocused();
     await expect(page.locator("[data-success]")).toBeHidden();
+  });
+
+  test("a refused start time sends the visitor back to that step", async ({ page }) => {
+    await fakeTurnstile(page);
+    await page.route("**/api/contact", (route) =>
+      route.fulfill({ status: 422, json: { ok: false, error: "Check the highlighted fields.", fields: { timeline: contact.start.error } } }),
+    );
+    await page.goto("/#message");
+    await settle(page);
+    await fillForm(page);
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page.locator("#msg-timeline-error")).toHaveText(contact.start.error);
+    await expect(page.locator('fieldset[data-step="1"]')).toBeVisible();
+    await expect(radio(page, "In 1 to 3 months")).toBeFocused();
   });
 
   test("a failed send explains itself and offers the email address", async ({ page }) => {
@@ -166,7 +228,8 @@ test.describe("message form", () => {
     const store = services.find((s) => s.id === "ecommerce")!;
     await page.locator(`a.svc[data-type="${store.formType}"]`).click();
     await expect(page).toHaveURL(/#message$/);
-    await expect(page.getByLabel("Project type")).toHaveValue(store.formType);
+    await expect(radio(page, store.formType)).toBeChecked();
+    await expect(page.locator('fieldset[data-step="0"]')).toBeVisible();
     expect(contact.projectTypes).toContain(store.formType);
   });
 
@@ -175,11 +238,22 @@ test.describe("message form", () => {
     await settle(page);
     for (const p of packages) {
       expect(contact.projectTypes).toContain(p.formType);
-      await page.getByLabel("Project type").selectOption({ index: 0 });
       await page.locator(`#pricing a[data-type="${p.formType}"]`).click();
       await expect(page).toHaveURL(/#message$/);
-      await expect(page.getByLabel("Project type")).toHaveValue(p.formType);
+      await expect(radio(page, p.formType)).toBeChecked();
     }
+  });
+});
+
+test.describe("message form without script", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("shows every step at once and the browser blocks an empty send", async ({ page }) => {
+    await page.goto("/#message");
+    for (const fieldset of await page.locator("fieldset[data-step]").all()) await expect(fieldset).toBeVisible();
+    await expect(page.locator("[data-back]")).toBeHidden();
+    await page.getByRole("button", { name: "Send message" }).click();
+    await expect(page).toHaveURL(/\/#message$/);
   });
 });
 
@@ -248,8 +322,12 @@ test.describe("mobile menu", () => {
 test.describe("utility pages", () => {
   test("thanks page and 404 render and are noindex", async ({ page }) => {
     await page.goto("/contact/thanks/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Message sent");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(contact.success.title);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+    const whatsapp = page.locator(`a[href^="${whatsappUrl}"]`);
+    expect(new URL((await whatsapp.getAttribute("href"))!).searchParams.get("text")).toBe(contact.success.whatsappText());
+    await expect(page.locator(`a[href="${calendlyUrl}"]`)).toHaveAttribute("target", "_blank");
+    await expect(page.locator("body")).not.toContainText("9295092251");
 
     const res = await page.goto("/this-does-not-exist");
     expect(res?.status()).toBe(404);

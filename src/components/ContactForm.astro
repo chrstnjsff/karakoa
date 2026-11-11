@@ -167,16 +167,21 @@ import { TURNSTILE_SITE_KEY, calendlyUrl, contact, whatsappUrl } from "../data/s
   .msg fieldset {
     border: 0;
     padding: 0;
-    margin: 0;
+    margin: 24px 0 0;
     min-inline-size: 0;
   }
-  .msg fieldset:first-of-type {
-    margin-top: 24px;
+  .msg legend:focus-visible {
+    outline-offset: 6px;
+    border-radius: 4px;
   }
-  .msg:not([data-stepped]) fieldset + fieldset {
-    margin-top: 28px;
-    padding-top: 24px;
-    border-top: 1px solid var(--color-line);
+  /* Without script every step shows, divided by a bottom border: a top border would run through the legend. */
+  .msg:not([data-stepped]) fieldset:not(:last-of-type) {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  /* With script, show only step 1 until the script has taken over, so the form does not jump. */
+  .js .msg:not([data-stepped]) fieldset:not(:first-of-type) {
+    display: none;
   }
   .msg .f-opt {
     display: flex;

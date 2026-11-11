@@ -18,10 +18,10 @@ import { SITE, calendlyUrl, contact, whatsappUrl } from "../../data/site";
       <p class="reveal d2 mt-4 max-w-xl text-callout text-muted">{contact.success.textPlain}</p>
       <p class="reveal d2 mt-2 max-w-xl text-callout text-muted">{contact.success.next}</p>
       <div class="reveal d3 mt-8 flex flex-wrap items-center gap-3">
-        <a class="btn-primary" target="_blank" rel="noopener" href={`${whatsappUrl}?text=${encodeURIComponent(contact.success.whatsappText())}`}>
+        <a class="btn-primary w-full sm:w-auto" target="_blank" rel="noopener" href={`${whatsappUrl}?text=${encodeURIComponent(contact.success.whatsappText())}`}>
           {contact.success.whatsapp}<Icon name="arrow" class="size-4" /><span class="sr-only"> {contact.success.whatsappNote}</span>
         </a>
-        <a class="btn-ghost" target="_blank" rel="noopener" href={calendlyUrl}>
+        <a class="btn-ghost w-full sm:w-auto" target="_blank" rel="noopener" href={calendlyUrl}>
           <Icon name="calendar" class="size-4" />{contact.success.call}<span class="sr-only"> {contact.success.callNote}</span>
         </a>
         <a href="/" class="btn-link min-h-11">Back to home</a>

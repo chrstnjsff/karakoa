@@ -2,7 +2,7 @@
 // Posts to the Worker at /api/contact (worker/index.ts). Without script the
 // form still posts and the Worker answers with a page.
 import Icon from "./Icon.astro";
-import { TURNSTILE_SITE_KEY, contact } from "../data/site";
+import { TURNSTILE_SITE_KEY, calendlyUrl, contact, whatsappUrl } from "../data/site";
 ---
 
 <div id="message" class="scroll-mt-24">
@@ -21,82 +21,96 @@ import { TURNSTILE_SITE_KEY, contact } from "../data/site";
     <h3 id="msg-title" class="text-[22px] font-semibold tracking-[-0.01em]">{contact.formTitle}</h3>
     <p class="mt-1.5 text-[15px] text-muted">{contact.formLede}</p>
 
-    <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-      <div>
-        <label for="msg-name" class="f-label">Name</label>
-        <input id="msg-name" name="name" type="text" autocomplete="name" required maxlength="100" class="f-in" aria-describedby="msg-name-error" />
-        <p id="msg-name-error" class="f-err" hidden></p>
-      </div>
-      <div>
-        <label for="msg-email" class="f-label">Email</label>
-        <input
-          id="msg-email"
-          name="email"
-          type="email"
-          autocomplete="email"
-          inputmode="email"
-          spellcheck="false"
-          required
-          maxlength="254"
-          class="f-in"
-          aria-describedby="msg-email-error"
-        />
-        <p id="msg-email-error" class="f-err" hidden></p>
-      </div>
-    </div>
+    {
+      [
+        { id: "msg-service", name: "service", copy: contact.need, options: contact.projectTypes },
+        { id: "msg-timeline", name: "timeline", copy: contact.start, options: contact.timelines },
+      ].map((step, i) => (
+        <fieldset id={step.id} data-step={i} data-name={step.name} aria-describedby={`${step.id}-hint ${step.id}-error`}>
+          <legend tabindex="-1" class="outline-none">
+            <span class="block text-[13px] font-medium text-muted">{contact.stepOf(i + 1, 3)}</span>
+            <span class="mt-1 block text-[17px] font-semibold leading-snug text-navy">{step.copy.legend}</span>
+          </legend>
+          <p id={`${step.id}-hint`} class="mt-1 text-[14px] text-muted">{step.copy.hint}</p>
+          <p id={`${step.id}-error`} class="f-err" hidden />
+          <div class="mt-4 grid gap-2 sm:grid-cols-2">
+            {step.options.map((opt) => (
+              <label class="f-opt">
+                <input type="radio" name={step.name} value={opt} required />
+                <span>{opt}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))
+    }
 
-    <div class="mt-5">
-      <label for="msg-type" class="f-label">Project type</label>
-      <div class="relative">
-        <select id="msg-type" name="service" required class="f-in" aria-describedby="msg-type-error">
-          <option value="">Choose one</option>
-          {contact.projectTypes.map((t) => <option>{t}</option>)}
-        </select>
-        <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
+    <fieldset data-step="2">
+      <legend tabindex="-1" class="outline-none">
+        <span class="block text-[13px] font-medium text-muted">{contact.stepOf(3, 3)}</span>
+        <span class="mt-1 block text-[17px] font-semibold leading-snug text-navy">{contact.details.legend}</span>
+      </legend>
+      <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label for="msg-name" class="f-label">Name</label>
+          <input id="msg-name" name="name" type="text" autocomplete="name" required maxlength="100" class="f-in" aria-describedby="msg-name-error" />
+          <p id="msg-name-error" class="f-err" hidden></p>
+        </div>
+        <div>
+          <label for="msg-email" class="f-label">Email</label>
+          <input
+            id="msg-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            spellcheck="false"
+            required
+            maxlength="254"
+            class="f-in"
+            aria-describedby="msg-email-error"
+          />
+          <p id="msg-email-error" class="f-err" hidden></p>
+        </div>
       </div>
-      <p id="msg-type-error" class="f-err" hidden></p>
-    </div>
 
-    <div class="mt-5">
-      <label for="msg-body" class="f-label">Message</label>
-      <textarea
-        id="msg-body"
-        name="message"
-        rows="5"
-        required
-        minlength="10"
-        maxlength="5000"
-        class="f-in"
-        placeholder={contact.messagePlaceholder}
-        aria-describedby="msg-body-error"></textarea>
-      <p id="msg-body-error" class="f-err" hidden></p>
-    </div>
+      <div class="mt-5">
+        <label for="msg-body" class="f-label">{contact.details.notes} <span class="font-normal text-muted">{contact.details.optional}</span></label>
+        <p id="msg-body-hint" class="-mt-1 mb-2 text-[14px] text-muted">{contact.details.notesHint}</p>
+        <textarea id="msg-body" name="message" rows="3" maxlength="5000" class="f-in" aria-describedby="msg-body-hint msg-body-error"></textarea>
+        <p id="msg-body-error" class="f-err" hidden></p>
+      </div>
+    </fieldset>
 
     <!-- Turnstile stays invisible unless Cloudflare needs the visitor to click -->
     <div class="mt-5 empty:hidden" data-turnstile></div>
 
     <div class="f-alert" role="alert" data-alert></div>
 
-    <div class="mt-6 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <p id="msg-privacy" class="text-[13px] leading-snug text-muted">
-        {contact.privacy} <a href="/privacy/" class="text-navy underline underline-offset-2">Privacy</a>
-      </p>
-      <button type="submit" class="btn-primary shrink-0" data-submit>
-        <Icon name="mail" class="size-4" /><span data-label>Send message</span>
-      </button>
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button type="button" class="btn-ghost px-4" hidden data-back>{contact.back}</button>
+      <button type="submit" class="btn-primary ml-auto" data-submit><span data-label>{contact.send}</span></button>
     </div>
+    <p id="msg-privacy" class="mt-4 text-[13px] leading-snug text-muted">
+      {contact.privacy} <a href="/privacy/" class="text-navy underline underline-offset-2">Privacy</a>
+    </p>
     <p class="sr-only" role="status" aria-live="polite" data-status></p>
   </form>
 
   <div class="msg rounded-xl bg-paper p-5 sm:p-7" hidden data-success>
     <span class="inline-grid size-9 place-items-center rounded-full bg-[#dcf3ef] text-[#13665b]"><Icon name="check" class="size-4" /></span>
-    <h3 tabindex="-1" class="mt-4 text-[22px] font-semibold tracking-[-0.01em] outline-none" data-success-heading>Message sent</h3>
-    <p class="mt-2 text-[15px] leading-relaxed" data-success-text>
-      Thanks for reaching out. We reply to the email address you gave within one working day.
-    </p>
-    <button type="button" class="btn-ghost mt-6" data-send-another>Send another message</button>
+    <h3 tabindex="-1" class="mt-4 text-[22px] font-semibold tracking-[-0.01em] outline-none" data-success-heading>{contact.success.title}</h3>
+    <p class="mt-2 text-[15px] leading-relaxed" data-success-text>{contact.success.textPlain}</p>
+    <p class="mt-4 text-[15px] text-muted">{contact.success.next}</p>
+    <div class="mt-5 grid gap-3">
+      <a data-whatsapp class="btn-primary" target="_blank" rel="noopener" href={`${whatsappUrl}?text=${encodeURIComponent(contact.success.whatsappText())}`}>
+        {contact.success.whatsapp}<Icon name="arrow" class="size-4" /><span class="sr-only"> {contact.success.whatsappNote}</span>
+      </a>
+      <a data-call class="btn-ghost" target="_blank" rel="noopener" href={calendlyUrl}>
+        <Icon name="calendar" class="size-4" />{contact.success.call}<span class="sr-only"> {contact.success.callNote}</span>
+      </a>
+    </div>
+    <button type="button" data-send-another class="mt-5 min-h-11 text-[14px] text-muted underline underline-offset-4">{contact.success.another}</button>
   </div>
 </div>
 
@@ -129,22 +143,10 @@ import { TURNSTILE_SITE_KEY, contact } from "../data/site";
   }
   .msg textarea.f-in {
     height: auto;
-    min-height: 128px;
+    min-height: 96px;
     padding: 10px 12px;
     line-height: 1.5;
     resize: vertical;
-  }
-  .msg select.f-in {
-    appearance: none;
-    padding-right: 38px;
-    text-overflow: ellipsis;
-    cursor: pointer;
-  }
-  .msg select.f-in:invalid {
-    color: #6b747c;
-  }
-  .msg .f-in::placeholder {
-    color: #6b747c;
   }
   .msg .f-in:hover {
     border-color: #bfb6a8;
@@ -161,6 +163,56 @@ import { TURNSTILE_SITE_KEY, contact } from "../data/site";
     margin-top: 6px;
     font-size: 13px;
     color: var(--color-coral-700);
+  }
+  .msg fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+  }
+  .msg fieldset:first-of-type {
+    margin-top: 24px;
+  }
+  .msg:not([data-stepped]) fieldset + fieldset {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-line);
+  }
+  .msg .f-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 1px solid #d9d2c6;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-navy);
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .msg .f-opt:hover {
+    border-color: #bfb6a8;
+  }
+  .msg .f-opt:has(:checked) {
+    border-color: var(--color-navy);
+    box-shadow: inset 0 0 0 1px var(--color-navy);
+    background: var(--color-wash);
+  }
+  .msg fieldset[data-invalid] .f-opt {
+    border-color: var(--color-coral-700);
+  }
+  .msg .f-opt input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex: none;
+    accent-color: var(--color-navy);
   }
   .msg .f-alert:empty {
     display: none;

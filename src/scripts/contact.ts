@@ -1,31 +1,43 @@
+import { calendlyUrl, contact, whatsappUrl } from "../data/site";
 
 const form = document.querySelector<HTMLFormElement>("form[data-contact]");
 
 if (form) {
-  type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+  type Field = HTMLInputElement | HTMLTextAreaElement;
 
   const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
   const submitLabel = submit.querySelector<HTMLElement>("[data-label]")!;
+  const back = form.querySelector<HTMLButtonElement>("[data-back]")!;
   const alertBox = form.querySelector<HTMLElement>("[data-alert]")!;
   const status = form.querySelector<HTMLElement>("[data-status]")!;
   const success = document.querySelector<HTMLElement>("[data-success]")!;
   const successHeading = success.querySelector<HTMLElement>("[data-success-heading]")!;
   const successText = success.querySelector<HTMLElement>("[data-success-text]")!;
-  const typeField = form.querySelector<HTMLSelectElement>("select[name=service]")!;
+  const waLink = success.querySelector<HTMLAnchorElement>("[data-whatsapp]")!;
+  const callLink = success.querySelector<HTMLAnchorElement>("[data-call]")!;
+  const steps = [...form.querySelectorAll<HTMLFieldSetElement>("fieldset[data-step]")];
+  const last = steps.length - 1;
   // The page's own email link doubles as the fallback in error messages.
   const fallbackEmail = document.querySelector<HTMLAnchorElement>("a[data-contact-email]")?.href;
 
-  const fields = Array.from(form.querySelectorAll<Field>("input[required], select[required], textarea[required]"));
+  // Name and email: the radios are checked per step.
+  const fields = Array.from(form.querySelectorAll<Field>("input[required]:not([type=radio])"));
   const requiredMessages: Record<string, string> = {
     name: "Enter your name.",
     email: "Enter your email address.",
-    service: "Choose a project type.",
-    message: "Write a short message.",
+  };
+  const choiceErrors: Record<string, string> = {
+    service: contact.need.error,
+    timeline: contact.start.error,
   };
 
   // The browser's own bubbles are replaced by inline messages below.
   form.noValidate = true;
+  form.setAttribute("data-stepped", "");
   let sending = false;
+  let step = 0;
+  let pending = 0;
+  let tapped = false;
 
   const turnstile = createTurnstile(form);
   // Load the spam check only when someone is likely to write.
@@ -44,9 +56,6 @@ if (form) {
     const value = field.value.trim();
     if (!value) return requiredMessages[field.name] ?? "This field is required.";
     if (field.type === "email" && field.validity.typeMismatch) return "Enter an email address like name@example.com.";
-    if ("minLength" in field && field.minLength > 0 && value.length < field.minLength) {
-      return `Write at least ${field.minLength} characters.`;
-    }
     return "";
   }
 
@@ -60,12 +69,78 @@ if (form) {
     }
   }
 
+  function showChoiceError(fieldset: HTMLFieldSetElement, message: string) {
+    const error = document.getElementById(`${fieldset.id}-error`)!;
+    fieldset.toggleAttribute("data-invalid", !!message);
+    error.textContent = message;
+    error.hidden = !message;
+  }
+
+  function checkChoice(fieldset: HTMLFieldSetElement): boolean {
+    const chosen = (form!.elements.namedItem(fieldset.dataset.name!) as RadioNodeList).value;
+    showChoiceError(fieldset, chosen ? "" : choiceErrors[fieldset.dataset.name!]);
+    return !!chosen;
+  }
+
+  /** Flags what is wrong on step `i` and returns the control to focus, or null when it is fine. */
+  function stepProblem(i: number): HTMLElement | null {
+    const fieldset = steps[i];
+    if (fieldset.dataset.name) return checkChoice(fieldset) ? null : fieldset.querySelector<HTMLElement>("input");
+    let firstInvalid: Field | null = null;
+    for (const field of fields) {
+      const problem = problemWith(field);
+      showFieldError(field, problem);
+      if (problem && !firstInvalid) firstInvalid = field;
+    }
+    return firstInvalid;
+  }
+
+  function showStep(i: number, focus = true) {
+    step = i;
+    steps.forEach((fieldset, n) => (fieldset.hidden = n !== i));
+    back.hidden = i === 0;
+    submitLabel.textContent = i < last ? contact.next : contact.send;
+    alertBox.replaceChildren();
+    if (focus) steps[i].querySelector<HTMLElement>("legend")!.focus();
+  }
+
+  function next() {
+    const problem = stepProblem(step);
+    if (problem) problem.focus();
+    else showStep(step + 1);
+  }
+
+  showStep(0, false);
+
   // Once a field has been flagged, clear the error as soon as it is fixed.
   for (const field of fields) {
-    field.addEventListener(field instanceof HTMLSelectElement ? "change" : "input", () => {
+    field.addEventListener("input", () => {
       if (field.getAttribute("aria-invalid") === "true") showFieldError(field, problemWith(field));
     });
   }
+
+  // A tap or click on an answer moves on after a beat. The keyboard never
+  // does, so arrow keys can browse the options; Next always works.
+  for (const fieldset of steps.filter((f) => f.dataset.name)) {
+    fieldset.addEventListener("pointerdown", () => (tapped = true));
+    fieldset.addEventListener("keydown", () => (tapped = false));
+    fieldset.addEventListener("click", (event) => {
+      if (!tapped || !(event.target instanceof HTMLInputElement) || event.target.type !== "radio") return;
+      tapped = false;
+      const at = step;
+      pending = window.setTimeout(() => {
+        if (step === at) next();
+      }, 150);
+    });
+    fieldset.addEventListener("change", () => {
+      if (fieldset.hasAttribute("data-invalid")) checkChoice(fieldset);
+    });
+  }
+
+  back.addEventListener("click", () => {
+    clearTimeout(pending);
+    showStep(step - 1);
+  });
 
   const asSentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
 
@@ -86,23 +161,23 @@ if (form) {
     sending = value;
     submit.setAttribute("aria-disabled", String(value));
     submit.toggleAttribute("aria-busy", value);
-    submitLabel.textContent = value ? "Sending…" : "Send message";
+    submitLabel.textContent = value ? "Sending…" : contact.send;
     status.textContent = value ? "Sending your message" : "";
   }
+
+  const stepOf = (control: HTMLElement) => steps.indexOf(control.closest<HTMLFieldSetElement>("fieldset[data-step]")!);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (sending) return;
+    if (step < last) return next();
     alertBox.replaceChildren();
 
-    let firstInvalid: Field | null = null;
-    for (const field of fields) {
-      const problem = problemWith(field);
-      showFieldError(field, problem);
-      if (problem && !firstInvalid) firstInvalid = field;
-    }
-    if (firstInvalid) {
-      firstInvalid.focus();
+    for (let i = 0; i <= last; i++) {
+      const problem = stepProblem(i);
+      if (!problem) continue;
+      showStep(i, false);
+      problem.focus();
       return;
     }
 
@@ -129,21 +204,36 @@ if (form) {
       turnstile.reset();
 
       if (response.ok && result.ok) {
-        successText.textContent = `Thanks, ${name}. Your message is on its way. We reply to ${replyTo} within one working day.`;
+        successText.textContent = contact.success.text(name, replyTo);
+        waLink.href = `${whatsappUrl}?text=${encodeURIComponent(
+          contact.success.whatsappText({ name, service: data.service, timeline: data.timeline }),
+        )}`;
+        callLink.href = `${calendlyUrl}?name=${encodeURIComponent(name)}&email=${encodeURIComponent(replyTo)}`;
         form.reset();
+        showStep(0, false);
         form.hidden = true;
         success.hidden = false;
         successHeading.focus();
       } else {
-        let first: Field | null = null;
-        for (const field of fields) {
-          const problem = result.fields?.[field.name];
-          if (!problem) continue;
-          showFieldError(field, problem);
-          first ??= field;
+        // Send the visitor to the earliest step that holds a refused field.
+        let target: HTMLElement | null = null;
+        for (const [key, message] of Object.entries(result.fields ?? {})) {
+          const control = form.elements.namedItem(key);
+          let focusable: HTMLElement;
+          if (control instanceof RadioNodeList) {
+            const fieldset = form.querySelector<HTMLFieldSetElement>(`fieldset[data-name="${key}"]`)!;
+            showChoiceError(fieldset, message);
+            focusable = fieldset.querySelector<HTMLElement>("input:checked") ?? fieldset.querySelector<HTMLElement>("input")!;
+          } else if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) {
+            showFieldError(control, message);
+            focusable = control;
+          } else continue;
+          if (!target || stepOf(focusable) < stepOf(target)) target = focusable;
         }
-        if (first) first.focus();
-        else showAlert(result.error ? asSentence(result.error) : "Your message could not be sent.");
+        if (target) {
+          showStep(stepOf(target), false);
+          target.focus();
+        } else showAlert(result.error ? asSentence(result.error) : "Your message could not be sent.");
       }
     } catch {
       showAlert("Your message could not be sent. Check your connection and try again.");
@@ -155,7 +245,7 @@ if (form) {
   success.querySelector("[data-send-another]")?.addEventListener("click", () => {
     success.hidden = true;
     form.hidden = false;
-    fields[0]?.focus();
+    showStep(0);
   });
 
   // Focus waits for the smooth scroll to land. Phones skip it so the
@@ -165,13 +255,18 @@ if (form) {
     link.addEventListener("click", () => {
       const type = link.dataset.type;
       if (type && !form.hidden) {
-        typeField.value = type;
-        showFieldError(typeField, "");
+        const radio = form.querySelector<HTMLInputElement>(`input[name=service][value="${CSS.escape(type)}"]`);
+        if (radio) radio.checked = true;
+        showChoiceError(steps[0], "");
+        showStep(0, false);
       }
       if (!window.matchMedia("(pointer: fine)").matches) return;
+      const current = steps[step];
       const target: HTMLElement = form.hidden
         ? success.querySelector<HTMLElement>("[data-send-another]")!
-        : (fields.find((f) => !f.value.trim()) ?? fields[0]);
+        : (current.querySelector<HTMLElement>("input:checked") ??
+          (step === last ? fields.find((f) => !f.value.trim()) : undefined) ??
+          current.querySelector<HTMLElement>("input"))!;
       window.setTimeout(() => target.focus({ preventScroll: true }), reduceMotion ? 0 : 650);
     }),
   );

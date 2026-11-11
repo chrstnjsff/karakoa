@@ -98,6 +98,11 @@ describe("structure", () => {
     site.packages.forEach((p) => p.formType && expect(types, p.id).toContain(p.formType));
   });
 
+  it("keeps radio labels unique across the form steps", () => {
+    const all = [...site.contact.projectTypes, ...site.contact.timelines];
+    expect(new Set(all).size).toBe(all.length);
+  });
+
   it("has one figure per hero proof point and four track record figures", () => {
     expect(site.hero.proof).toHaveLength(3);
     expect(site.stats).toHaveLength(4);
@@ -112,8 +117,12 @@ describe("contact links", () => {
   const byId = (id: site.ChannelId) => site.channels.find((c) => c.id === id)!;
 
   it("publishes no phone number anywhere", () => {
-    const hits = everyString.filter((s) => /(\+63|\b09|\b639)\s?\d{2,3}\s?\d{3}\s?\d{4}/.test(s));
+    const hits = everyString.filter((s) => s !== site.whatsappUrl).filter((s) => /(\+63|\b09|\b639)\s?\d{2,3}\s?\d{3}\s?\d{4}/.test(s));
     expect(hits).toEqual([]);
+  });
+
+  it("links WhatsApp by number only", () => {
+    expect(site.whatsappUrl).toMatch(/^https:\/\/wa\.me\/\d{10,15}$/);
   });
 
   it("uses a public calendly booking url", () => {

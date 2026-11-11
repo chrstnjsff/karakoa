@@ -799,7 +799,8 @@ export const hours = "Mon to Fri, 2:00 PM to 9:00 PM, Philippine time (GMT+8)";
 
 // A channel with an empty value is not rendered. Messenger stays hidden
 // until the Facebook Page exists; set its value and href to show it.
-// No phone number is published anywhere on the site, by the owner's choice.
+// No phone number is shown anywhere on the site, by the owner's choice. The owner's
+// WhatsApp number appears only inside whatsappUrl, as a link target.
 export const channels: Channel[] = [
   {
     id: "email",
@@ -830,15 +831,38 @@ export const channels: Channel[] = [
 
 export const calendlyUrl = channels.find((c) => c.id === "calendly")!.href;
 
+// A link target only: never visible copy, and never in `channels`.
+export const whatsappUrl = "https://wa.me/639295092251";
+
 export const contact = {
   title: "Tell us what you are building.",
-  lede: "Talk it through on a free 30-minute call, or send a message and get a reply within one working day.",
+  lede: "Talk it through on a free 30-minute call, or answer three quick questions and get a reply within one working day.",
   book: "Book a free call",
   callHours: "Mon to Fri, 2 PM to 9 PM, Philippine time",
   replies: "Within one working day, from the founder",
-  formTitle: "Send a message",
-  formLede: "A few lines is enough. We reply by email.",
-  messagePlaceholder: "What you want to build, who it is for, and any deadline.",
+  formTitle: "Get a reply by email",
+  formLede: "Three short steps. Tap your answers, then tell us where to reply.",
+  stepOf: (n: number, total: number) => `Step ${n} of ${total}`,
+  need: { legend: "What do you need?", hint: "Pick one to continue.", error: "Choose a project type." },
+  start: { legend: "When do you want to start?", hint: "Pick one to continue.", error: "Choose when you want to start." },
+  timelines: ["As soon as possible", "In 1 to 3 months", "Later than 3 months", "No date yet"],
+  details: { legend: "Where should we reply?", notes: "Anything else?", optional: "(optional)", notesHint: "A deadline, a link to your current site, or what it should do." },
+  next: "Next",
+  back: "Back",
+  send: "Send message",
+  success: {
+    title: "Message sent",
+    text: (name: string, email: string) => `Thanks, ${name}. We reply to ${email} within one working day.`,
+    textPlain: "Thanks for reaching out. We reply to the email address you gave within one working day.",
+    next: "Want to talk sooner? Message us on WhatsApp or pick a call time. Neither is required.",
+    whatsapp: "Continue on WhatsApp",
+    whatsappNote: "(opens WhatsApp)",
+    call: "Book a 30-minute call",
+    callNote: "(opens Calendly in a new tab)",
+    another: "Send another message",
+    whatsappText: (a?: { name: string; service: string; timeline: string }) =>
+      ["Hi Karakoa, I just sent the form on karakoa.dev.", ...(a ? [`Name: ${a.name}`, `Need: ${a.service}`, `Start: ${a.timeline}`] : [])].join("\n"),
+  },
   /** Options of the required project type field; cards and packages pick from these. */
   projectTypes: [
     "Website",

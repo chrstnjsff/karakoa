@@ -4,6 +4,7 @@ export interface Inquiry {
   name: string;
   email: string;
   service: string;
+  timeline: string;
   message: string;
 }
 
@@ -20,6 +21,7 @@ export function validate(input: Record<string, unknown>): { inquiry: Inquiry } |
     name: text(input.name),
     email: text(input.email),
     service: text(input.service),
+    timeline: text(input.timeline),
     message: text(input.message),
   };
   const errors: FieldErrors = {};
@@ -30,11 +32,11 @@ export function validate(input: Record<string, unknown>): { inquiry: Inquiry } |
   if (!inquiry.email) errors.email = "Enter your email address.";
   else if (inquiry.email.length > 254 || !EMAIL.test(inquiry.email)) errors.email = "Enter an email address like name@example.com.";
 
-  if (!contact.projectTypes.includes(inquiry.service)) errors.service = "Choose a project type.";
+  if (!contact.projectTypes.includes(inquiry.service)) errors.service = contact.need.error;
 
-  if (!inquiry.message) errors.message = "Write a short message.";
-  else if (inquiry.message.length < 10) errors.message = "Write at least 10 characters.";
-  else if (inquiry.message.length > 5000) errors.message = "Keep the message under 5,000 characters.";
+  if (!contact.timelines.includes(inquiry.timeline)) errors.timeline = contact.start.error;
+
+  if (inquiry.message.length > 5000) errors.message = "Keep the message under 5,000 characters.";
 
   return Object.keys(errors).length ? { errors } : { inquiry };
 }
@@ -47,17 +49,17 @@ const manila = new Intl.DateTimeFormat("en-US", {
 
 export function notification(inquiry: Inquiry, received: Date) {
   return {
-    subject: `[Karakoa] ${inquiry.service}: ${inquiry.name}`,
+    subject: `[Karakoa] ${inquiry.service}, ${inquiry.timeline}: ${inquiry.name}`,
     text: [
       "New message from the karakoa.dev contact form.",
       "",
       `Name: ${inquiry.name}`,
       `Email: ${inquiry.email}`,
       `Project type: ${inquiry.service}`,
+      `Start: ${inquiry.timeline}`,
       `Received: ${manila.format(received)} Manila time (${received.toISOString()})`,
       "",
-      "Message:",
-      inquiry.message,
+      ...(inquiry.message ? ["Notes:", inquiry.message] : ["Notes: none"]),
       "",
       `Reply to this email to answer ${inquiry.name} directly.`,
     ].join("\n"),

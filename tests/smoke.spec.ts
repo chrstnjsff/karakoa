@@ -81,6 +81,8 @@ const radio = (page: Page, name: string) => page.getByRole("radio", { name, exac
 async function fillForm(page: Page, type = "Website", timeline = "In 1 to 3 months") {
   await radio(page, type).click();
   await expect(legendOf(page, contact.start.legend)).toBeFocused();
+  // A tap just after a step change is ignored as a double tap.
+  await page.waitForTimeout(450);
   await radio(page, timeline).click();
   await expect(legendOf(page, contact.details.legend)).toBeFocused();
   await page.getByLabel("Name", { exact: true }).fill("Test Person");
@@ -194,6 +196,37 @@ test.describe("message form", () => {
     await expect(page.locator("#msg-timeline-error")).toHaveText(contact.start.error);
     await expect(page.locator('fieldset[data-step="1"]')).toBeVisible();
     await expect(radio(page, "In 1 to 3 months")).toBeFocused();
+    await expect(page.getByRole("button", { name: "Next" })).toBeVisible();
+  });
+
+  test("a second tap right after a step change does not answer the next step", async ({ page }) => {
+    await page.goto("/#message");
+    await settle(page);
+    // Both taps run inside the page, 250 ms apart, so a slow test runner cannot stretch the gap.
+    await page.evaluate(async (timeline) => {
+      const tap = (value: string) => {
+        const input = document.querySelector<HTMLInputElement>(`input[value="${value}"]`)!;
+        input.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+        input.click();
+      };
+      tap("Website");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      tap(timeline);
+    }, contact.timelines[0]);
+    await expect(legendOf(page, contact.start.legend)).toBeFocused();
+    await expect(radio(page, contact.timelines[0])).not.toBeChecked();
+    await expect(page.locator('fieldset[data-step="1"]')).toBeVisible();
+
+    await page.waitForTimeout(450);
+    await radio(page, contact.timelines[0]).click();
+    await expect(legendOf(page, contact.details.legend)).toBeFocused();
+  });
+
+  test("every step shows, and Send works, if the form script does not load", async ({ page }) => {
+    await page.route("**/_astro/ContactForm*.js", (route) => route.abort());
+    await page.goto("/#message");
+    for (const fieldset of await page.locator("fieldset[data-step]").all()) await expect(fieldset).toBeVisible();
+    await expect(page.getByRole("button", { name: "Send message" })).toBeVisible();
   });
 
   test("a failed send explains itself and offers the email address", async ({ page }) => {

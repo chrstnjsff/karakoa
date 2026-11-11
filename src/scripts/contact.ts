@@ -38,6 +38,7 @@ if (form) {
   let step = 0;
   let pending = 0;
   let tapped = false;
+  let changedAt = -Infinity;
 
   const turnstile = createTurnstile(form);
   // Load the spam check only when someone is likely to write.
@@ -96,6 +97,7 @@ if (form) {
   }
 
   function showStep(i: number, focus = true) {
+    if (i !== step) changedAt = performance.now();
     step = i;
     steps.forEach((fieldset, n) => (fieldset.hidden = n !== i));
     back.hidden = i === 0;
@@ -127,6 +129,8 @@ if (form) {
     fieldset.addEventListener("click", (event) => {
       if (!tapped || !(event.target instanceof HTMLInputElement) || event.target.type !== "radio") return;
       tapped = false;
+      // The next step has the same layout, so a second tap meant for the last step lands on a tile here.
+      if (performance.now() - changedAt < 400) return event.preventDefault();
       const at = step;
       pending = window.setTimeout(() => {
         if (step === at) next();
@@ -161,7 +165,7 @@ if (form) {
     sending = value;
     submit.setAttribute("aria-disabled", String(value));
     submit.toggleAttribute("aria-busy", value);
-    submitLabel.textContent = value ? "Sending…" : contact.send;
+    submitLabel.textContent = value ? "Sending…" : step < last ? contact.next : contact.send;
     status.textContent = value ? "Sending your message" : "";
   }
 
